@@ -1,0 +1,61 @@
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web;
+using System.Web.UI;
+
+namespace YieldTrackingSystem
+{
+    public partial class LoginPage : Page
+    {
+        string connectionstring = System.Configuration.ConfigurationManager
+            .ConnectionStrings["DefaultConnectionString"].ToString();
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // If already logged in, redirect
+            if (Session["EmployeeId"] != null)
+                Response.Redirect("HomePage.aspx");
+        }
+
+        protected void btnLogin_Click(object sender, EventArgs e)
+{
+    string employeeId = txtEmployeeId.Text.Trim();
+    string password = txtPassword.Text.Trim();
+
+    if (string.IsNullOrWhiteSpace(employeeId) || string.IsNullOrWhiteSpace(password))
+    {
+        ShowError("Please enter Employee ID and Password.");
+        return;
+    }
+
+    // ✅ STATIC LOGIN LOGIC
+    if (employeeId == "admin" && password == "1234")
+    {
+        Session["EmployeeId"] = "admin";
+        Session["EmployeeName"] = "Administrator";
+        Session["Role"] = "Admin";
+
+        Response.Redirect("HomePage.aspx", false);
+    }
+    else if (employeeId == "user1" && password == "1111")
+    {
+        Session["EmployeeId"] = "user1";
+        Session["EmployeeName"] = "Normal User";
+        Session["Role"] = "User";
+
+        Response.Redirect("HomePage.aspx", false);
+    }
+    else
+    {
+        ShowError("Invalid Employee ID or Password.");
+    }
+}
+
+        private void ShowError(string message)
+        {
+            lblError.Text    = $"<span>⚠</span><span>{message}</span>";
+            lblError.Visible = true;
+        }
+    }
+}

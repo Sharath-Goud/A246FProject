@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A246F CTP Parameters</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .form-card {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 0.5px solid rgba(167,139,250,.2);
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+        }
+
+        input, select {
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+        }
+
+            select option {
+                background: #1a1040;
+            }
+
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
+        /* BUTTON */
+        .btn-search {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* TABLE */
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            background: rgba(167,139,250,.08);
+            padding: 12px;
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+        }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 16px;
+        }
+
+        @@media (max-width: 900px) {
+            .form-row
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        .header-row {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="form-card">
+        <div class="form-card-header">A246F CTP Parameter</div>
+
+        <div class="form-body">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Line</label>
+                    <select>
+                        <option>-- Select Line --</option>
+                        <option>Line 1</option>
+                        <option>Line 2</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Project</label>
+                    <select>
+                        <option>-- Select Project --</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Model</label>
+                    <select>
+                        <option>-- Select Model --</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Part</label>
+                    <select>
+                        <option>-- Select Part --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Machine</label>
+                    <select>
+                        <option>-- Select Machine --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Line Leader</label>
+                    <input type="text" placeholder="Production Line Leader">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Checked By</label>
+                    <input type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Approved By</label>
+                    <input type="text">
+                </div>
+
+                <div class="form-group" style="justify-content:flex-end;">
+                    <button class="btn-search">Search</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="results-table">
+        <div class="header-row">
+            <div>Station No</div>
+            <div>Station Name</div>
+            <div>Equipment Name/Model</div>
+            <div>Parameter items</div>
+            <div>Unit</div>
+            <div>LSL</div>
+            <div>USL</div>
+            <div>Value</div>
+            <div>Action</div>
+        </div>
+
+        <div class="empty">
+            No records found. Use search to load data.
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn-submit">Submit</button>
+    </div>
+
+</body>
+</html>

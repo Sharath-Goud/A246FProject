@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .dashboard-container {
+        padding: 40px 20px;
+    }
+
+    .dashboard-title {
+        font-size: 56px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+        .dashboard-title span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: titleReveal .8s ease forwards;
+        }
+
+            .dashboard-title span:nth-child(1) {
+                animation-delay: .3s;
+            }
+
+            .dashboard-title span:nth-child(2) {
+                animation-delay: .8s;
+            }
+
+    .welcome-text {
+        font-size: 28px;
+        color: #fff;
+    }
+
+        .welcome-text span {
+            display: inline-block;
+            opacity: 0;
+            margin-right: 8px;
+            transform: translateY(20px);
+            animation: wordReveal .6s ease forwards;
+        }
+
+            .welcome-text span:nth-child(1) {
+                animation-delay: 1.3s;
+            }
+
+            .welcome-text span:nth-child(2) {
+                animation-delay: 1.8s;
+            }
+
+            .welcome-text span:nth-child(3) {
+                animation-delay: 2.3s;
+            }
+
+    @@keyframes titleReveal {
+
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes wordReveal {
+
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+
+    <h1 class="dashboard-title">
+        <span>A246F</span><span> Dashboard</span>
+    </h1>
+
+    <div class="welcome-text">
+        <span>Welcome</span>
+        <span>back,</span>
+        <span>Admin</span>
+    </div>
+
+</div>
+

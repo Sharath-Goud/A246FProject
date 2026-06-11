@@ -1,0 +1,439 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Inspection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 0.5px solid rgba(167,139,250,.2);
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+            transition: border-color .2s, background .2s;
+        }
+
+            select option {
+                background: #1a1040;
+            }
+
+            input::placeholder {
+                color: rgba(255,255,255,.25);
+            }
+
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
+        /* BUTTONS */
+        .btn-search {
+            background: linear-gradient(135deg, #34d399, #059669);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: Poppins, sans-serif;
+            font-weight: 500;
+            transition: opacity .2s;
+        }
+
+            .btn-search:hover {
+                opacity: .85;
+            }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 32px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: Poppins, sans-serif;
+            font-weight: 500;
+            transition: opacity .2s;
+        }
+
+            .btn-submit:hover {
+                opacity: .85;
+            }
+
+        /* NOTE BOX */
+        .note-box {
+            background: rgba(255,255,255,.03);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+
+            .note-box span {
+                font-size: 12px;
+                font-weight: 600;
+                color: #f87171;
+                line-height: 1.8;
+            }
+
+        /* TABLE */
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: 160px 1fr 1fr 120px 120px 180px 120px;
+            background: rgba(167,139,250,.08);
+            padding: 12px 16px;
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            gap: 10px;
+        }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 160px 1fr 1fr 120px 120px 180px 120px;
+            padding: 10px 16px;
+            font-size: 13px;
+            border-top: 0.5px solid rgba(255,255,255,.05);
+            gap: 10px;
+            align-items: center;
+            transition: background .15s;
+        }
+
+            .data-row:hover {
+                background: rgba(255,255,255,.03);
+            }
+
+            .data-row input, .data-row select {
+                padding: 6px 10px;
+                font-size: 12px;
+                width: 100%;
+            }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 4px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* STATUS BADGES */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-ok {
+            background: rgba(52,211,153,.15);
+            color: #34d399;
+            border: 0.5px solid rgba(52,211,153,.3);
+        }
+
+        .badge-ng {
+            background: rgba(248,113,113,.15);
+            color: #f87171;
+            border: 0.5px solid rgba(248,113,113,.3);
+        }
+
+        .badge-na {
+            background: rgba(148,163,184,.15);
+            color: #94a3b8;
+            border: 0.5px solid rgba(148,163,184,.3);
+        }
+
+        @@media (max-width: 900px) {
+            .form-row, .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .header-row, .data-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Visual Inspection</h1>
+
+    <!-- SEARCH FORM CARD -->
+    <div class="form-card">
+        <div class="form-card-header">Search Criteria</div>
+        <div class="form-body">
+
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Line</label>
+                    <select id="ddlLine">
+                        <option value="">-- Select Line --</option>
+                        <option>Line 1</option>
+                        <option>Line 2</option>
+                        <option>Line 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Project</label>
+                    <select id="ddlProject">
+                        <option value="">-- Select Project --</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="ddlModel">
+                        <option value="">-- Select Model --</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Inspection</label>
+                    <select id="ddlPart">
+                        <option value="">-- Select Inspection --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Production Line Leader</label>
+                    <input type="text" id="txtLineLeader" placeholder="Production Line Leader" />
+                </div>
+                <div class="form-group">
+                    <label>Checked By</label>
+                    <input type="text" id="txtCheckedBy" placeholder="Checked By" />
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Approved By</label>
+                    <input type="text" id="txtApprovedBy" placeholder="Approved By" />
+                </div>
+                <div class="form-group" style="display:flex; justify-content:flex-end;">
+                    <label style="visibility:hidden;">Search</label>
+                    <button class="btn-search" onclick="loadData()">
+                        Search
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NOTE BOX -->
+    <div class="note-box">
+        <span>NOTE:-</span>
+        <span>N - NA</span>
+        <span>, V - OK</span>
+        <span>, X - NG</span>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <div class="results-table">
+        <div class="header-row">
+            <div>SNO</div>
+            <div>Station Name</div>
+            <div>Inspection Project</div>
+            <div>Sample Size</div>
+            <div>Inspection Specifaction</div>
+            <div>Result</div>
+            <div>Defective Number</div>
+            <div>Save</div>
+        </div>
+        <div id="tableBody">
+            <div class="empty">No records found. Use Search to load data.</div>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+        <button class="btn-submit" onclick="submitData()">Submit</button>
+    </div>
+
+    <script>
+        // Sample data — replace with real API/controller call
+        const sampleData = [
+            { station: "Station 01", item: "Dimension Check",    criteria: "± 0.05 mm",         status: "V-OK", result: "",  ngDesc: "" },
+            { station: "Station 01", item: "Surface Finish",     criteria: "Ra ≤ 1.6 μm",        status: "V-OK", result: "",  ngDesc: "" },
+            { station: "Station 02", item: "Hole Diameter",      criteria: "Ø 5.00 ± 0.02 mm",   status: "X-NG", result: "",  ngDesc: "" },
+            { station: "Station 02", item: "Thread Check",       criteria: "M6 × 1.0",            status: "N-NA", result: "",  ngDesc: "" },
+            { station: "Station 03", item: "Visual Inspection",  criteria: "No scratch/dent",     status: "V-OK", result: "",  ngDesc: "" },
+            { station: "Station 03", item: "Torque Check",       criteria: "5 Nm ± 0.5",          status: "V-OK", result: "",  ngDesc: "" },
+            { station: "Station 04", item: "Label Placement",    criteria: "As per drawing",      status: "N-NA", result: "",  ngDesc: "" },
+        ];
+
+        function getBadge(status) {
+            if (status === "V-OK") return `<span class="badge badge-ok">V-OK</span>`;
+            if (status === "X-NG") return `<span class="badge badge-ng">X-NG</span>`;
+            return `<span class="badge badge-na">N-NA</span>`;
+        }
+
+        function loadData() {
+            const line = document.getElementById('ddlLine').value;
+            const project = document.getElementById('ddlProject').value;
+
+            if (!line || !project) {
+                alert("Please select Line and Project.");
+                return;
+            }
+
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+
+            sampleData.forEach((row, i) => {
+                const div = document.createElement('div');
+                div.className = 'data-row';
+                div.innerHTML = `
+                    <div>${row.station}</div>
+                    <div>${row.item}</div>
+                    <div>${row.criteria}</div>
+                    <div>${getBadge(row.status)}</div>
+                    <div>
+                        <select onchange="sampleData[${i}].result = this.value">
+                            <option value="">Select</option>
+                            <option value="N-NA"  ${row.result==='N-NA'?'selected':''}>N - NA</option>
+                            <option value="V-OK"  ${row.result==='V-OK'?'selected':''}>V - OK</option>
+                            <option value="X-NG"  ${row.result==='X-NG'?'selected':''}>X - NG</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" placeholder="NG description..."
+                               value="${row.ngDesc}"
+                               oninput="sampleData[${i}].ngDesc = this.value" />
+                    </div>
+                    <div>
+                        <button class="btn-search" style="padding:5px 12px;font-size:11px;"
+                                onclick="saveRow(${i})">Save</button>
+                    </div>
+                `;
+                body.appendChild(div);
+            });
+        }
+
+        function saveRow(i) {
+            const row = sampleData[i];
+            if (!row.result) {
+                alert(`Please select a Result for: ${row.item}`);
+                return;
+            }
+            alert(`Saved: ${row.station} — ${row.item}\nResult: ${row.result}`);
+        }
+
+        function submitData() {
+            const body = document.getElementById('tableBody');
+            if (body.querySelector('.empty')) {
+                alert("No data loaded. Please search first.");
+                return;
+            }
+            const incomplete = sampleData.filter(r => !r.result);
+            if (incomplete.length > 0) {
+                alert(`Please fill Result for all ${incomplete.length} pending row(s).`);
+                return;
+            }
+            alert("All inspection records submitted successfully!");
+        }
+    </script>
+</body>
+</html>

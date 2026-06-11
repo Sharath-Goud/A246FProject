@@ -1,0 +1,490 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Article Dimensions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .form-card {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 0.5px solid rgba(167,139,250,.2);
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+            transition: border-color .2s, background .2s;
+        }
+
+            select option {
+                background: #1a1040;
+            }
+
+            input::placeholder {
+                color: rgba(255,255,255,.25);
+            }
+
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
+        .btn-search {
+            background: linear-gradient(135deg, #34d399, #059669);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: Poppins, sans-serif;
+            font-weight: 500;
+            transition: opacity .2s;
+        }
+
+            .btn-search:hover {
+                opacity: .85;
+            }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 32px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: Poppins, sans-serif;
+            font-weight: 500;
+            transition: opacity .2s;
+        }
+
+            .btn-submit:hover {
+                opacity: .85;
+            }
+
+        /* TABLE */
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        /* Scrollable table wrapper */
+        .table-scroll {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+            font-size: 12px;
+        }
+
+        thead tr {
+            background: rgba(167,139,250,.08);
+        }
+
+        thead th {
+            padding: 12px 10px;
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(255,255,255,.08);
+            white-space: nowrap;
+        }
+
+        /* Group header */
+        thead tr.group-header th {
+            background: rgba(96,165,250,.08);
+            color: rgba(96,165,250,.8);
+            font-size: 11px;
+            padding: 8px 10px;
+            border-bottom: 0.5px solid rgba(96,165,250,.15);
+        }
+
+        tbody tr {
+            border-top: 0.5px solid rgba(255,255,255,.05);
+            transition: background .15s;
+        }
+
+            tbody tr:hover {
+                background: rgba(255,255,255,.03);
+            }
+
+        tbody td {
+            padding: 8px 10px;
+            text-align: center;
+            color: #e2e8f0;
+            vertical-align: middle;
+        }
+
+            tbody td:first-child {
+                text-align: left;
+                color: rgba(255,255,255,.75);
+                font-weight: 500;
+            }
+
+            tbody td input {
+                width: 72px;
+                padding: 5px 8px;
+                font-size: 12px;
+                text-align: center;
+                background: rgba(255,255,255,.06);
+                border: 0.5px solid rgba(255,255,255,.12);
+                border-radius: 6px;
+                color: #fff;
+            }
+
+                tbody td input:focus {
+                    border-color: rgba(167,139,250,.5);
+                    background: rgba(167,139,250,.08);
+                    outline: none;
+                }
+
+        .spec-cell {
+            color: rgba(167,139,250,.9);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 4px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Result color coding */
+        .ok {
+            color: #34d399;
+        }
+
+        .ng {
+            color: #f87171;
+        }
+
+        @@media (max-width: 900px) {
+            .form-row
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <h1>First Article Dimensions</h1>
+    <p class="sub">Dimensional Inspection Record</p>
+
+    <!-- SEARCH FORM -->
+    <div class="form-card">
+        <div class="form-card-header">Search Criteria</div>
+        <div class="form-body">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Line</label>
+                    <select id="ddlLine">
+                        <option value="">-- Select Line --</option>
+                        <option>Line 1</option>
+                        <option>Line 2</option>
+                        <option>Line 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Project</label>
+                    <select id="ddlProject">
+                        <option value="">-- Select Project --</option>
+                        <option>A246F</option>
+                        <option>B312G</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="ddlModel">
+                        <option value="">-- Select Model --</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Part</label>
+                    <select id="ddlPart">
+                        <option value="">-- Select Part --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Production Line Leader</label>
+                    <input type="text" id="txtLineLeader" placeholder="Production Line Leader" />
+                </div>
+                <div class="form-group">
+                    <label>Checked By</label>
+                    <input type="text" id="txtCheckedBy" placeholder="Checked By" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Approved By</label>
+                    <input type="text" id="txtApprovedBy" placeholder="Approved By" />
+                </div>
+                <div class="form-group">
+                    <label>Work Order</label>
+                    <input type="text" id="txtWorkOrder" placeholder="Work Order" />
+                </div>
+                <div class="form-group">
+                    <label>Drawing Version</label>
+                    <input type="text" id="txtDrawingVersion" placeholder="Drawing Version" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Pack Version</label>
+                    <input type="text" id="txtPackVersion" placeholder="Pack Version" />
+                </div>
+                <div class="form-group">
+                    <label>Sampling Quantity</label>
+                    <input type="number" id="txtSamplingQty" placeholder="Sampling Quantity" />
+                </div>
+                <div class="form-group" style="justify-content:flex-end;">
+                    <button class="btn-search" onclick="loadData()">Search</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <div class="results-table">
+        <div class="table-scroll">
+            <table id="dimTable">
+                <thead>
+                    <tr>
+                        <th>Inspection Location</th>
+                        <th>Spec</th>
+                        <th>Check1</th>
+                        <th>SerialNo1</th>
+                        <th>Check2</th>
+                        <th>SerialNo2</th>
+                        <th>Check3</th>
+                        <th>SerialNo3</th>
+                        <th>Check4</th>
+                        <th>SerialNo4</th>
+                        <th>Check5</th>
+                        <th>SerialNo5</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="13" class="empty">No records found. Use Search to load data.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+        <button class="btn-submit" onclick="submitData()">Submit</button>
+    </div>
+
+    <script>
+        // Sample dimension data — replace with real API call
+        const dimData = [
+            { location: "Hole Diameter A",    spec: "Ø 5.00 ± 0.02" },
+            { location: "Hole Diameter B",    spec: "Ø 8.00 ± 0.05" },
+            { location: "Length Overall",     spec: "120.00 ± 0.10" },
+            { location: "Width",              spec: "45.00 ± 0.05"  },
+            { location: "Height",             spec: "30.00 ± 0.05"  },
+            { location: "Thread Depth",       spec: "M6 × 1.0"      },
+            { location: "Radius Corner",      spec: "R 2.0 ± 0.2"   },
+            { location: "Flatness",           spec: "≤ 0.05 mm"     },
+            { location: "Perpendicularity",   spec: "≤ 0.08 mm"     },
+            { location: "Surface Roughness",  spec: "Ra ≤ 1.6 μm"   },
+        ];
+
+        const serials = 5;
+
+        function loadData() {
+            const line    = document.getElementById('ddlLine').value;
+            const project = document.getElementById('ddlProject').value;
+
+            if (!line || !project) {
+                alert("Please select Line and Project.");
+                return;
+            }
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            dimData.forEach((row, i) => {
+                const tr = document.createElement('tr');
+
+                let cells = `
+                    <td>${row.location}</td>
+                    <td class="spec-cell">${row.spec}</td>
+                `;
+
+                for (let s = 1; s <= serials; s++) {
+                    cells += `
+                        <td>
+                            <select onchange="evalResult(${i},${s},'check',this.value)"
+                                    id="chk_${i}_${s}" style="width:72px;padding:5px 6px;font-size:11px;">
+                                <option value="">-</option>
+                                <option value="OK">OK</option>
+                                <option value="NG">NG</option>
+                                <option value="NA">NA</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" id="ser_${i}_${s}"
+                                   placeholder="0.00"
+                                   oninput="evalResult(${i},${s},'serial',this.value)" />
+                        </td>
+                    `;
+                }
+
+                cells += `
+                    <td>
+                        <button class="btn-search"
+                                style="padding:5px 12px;font-size:11px;"
+                                onclick="saveRow(${i})">Save</button>
+                    </td>
+                `;
+
+                tr.innerHTML = cells;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function evalResult(rowIdx, serial, type, value) {
+            const chkEl = document.getElementById(`chk_${rowIdx}_${serial}`);
+            if (type === 'serial' && chkEl) {
+                const num = parseFloat(value);
+                if (!isNaN(num)) {
+                    chkEl.style.color = '#34d399';
+                }
+            }
+            if (type === 'check') {
+                chkEl.style.color =
+                    value === 'OK' ? '#34d399' :
+                    value === 'NG' ? '#f87171' : '#94a3b8';
+            }
+        }
+
+        function saveRow(i) {
+            const row = dimData[i];
+            let allFilled = true;
+            for (let s = 1; s <= serials; s++) {
+                const chk = document.getElementById(`chk_${i}_${s}`);
+                if (chk && !chk.value) { allFilled = false; break; }
+            }
+            if (!allFilled) {
+                alert(`Please fill all Check values for: ${row.location}`);
+                return;
+            }
+            alert(`Saved: ${row.location} (${row.spec})`);
+        }
+
+        function submitData() {
+            const tbody = document.getElementById('tableBody');
+            if (tbody.querySelector('.empty')) {
+                alert("No data loaded. Please search first.");
+                return;
+            }
+            alert("All dimension records submitted successfully!");
+        }
+    </script>
+
+</body>
+</html>

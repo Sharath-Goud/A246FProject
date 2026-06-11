@@ -1,0 +1,299 @@
+﻿@{
+    ViewData["Title"] = ViewData["Title"] ?? "A246F Project";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - A246FProject</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    @* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"> *@
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 16px;
+            top: 16px;
+            bottom: 16px;
+            width: 240px;
+            background: linear-gradient(160deg, #1a1040 0%, #0d1b2a 100%);
+            border-radius: 20px;
+            padding: 20px 14px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+            border: 0.5px solid rgba(255,255,255,.06);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 0.5px solid rgba(255,255,255,.08);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,.65);
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: .25s;
+        }
+
+            .nav-btn:hover {
+                background: rgba(167,139,250,.12);
+                color: #fff;
+            }
+
+            .nav-btn.active {
+                background: linear-gradient(90deg, rgba(167,139,250,.25), rgba(99,179,237,.12));
+                color: #fff;
+            }
+
+        .chevron {
+            margin-left: auto;
+            transition: .3s;
+        }
+
+        .nav-btn.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* dropdown animation */
+        .dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .35s ease;
+        }
+
+            .dropdown.open {
+                max-height: 600px;
+            }
+
+        .dd-item {
+            padding: 8px 12px 8px 34px;
+            font-size: 12px;
+            color: rgba(255,255,255,.55);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: .2s;
+        }
+
+            .dd-item:hover {
+                background: rgba(167,139,250,.1);
+                color: #d8b4fe;
+            }
+
+            .dd-item.selected {
+                color: #d8b4fe;
+            }
+
+        /* ================= HEADER ================= */
+        .header {
+            position: fixed;
+            left: 280px;
+            right: 16px;
+            top: 16px;
+            height: 56px;
+            background: rgba(255,255,255,.04);
+            backdrop-filter: blur(16px);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,.06);
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 0.5px solid rgba(255,255,255,.08);
+            width: 260px;
+        }
+
+            .search input {
+                background: none;
+                border: none;
+                outline: none;
+                color: #fff;
+                width: 100%;
+            }
+
+        /* ================= MAIN ================= */
+        .main {
+            margin-left: 280px;
+            padding: 90px 20px 20px 20px;
+        }
+
+        /* animations */
+        @@keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main {
+            animation: fade .4s ease;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+    <div class="sidebar">
+
+        <div class="logo">
+            <i class="ti ti-shield-check"></i>
+            QA SYSTEM
+        </div>
+
+        <button class="nav-btn active" onclick="toggleMenu()">
+            <i class="ti ti-forms"></i>
+            A246F Forms
+            <i class="ti ti-chevron-down chevron"></i>
+        </button>
+
+        <div class="dropdown" id="menu">
+
+            <div class="dd-item" onclick="go('/CTPParameter/Index')">
+                A246F CTP Parameters
+            </div>
+            <div class="dd-item" onclick="go('/GlueWeighing/Index')">
+                Glue Weighing
+            </div>
+            <div class="dd-item" onclick="go('/SOPPOR/Index')">
+                SOP/POR
+            </div>
+            <div class="dd-item" onclick="go('/FirstArticleInspection/Index')">
+                First Article Inspection
+            </div>
+            <div class="dd-item" onclick="go('/FirstArticleDimension/Index')">
+                First Article Dimension
+                </div>
+            <div class="dd-item" onclick="go('/VisualInspection/Index')">
+                Visual Inspection
+            </div>
+            <div class="dd-item" onclick="go('/CCMCHI4SC/Index')">
+                CCM &amp; CHI &amp; 4SC
+            </div>
+            <div class="dd-item" onclick="go('/WireCombMolding/Index')">
+                Wire Comb Molding
+            </div>
+            <div class="dd-item" onclick="go('/HotBar/Index')">
+                Hot Bar
+            </div>
+            <div class="dd-item" onclick="go('/Destructive/Index')">
+                Destructive
+            </div>
+            <div class="dd-item" onclick="go('/ShellCrimp/Index')">
+                Shell Crimp
+            </div>
+            <div class="dd-item" onclick="go('/InnerMold/Index')">
+                Inner Mold
+            </div>
+            <div class="dd-item" onclick="go('/AOI/Index')">
+                AOI
+            </div>
+            <div class="dd-item" onclick="go('/Hanking/Index')">
+                Hanking
+            </div>
+            <div class="dd-item" onclick="go('/LaserEngraving/Index')">
+                Laser Engraving
+            </div>
+            <div class="dd-item" onclick="go('/NewHanking/Index')">
+                New Hanking
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= HEADER ================= -->
+    <div class="header">
+
+        <div class="search">
+            <i class="ti ti-search"></i>
+            <input placeholder="Search..." />
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;">
+            <div class="ti ti-bell"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;">
+                A
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= PAGE CONTENT ================= -->
+    <div class="main">
+        @RenderBody()
+    </div>
+
+    <script>
+
+        function toggleMenu() {
+            document.querySelector('.nav-btn').classList.toggle('open');
+            document.getElementById('menu').classList.toggle('open');
+        }
+
+        function go(url) {
+            window.location.href = url;
+        }
+
+        document.querySelectorAll('.dd-item').forEach(x => {
+            x.addEventListener('click', function () {
+                document.querySelectorAll('.dd-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+    </script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
