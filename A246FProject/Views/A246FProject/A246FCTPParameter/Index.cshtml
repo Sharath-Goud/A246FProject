@@ -120,13 +120,117 @@
             font-size: 13px;
         }
 
-        /* TABLE */
+        /* ================= TABLE ================= */
+
         .results-table {
             background: rgba(255,255,255,.04);
-            border: 0.5px solid rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.08);
             border-radius: 16px;
-            overflow: hidden;
+            overflow-x: auto;
+            padding: 10px;
         }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            .custom-table thead tr {
+                background: rgba(167,139,250,.12);
+            }
+
+            .custom-table th {
+                padding: 14px 10px;
+                text-align: left;
+                color: #fff;
+                font-size: 13px;
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255,255,255,.1);
+            }
+
+            .custom-table td {
+                padding: 12px 10px;
+                color: #fff;
+                font-size: 13px;
+                border-bottom: 1px solid rgba(255,255,255,.06);
+                vertical-align: middle;
+            }
+
+                /* Column Widths */
+
+                .custom-table th:nth-child(1),
+                .custom-table td:nth-child(1) {
+                    width: 90px;
+                }
+
+                .custom-table th:nth-child(2),
+                .custom-table td:nth-child(2) {
+                    width: 180px;
+                }
+
+                .custom-table th:nth-child(3),
+                .custom-table td:nth-child(3) {
+                    width: 250px;
+                }
+
+                .custom-table th:nth-child(4),
+                .custom-table td:nth-child(4) {
+                    width: 220px;
+                }
+
+                .custom-table th:nth-child(5),
+                .custom-table td:nth-child(5) {
+                    width: 80px;
+                    text-align: center;
+                }
+
+                .custom-table th:nth-child(6),
+                .custom-table td:nth-child(6) {
+                    width: 80px;
+                    text-align: center;
+                }
+
+                .custom-table th:nth-child(7),
+                .custom-table td:nth-child(7) {
+                    width: 80px;
+                    text-align: center;
+                }
+
+                .custom-table th:nth-child(8),
+                .custom-table td:nth-child(8) {
+                    width: 150px;
+                    text-align: center;
+                }
+
+                .custom-table th:nth-child(9),
+                .custom-table td:nth-child(9) {
+                    width: 110px;
+                    text-align: center;
+                }
+
+        .value-box {
+            width: 90px;
+            height: 34px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,.2);
+            background: rgba(255,255,255,.08);
+            color: white;
+            text-align: center;
+        }
+
+        .btn-save {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+            .btn-save:hover {
+                background: #2980b9;
+            }
 
         .header-row {
             display: grid;
@@ -302,23 +406,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
-                    {
+                <tbody>
+
+                        @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                        {
                         <tr>
 
-                            <td>@Model.dtChecklist.Rows[i]["StationNo"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["StationNo"]
+                            </td>
 
-                            <td>@Model.dtChecklist.Rows[i]["Station"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["Station"]
+                            </td>
 
-                            <td>@Model.dtChecklist.Rows[i]["EquipmentModel"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["EquipmentModel"]
+                            </td>
 
-                            <td>@Model.dtChecklist.Rows[i]["Parameter"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["Parameter"]
+                            </td>
 
-                            <td>@Model.dtChecklist.Rows[i]["unit"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["unit"]
+                            </td>
 
-                            <td>@Model.dtChecklist.Rows[i]["LSL"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["LSL"]
+                            </td>
 
-                            <td>@Model.dtChecklist.Rows[i]["USL"]</td>
+                            <td>
+                                    @Model.dtChecklist.Rows[i]["USL"]
+                            </td>
 
                             <td>
 
@@ -327,13 +447,22 @@
                                        value="@Model.dtChecklist.Rows[i]["LimitId"]" />
 
                                 <input type="text"
-                                       name="A246FCTPParameterResults[@i].Value"
-                                       class="form-control" />
+                                       class="value-box"
+                                       name="A246FCTPParameterResults[@i].Value" />
 
                             </td>
 
+                            <td>
+                                <button type="button"
+                                        class="btn-save">
+                                    Save
+                                </button>
+                            </td>
+
                         </tr>
-                    }
+                        }
+
+                </tbody>
                 </tbody>
             </table>
         }
