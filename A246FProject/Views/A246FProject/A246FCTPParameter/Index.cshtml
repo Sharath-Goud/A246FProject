@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.A246FCTPParameterViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Data
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -165,98 +168,265 @@
 <body>
 
     <div class="form-card">
-        <div class="form-card-header">A246F CTP Parameter</div>
 
-        <div class="form-body">
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Line</label>
-                    <select>
-                        <option>-- Select Line --</option>
-                        <option>Line 1</option>
-                        <option>Line 2</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Project</label>
-                    <select>
-                        <option>-- Select Project --</option>
-                        <option>A246F</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Model</label>
-                    <select>
-                        <option>-- Select Model --</option>
-                        <option>A246F</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Part</label>
-                    <select>
-                        <option>-- Select Part --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Machine</label>
-                    <select>
-                        <option>-- Select Machine --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Line Leader</label>
-                    <input type="text" placeholder="Production Line Leader">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Checked By</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>Approved By</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group" style="justify-content:flex-end;">
-                    <button class="btn-search">Search</button>
-                </div>
-            </div>
-
+        <div class="form-card-header">
+            A246F CTP Parameter
         </div>
+
+        <form asp-action="Index" method="post">
+
+            <div class="form-body">
+
+                <!-- Row 1 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Line</label>
+
+                        <select asp-for="LineId"
+                                asp-items="@(new SelectList(Model.Lines,
+                                            "LineId",
+                                            "LineName"))">
+                            <option value="">-- Select Line --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project</label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,
+                                    "ProjectId",
+                                    "ProjectName"))">
+                            <option value="">-- Select Project --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Model</label>
+
+                        <select asp-for="ModelId"
+                                id="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos,
+                                    "ModelId",
+                                    "Model"))">
+                            <option value="">-- Select Model --</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Row 2 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Part</label>
+
+                        <select asp-for="PartId" id="PartId">
+                            <option value="">-- Select Part --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Machine</label>
+
+                        <select asp-for="MachineId"
+                                asp-items="@(new SelectList(Model.Machines,
+                                            "MachineId",
+                                            "Machine"))">
+                            <option value="">-- Select Machine --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Line Leader</label>
+
+                        <input type="text"
+                               name="ProdLineLeader"
+                               placeholder="Production Line Leader" />
+                    </div>
+
+                </div>
+
+                <!-- Row 3 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Checked By</label>
+
+                        <input type="text"
+                               name="CheckedBy" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Approved By</label>
+
+                        <input type="text"
+                               name="ApprovedBy" />
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="results-table">
-        <div class="header-row">
-            <div>Station No</div>
-            <div>Station Name</div>
-            <div>Equipment Name/Model</div>
-            <div>Parameter items</div>
-            <div>Unit</div>
-            <div>LSL</div>
-            <div>USL</div>
-            <div>Value</div>
-            <div>Action</div>
-        </div>
 
-        <div class="empty">
-            No records found. Use search to load data.
-        </div>
+        @if (Model.dtChecklist != null &&
+        Model.dtChecklist.Rows.Count > 0)
+        {
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Station No</th>
+                        <th>Station Name</th>
+                        <th>Equipment Name/Model</th>
+                        <th>Parameter Items</th>
+                        <th>Unit</th>
+                        <th>LSL</th>
+                        <th>USL</th>
+                        <th>Value</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                    {
+                        <tr>
+
+                            <td>@Model.dtChecklist.Rows[i]["StationNo"]</td>
+
+                            <td>@Model.dtChecklist.Rows[i]["Station"]</td>
+
+                            <td>@Model.dtChecklist.Rows[i]["EquipmentModel"]</td>
+
+                            <td>@Model.dtChecklist.Rows[i]["Parameter"]</td>
+
+                            <td>@Model.dtChecklist.Rows[i]["unit"]</td>
+
+                            <td>@Model.dtChecklist.Rows[i]["LSL"]</td>
+
+                            <td>@Model.dtChecklist.Rows[i]["USL"]</td>
+
+                            <td>
+
+                                <input type="hidden"
+                                       name="A246FCTPParameterResults[@i].LimitId"
+                                       value="@Model.dtChecklist.Rows[i]["LimitId"]" />
+
+                                <input type="text"
+                                       name="A246FCTPParameterResults[@i].Value"
+                                       class="form-control" />
+
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty">
+                No records found. Use search to load data.
+            </div>
+        }
     </div>
-
     <div class="actions">
-        <button class="btn-submit">Submit</button>
+        <button type="button"
+                class="btn-submit">
+            Submit
+        </button>
+
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        $("#ModelId").change(function () {
+
+            var modelId = $("#ModelId").val();
+
+            $.ajax({
+                url: '/CTPParameter/GetPartNoByModel',
+                type: 'POST',
+                data: { modelId: modelId },
+
+                success: function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>'
+                        );
+                    });
+                }
+            });
+
+        });
+
+                $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+            $.ajax({
+                url: '/CTPParameter/GetModelNoByProject',
+                type: 'POST',
+                data: { projectId: projectId },
+
+                success: function (data) {
+
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>'
+                        );
+
+                    });
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+                }
+            });
+
+        });
+
+    </script>
 </body>
 </html>
