@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CCMMC Checklist</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins,sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg,#0d0d1a,#0a0a2e,#0d1b2a);
+            padding: 20px;
+            color: #fff;
+        }
+
+        /* CARD */
+        .form-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            padding: 12px 18px;
+            background: rgba(167,139,250,0.15);
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        /* FORM */
+        .form-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        input, select {
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            outline: none;
+        }
+
+            input:focus, select:focus {
+                border-color: #7c3aed;
+            }
+
+        /* BUTTONS */
+        .btn-search {
+            background: linear-gradient(135deg,#34d399,#059669);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg,#60a5fa,#2563eb);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* TABLE */
+        .table {
+            margin-top: 18px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 120px 1fr 1fr 1fr 80px 80px 80px 120px 100px;
+            padding: 12px;
+            font-size: 11px;
+            background: rgba(167,139,250,0.15);
+            color: rgba(255,255,255,0.6);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 120px 1fr 1fr 1fr 80px 80px 80px 120px 100px;
+            padding: 10px;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .empty {
+            padding: 30px;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* RESPONSIVE */
+        @@media(max - width:900px) {
+            .form-row
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        .table-header, .row {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+            CCMMC CheckList
+        </div>
+
+        <div class="form-body">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Line</label>
+                    <select id="line">
+                        <option>--select Line--</option>
+                        <option>Line 1</option>
+                        <option>Line 2</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Project</label>
+                    <select id="project">
+                        <option>--select Project--</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="model">
+                        <option>--select Model--</option>
+                        <option>A246F</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Part</label>
+                    <select id="part">
+                        <option>--select Part--</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Machine</label>
+                    <select id="machine">
+                        <option>--select Machine--</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Line Leader</label>
+                    <input type="text" placeholder="Production Line Leader">
+                </div>
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>Checked By</label>
+                    <input type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Approved By</label>
+                    <input type="text">
+                </div>
+
+                <div class="form-group" style="justify-content:flex-end;">
+                    <label style="visibility:hidden;">btn</label>
+                    <button class="btn-search" onclick="loadData()">Search</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table">
+
+        <div class="table-header">
+            <div>Station No</div>
+            <div>Station Name</div>
+            <div>Equipment</div>
+            <div>Parameter</div>
+            <div>Unit</div>
+            <div>LSL</div>
+            <div>USL</div>
+            <div>Value</div>
+            <div>Action</div>
+        </div>
+
+        <div id="body">
+            <div class="empty">No records found. Click Search.</div>
+        </div>
+
+    </div>
+
+    <div style="margin-top:15px;">
+        <button class="btn-submit" onclick="submitData()">Submit</button>
+    </div>
+
+    <script>
+        const data = [
+            {station:"S1", name:"Clamp Check", eq:"Machine A", param:"Torque", unit:"Nm", lsl:4, usl:6, value:""},
+            {station:"S2", name:"Vision Check", eq:"Camera B", param:"Defect", unit:"%", lsl:0, usl:2, value:""},
+            {station:"S3", name:"Pressure", eq:"Gauge C", param:"Bar", unit:"bar", lsl:2, usl:5, value:""}
+        ];
+
+        function loadData(){
+
+            const body = document.getElementById("body");
+            body.innerHTML="";
+
+            data.forEach((d,i)=>{
+                const row=document.createElement("div");
+                row.className="row";
+
+                row.innerHTML=`
+                    <div>${d.station}</div>
+                    <div>${d.name}</div>
+                    <div>${d.eq}</div>
+                    <div>${d.param}</div>
+                    <div>${d.unit}</div>
+                    <div>${d.lsl}</div>
+                    <div>${d.usl}</div>
+                    <div>
+                        <input style="width:90px" oninput="data[${i}].value=this.value"/>
+                    </div>
+                    <div>
+                        <button class="btn-search" onclick="save(${i})">Save</button>
+                    </div>
+                `;
+
+                body.appendChild(row);
+            });
+        }
+
+        function save(i){
+            alert("Saved: "+data[i].station+" Value: "+data[i].value);
+        }
+
+        function submitData(){
+            alert("Submitted Successfully!");
+        }
+    </script>
+
+</body>
+</html>

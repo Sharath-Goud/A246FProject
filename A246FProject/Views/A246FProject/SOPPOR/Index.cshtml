@@ -1,0 +1,523 @@
+﻿@model A246FProject.Models.SOPPORViewModel
+@using System.Data
+@using Microsoft.AspNetCore.Mvc.Rendering
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOP/POR</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 0.5px solid rgba(167,139,250,.2);
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+            text-transform: uppercase;
+        }
+
+        input, select {
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+        }
+
+            select option {
+                background: #1a1040;
+            }
+
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
+        /* BUTTON */
+        .btn-search {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* TABLE */
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            background: rgba(167,139,250,.08);
+            padding: 12px;
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+        }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 16px;
+        }
+
+        @@media (max-width: 900px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-row {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <form asp-action="Index" asp-controller="SOPPOR" method="post" enctype="multipart/form-data">
+
+        <div class="form-card">
+
+            <div class="form-card-header">
+                SOP/POR
+            </div>
+
+            <div class="form-body">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Line</label>
+
+                        <select asp-for="LineId"
+                                asp-items="@(new SelectList(Model.Lines, "LineId", "LineName"))">
+
+                            <option value="">-- Select Line --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Project</label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId">
+
+                            <option value="">-- Select Project --</option>
+
+                            @foreach (var item in Model.Projects)
+
+                            {
+                                <option value="@item.ProjectId">
+                                    @item.ProjectName
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Model</label>
+
+                        <select asp-for="ModelId"
+                                id="ModelId">
+
+                            <option value="">-- Select Model --</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Part</label>
+
+                        <select asp-for="PartId"
+                                id="PartId">
+
+                            <option value="">-- Select Part --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Line Leader</label>
+
+                        <input asp-for="ProdLineLeader"
+                               type="text" />
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Checked By</label>
+
+                        <input asp-for="CheckedBy"
+                               type="text" />
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Approved By</label>
+
+                        <input asp-for="ApprovedBy"
+                               type="text" />
+
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="results-table">
+
+            <table style="width:100%; border-collapse:collapse;">
+
+                <thead>
+
+                    <tr class="header-row">
+
+                        <th>Process No</th>
+
+                        <th>Station Name</th>
+
+                        <th>Critical Check Points</th>
+
+                        <th>Sampling Frequency</th>
+
+                        <th>Responsible Department</th>
+
+                        <th>Status</th>
+
+                        <th>ID Number</th>
+
+                        <th>Upload</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model.dtChecklist != null &&
+                    Model.dtChecklist.Rows.Count > 0)
+
+                    {
+
+                        int row = 1;
+
+                        int TotalCount = 0;
+
+
+
+                        foreach (System.Data.DataRow item in Model.dtChecklist.Rows)
+
+                        {
+                            TotalCount =
+                            Convert.ToInt32(
+                            item["TotalCount"]);
+
+                            <tr>
+
+                                @if (row > TotalCount)
+
+                                {
+                                    row = 1;
+
+                                }
+
+                                @if (row == 1)
+
+                                {
+                                    <td rowspan="@TotalCount">
+                                        @item["ProcessNo"]
+                                    </td>
+
+                                    <td rowspan="@TotalCount">
+                                        @item["Module"]
+                                    </td>
+                                }
+
+                                <td>
+                                    @item["Points"]
+                                </td>
+
+                                <td>
+                                    @item["SamplingUnits"]
+                                </td>
+
+                                <td>
+                                    @item["Dept"]
+                                </td>
+
+                                <td>
+
+                                    <select class="form-control">
+
+                                        <option value="">
+                                            --Select--
+                                        </option>
+
+                                        @foreach (var status
+                                       in Model.Statuses)
+
+                                        {
+                                            <option value="@status.StatusId">
+                                                @status.Status
+                                            </option>
+                                        }
+
+                                    </select>
+
+                                </td>
+
+                                <td>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           placeholder="Enter ID" />
+
+                                </td>
+
+                                <td>
+
+                                    <input type="file"
+                                           class="form-control" />
+
+                                </td>
+
+                                <td>
+
+                                    <button type="button"
+                                            class="btn-submit">
+
+                                        Save
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            row++;
+
+                        }
+
+                    }
+
+                    else
+
+                    {
+                        <tr>
+
+                            <td colspan="9"
+                                style="text-align:center;padding:30px;">
+
+                                No records found. Use search to load data.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="actions">
+
+            <button type="submit"
+                    class="btn-submit">
+
+                Submit
+
+            </button>
+
+        </div>
+
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+
+        $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+            $.get('/SOPPOR/GetModels',
+                { projectId: projectId },
+
+                function (data) {
+
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>');
+                    });
+                });
+        });
+
+        $("#ModelId").change(function () {
+
+            var modelId = $(this).val();
+
+            $.get('/SOPPOR/GetParts',
+                { modelId: modelId },
+
+                function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>');
+                    });
+                });
+        });
+
+    </script>
+
+</body>
+</html>
