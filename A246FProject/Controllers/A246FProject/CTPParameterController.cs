@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using A246FProject.BAL;
 using A246FProject.Models;
+using System.Data;
 
 namespace A246FProject.Controllers.A246FProject
 {
@@ -35,8 +36,16 @@ namespace A246FProject.Controllers.A246FProject
             model.Projects = _bal.GetProject();
             model.Machines = _bal.GetMachines();
             model.ModelNos = _bal.GetModelNo();
-
-            model.PartNos = new List<PartNo>();
+            if (model.ModelId > 0)
+            {
+                model.PartNos =
+                    _bal.GetPartNoByModel(model.ModelId);
+            }
+            else
+            {
+                model.PartNos =
+                    new List<PartNo>();
+            }
 
             model.dtChecklist =
                 _bal.GetCTPParameterData(
@@ -64,6 +73,60 @@ namespace A246FProject.Controllers.A246FProject
             var models = _bal.GetModelNoByProject(projectId);
 
             return Json(models);
+        }
+
+        [HttpPost]
+        public JsonResult SaveA246FCTPParameter(
+    [FromBody] A246FCTPParameterViewModel model)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return Json("Model is null");
+                }
+
+                if (model.A246FCTPParameterResults == null ||
+                    model.A246FCTPParameterResults.Length == 0)
+                {
+                    return Json("No records found");
+                }
+
+                DataTable dtChecklist = new DataTable();
+
+                dtChecklist.Columns.Add("Id", typeof(int));
+                dtChecklist.Columns.Add("LimitId", typeof(int));
+                dtChecklist.Columns.Add("Value", typeof(decimal));
+
+                int uid = 1;
+
+                foreach (var row in model.A246FCTPParameterResults)
+                {
+                    dtChecklist.Rows.Add(
+                        uid,
+                        row.LimitId,
+                        row.Value);
+
+                    uid++;
+                }
+
+                int result =
+                    _bal.InsertBulkA246FCTPParameter(
+                        dtChecklist,
+                        "2063907",
+                        model.LineId,
+                        model.ProdLineLeader,
+                        model.CheckedBy,
+                        model.ApprovedBy,
+                        model.ModelId,
+                        model.PartId);
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
         }
     }
 }

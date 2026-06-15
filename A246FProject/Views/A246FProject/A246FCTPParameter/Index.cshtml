@@ -301,9 +301,10 @@
                         <label>Line</label>
 
                         <select asp-for="LineId"
+                                id="LineId"
                                 asp-items="@(new SelectList(Model.Lines,
-                                            "LineId",
-                                            "LineName"))">
+                    "LineId",
+                    "LineName"))">
                             <option value="">-- Select Line --</option>
                         </select>
                     </div>
@@ -341,7 +342,11 @@
                     <div class="form-group">
                         <label>Part</label>
 
-                        <select asp-for="PartId" id="PartId">
+                        <select asp-for="PartId"
+                                id="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,
+                                    "PartId",
+                                    "Part"))">
                             <option value="">-- Select Part --</option>
                         </select>
                     </div>
@@ -350,9 +355,10 @@
                         <label>Machine</label>
 
                         <select asp-for="MachineId"
+                                id="MachineId"
                                 asp-items="@(new SelectList(Model.Machines,
-                                            "MachineId",
-                                            "Machine"))">
+                    "MachineId",
+                    "Machine"))">
                             <option value="">-- Select Machine --</option>
                         </select>
                     </div>
@@ -360,8 +366,8 @@
                     <div class="form-group">
                         <label>Production Line Leader</label>
 
-                        <input type="text"
-                               name="ProdLineLeader"
+                        <input asp-for="ProdLineLeader"
+                               type="text"
                                placeholder="Production Line Leader" />
                     </div>
 
@@ -374,15 +380,15 @@
                     <div class="form-group">
                         <label>Checked By</label>
 
-                        <input type="text"
-                               name="CheckedBy" />
+                        <input asp-for="CheckedBy"
+                               type="text" />
                     </div>
 
                     <div class="form-group">
                         <label>Approved By</label>
 
-                        <input type="text"
-                               name="ApprovedBy" />
+                        <input asp-for="ApprovedBy"
+                               type="text" />
                     </div>
 
                     <div class="form-group"
@@ -521,7 +527,8 @@
 
                             <td>
                                 <button type="button"
-                                        class="btn-save">
+                                        class="btn-save"
+                                        onclick="SaveSingleRow(this,@i)">
                                     Save
                                 </button>
                             </td>
@@ -541,7 +548,8 @@
     </div>
     <div class="actions">
         <button type="button"
-                class="btn-submit">
+                class="btn-submit"
+                onclick="Save();">
             Submit
         </button>
 
@@ -621,6 +629,153 @@
             });
 
         });
+
+
+
+                function Save()
+        {
+            var Results = [];
+
+            $("input[name$='.Value']").each(function (index)
+            {
+                var value = $(this).val();
+
+                var limitId =
+                    $("input[name='A246FCTPParameterResults[" +
+                    index +
+                    "].LimitId']").val();
+
+                Results.push({
+                    LimitId: limitId,
+                    Value: value
+                });
+            });
+
+            var obj = {
+
+                LineId: $("#LineId").val(),
+
+                ProjectId: $("#ProjectId").val(),
+
+                ModelId: $("#ModelId").val(),
+
+                PartId: $("#PartId").val(),
+
+                MachineId: $("#MachineId").val(),
+
+                ProdLineLeader:
+                    $("input[name='ProdLineLeader']").val(),
+
+                CheckedBy:
+                    $("input[name='CheckedBy']").val(),
+
+                ApprovedBy:
+                    $("input[name='ApprovedBy']").val(),
+
+                A246FCTPParameterResults:
+                    Results
+            };
+
+            $.ajax({
+                url: '/CTPParameter/SaveA246FCTPParameter',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(obj),
+
+                success: function (response)
+                {
+                    alert('Saved Successfully');
+
+                    location.reload();
+                },
+
+                error: function ()
+                {
+                    alert('Save Failed');
+                }
+            });
+        }
+
+
+                function SaveSingleRow(btn, index)
+        {
+            var limitId =
+                $("input[name='A246FCTPParameterResults[" +
+                    index +
+                    "].LimitId']").val();
+
+            var value =
+                $("input[name='A246FCTPParameterResults[" +
+                    index +
+                    "].Value']").val();
+
+            if (value == "")
+            {
+                alert("Please enter value");
+                return;
+            }
+
+            var Results = [];
+
+            Results.push({
+                LimitId: limitId,
+                Value: value
+            });
+            
+            var obj =
+            {
+                LineId: $("#LineId").val(),
+
+                ProjectId: $("#ProjectId").val(),
+
+                ModelId: $("#ModelId").val(),
+
+                PartId: $("#PartId").val(),
+
+                MachineId: $("#MachineId").val(),
+
+                ProdLineLeader:
+                    $("input[name='ProdLineLeader']").val(),
+
+                CheckedBy:
+                    $("input[name='CheckedBy']").val(),
+
+                ApprovedBy:
+                    $("input[name='ApprovedBy']").val(),
+
+                A246FCTPParameterResults:
+                    Results
+            };
+            console.log('ctp data sending : ',JSON.stringify(obj));
+            $.ajax({
+                url: '/CTPParameter/SaveA246FCTPParameter',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(obj),
+
+                success: function (response)
+                {
+                    alert("Saved Successfully");
+
+                    // Disable textbox
+                    $("input[name='A246FCTPParameterResults[" +
+                        index +
+                        "].Value']")
+                        .prop("disabled", true);
+
+                    // Disable save button
+                    $(btn).prop("disabled", true);
+
+                    // Change button text
+                    $(btn).text("Saved");
+                },
+
+                error: function ()
+                {
+                    alert("Save Failed");
+                }
+            });
+        } 
 
     </script>
 </body>

@@ -423,6 +423,7 @@ E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\A246FProje
 E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\A246FProject.MvcApplicationPartsAssemblyInfo.cache
 E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\A246FProject.RazorAssemblyInfo.cache
 E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\A246FProject.RazorAssemblyInfo.cs
+E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\A246FProject.sourcelink.json
 E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\scopedcss\bundle\A246FProject.styles.css
 E:\2063907\my project\A246FProject-main\A246FProject\obj\Debug\net8.0\scopedcss\projectbundle\A246FProject.bundle.scp.css

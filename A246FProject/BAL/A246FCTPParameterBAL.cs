@@ -49,5 +49,26 @@ namespace A246FProject.BAL
         {
             return _dal.GetModelNoByProject(projectId);
         }
+
+        public int InsertBulkA246FCTPParameter(
+            DataTable dtChecklist,
+            string userId,
+            int lineId,
+            string prodLineLeader,
+            string checkedBy,
+            string approvedBy,
+            int modelId,
+            int partId)
+        {
+            return _dal.InsertBulkA246FCTPParameter(
+                dtChecklist,
+                userId,
+                lineId,
+                prodLineLeader,
+                checkedBy,
+                approvedBy,
+                modelId,
+                partId);
+        }
     }
 }

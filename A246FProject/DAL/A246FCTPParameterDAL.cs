@@ -166,5 +166,32 @@ namespace A246FProject.DAL
 
             return list;
         }
+
+        public int InsertBulkA246FCTPParameter(
+             DataTable dtChecklist,
+             string userId,
+             int lineId,
+             string prodLineLeader,
+             string checkedBy,
+             string approvedBy,
+             int modelId,
+             int partId)
+        {
+            SqlParameter[] parms =
+            {
+                new SqlParameter("@Checklist",dtChecklist),
+                new SqlParameter("@CreatedBy",userId),
+                new SqlParameter("@LineId",lineId),
+                new SqlParameter("@ProdLineLeader",prodLineLeader),
+                new SqlParameter("@CheckedBy",checkedBy),
+                new SqlParameter("@ApprovedBy",approvedBy),
+                new SqlParameter("@ModelId",modelId),
+                new SqlParameter("@PartId",partId)
+            };
+
+            return _db.ExecuteNonQueryWithParameter(
+                "ipqc.InsertBulkA246FCTPParameter",
+                parms);
+        }
     }
 }
