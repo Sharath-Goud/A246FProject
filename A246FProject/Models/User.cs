@@ -14,5 +14,6 @@ namespace A246FProject.Models
 
         [NotMapped]
         public string ConfirmPassword { get; set; }
+        public string Role { get; set; }
     }
 }

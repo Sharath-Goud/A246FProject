@@ -431,53 +431,30 @@
 
                     @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
                     {
-
                         string stationId =
-
                         Model.dtChecklist.Rows[i]["StationId"].ToString();
-
-
-
                         bool isFirstRow =
-
                         stationId != currentStationId;
-
-
-
                         int rowSpan = 0;
-
-
-
                         if (isFirstRow)
 
                         {
 
                             currentStationId = stationId;
-
-
-
                             for (int j = i; j < Model.dtChecklist.Rows.Count; j++)
 
                             {
-
                                 if (Model.dtChecklist.Rows[j]["StationId"].ToString() == stationId)
 
                                 {
-
                                     rowSpan++;
-
                                 }
 
                                 else
-
                                 {
-
                                     break;
-
                                 }
-
                             }
-
                         }
 
                         <tr>
@@ -527,7 +504,7 @@
 
                             <td>
                                 <button type="button"
-                                        class="btn-save"
+                                        class="btn-search"
                                         onclick="SaveSingleRow(this,@i)">
                                     Save
                                 </button>
@@ -554,7 +531,9 @@
         </button>
 
     </div>
-
+    <script>
+        var LoggedInRole = '@ViewBag.Role';
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -632,7 +611,7 @@
 
 
 
-                function Save()
+        function Save()
         {
             var Results = [];
 
@@ -644,11 +623,13 @@
                     $("input[name='A246FCTPParameterResults[" +
                     index +
                     "].LimitId']").val();
-
-                Results.push({
-                    LimitId: limitId,
-                    Value: value
-                });
+                    if(value != "" && !isNaN(value))
+                    {
+                        Results.push({
+                            LimitId: limitId,
+                            Value: value
+                        });
+                    }
             });
 
             var obj = {
@@ -757,17 +738,17 @@
                 {
                     alert("Saved Successfully");
 
-                    // Disable textbox
-                    $("input[name='A246FCTPParameterResults[" +
-                        index +
-                        "].Value']")
-                        .prop("disabled", true);
+                    if (LoggedInRole == "User")
+                    {
+                        $("input[name='A246FCTPParameterResults[" +
+                            index +
+                            "].Value']")
+                            .prop("disabled", true);
 
-                    // Disable save button
-                    $(btn).prop("disabled", true);
+                        $(btn).prop("disabled", true);
 
-                    // Change button text
-                    $(btn).text("Saved");
+                        $(btn).text("Saved");
+                    }
                 },
 
                 error: function ()

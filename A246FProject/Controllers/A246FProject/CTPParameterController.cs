@@ -13,6 +13,8 @@ namespace A246FProject.Controllers.A246FProject
         [HttpGet]
         public IActionResult Index()
         {
+            ViewBag.Role =
+       HttpContext.Session.GetString("Role");
             A246FCTPParameterViewModel model =
                 new A246FCTPParameterViewModel();
 
@@ -32,6 +34,8 @@ namespace A246FProject.Controllers.A246FProject
         public IActionResult Index(
             A246FCTPParameterViewModel model)
         {
+            ViewBag.Role =
+       HttpContext.Session.GetString("Role");
             model.Lines = _bal.GetLine();
             model.Projects = _bal.GetProject();
             model.Machines = _bal.GetMachines();
@@ -113,7 +117,7 @@ namespace A246FProject.Controllers.A246FProject
                 int result =
                     _bal.InsertBulkA246FCTPParameter(
                         dtChecklist,
-                        "2063907",
+                        HttpContext.Session.GetString("User"),
                         model.LineId,
                         model.ProdLineLeader,
                         model.CheckedBy,

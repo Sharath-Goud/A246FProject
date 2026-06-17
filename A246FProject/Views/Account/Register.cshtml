@@ -180,6 +180,27 @@
                     text-decoration: underline;
                 }
 
+        .role-group {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-top: 5px;
+        }
+
+        .role-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+            .role-item input[type="radio"] {
+                width: auto !important;
+                margin: 0;
+                transform: scale(1.1);
+            }
     </style>
 
 </head>
@@ -224,11 +245,35 @@
                        placeholder="Confirm Password" />
 
             </div>
+            <div class="input-box">
+
+                <label style="color:white;display:block;margin-bottom:10px;font-weight:600;">
+                    Role
+                </label>
+
+                <div class="role-group">
+
+                    <label class="role-item">
+                        <input type="radio"
+                               asp-for="Role"
+                               value="Admin" />
+                        Admin
+                    </label>
+
+                    <label class="role-item">
+                        <input type="radio"
+                               asp-for="Role"
+                               value="User"
+                               checked />
+                        User
+                    </label>
+
+                </div>
+
+            </div>
 
             <button type="submit" class="btn">
-
                 Register
-
             </button>
 
         </form>

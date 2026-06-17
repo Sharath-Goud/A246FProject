@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.CCMCHI4SCViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -62,26 +64,32 @@
         }
 
         input, select {
-            padding: 9px 10px;
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.06);
+            padding: 9px 12px;
+            font-size: 13px;
             color: #fff;
             outline: none;
         }
 
-            input:focus, select:focus {
-                border-color: #7c3aed;
+            select option {
+                background: #1a1040;
             }
 
-        /* BUTTONS */
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
         .btn-search {
-            background: linear-gradient(135deg,#34d399,#059669);
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
             border: none;
-            padding: 10px 18px;
             border-radius: 8px;
+            padding: 10px 20px;
             color: #fff;
             cursor: pointer;
+            font-size: 13px;
         }
 
         .btn-submit {
@@ -93,36 +101,82 @@
             cursor: pointer;
         }
 
-        /* TABLE */
         .table {
             margin-top: 18px;
             background: rgba(255,255,255,0.04);
             border-radius: 14px;
-            overflow: hidden;
+            overflow-x: auto;
             border: 1px solid rgba(255,255,255,0.08);
         }
 
         .table-header {
             display: grid;
-            grid-template-columns: 120px 1fr 1fr 1fr 80px 80px 80px 120px 100px;
+            grid-template-columns: 80px 200px 150px 120px 80px 100px 100px 100px 100px 100px 90px;
+            min-width: 1240px;
             padding: 12px;
-            font-size: 11px;
+            font-size: 13px;
+            font-weight: 600;
             background: rgba(167,139,250,0.15);
-            color: rgba(255,255,255,0.6);
         }
 
         .row {
             display: grid;
-            grid-template-columns: 120px 1fr 1fr 1fr 80px 80px 80px 120px 100px;
-            padding: 10px;
+            grid-template-columns: 80px 200px 150px 120px 80px 100px 100px 100px 100px 100px 90px;
+            min-width: 1240px;
+            padding: 4px 12px;
             align-items: center;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
+
+            .table-header div,
+            .row div {
+                padding: 4px;
+                word-break: break-word;
+            }
+
+            .row input {
+                width: 85px;
+                height: 34px;
+                padding: 4px 8px;
+            }
 
         .empty {
             padding: 30px;
             text-align: center;
             color: rgba(255,255,255,0.3);
+        }
+
+        .table-header {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .table-header div {
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+        .row {
+            font-size: 13px;
+            padding: 4px 12px;
+        }
+
+            .row div {
+                font-size: 13px;
+                font-weight: 400;
+                line-height: 16px;
+                vertical-align: middle;
+            }
+
+        .inspection-project {
+            width: 200px;
+            max-width: 200px;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            line-height: 16px;
+            margin: 0;
+            padding: 0;
         }
 
         /* RESPONSIVE */
@@ -139,10 +193,14 @@
         }
 
         }
+
+       
     </style>
 </head>
 
 <body>
+
+<form asp-action="Index" method="post">
 
     <div class="form-card">
 
@@ -153,144 +211,275 @@
         <div class="form-body">
 
             <div class="form-row">
+
                 <div class="form-group">
                     <label>Line</label>
-                    <select id="line">
-                        <option>--select Line--</option>
-                        <option>Line 1</option>
-                        <option>Line 2</option>
+                    <select asp-for="LineId"
+                            id="LineId"
+                            asp-items="@(new SelectList(Model.Lines,
+                                    "LineId",
+                                    "LineName"))">
+                        <option value="">-- Select Line --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Project</label>
-                    <select id="project">
-                        <option>--select Project--</option>
-                        <option>A246F</option>
+                    <select asp-for="ProjectId"
+                            id="ProjectId"
+                            asp-items="@(new SelectList(Model.Projects,
+                                    "ProjectId",
+                                    "ProjectName"))">
+                        <option value="">-- Select Project --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Model</label>
-                    <select id="model">
-                        <option>--select Model--</option>
-                        <option>A246F</option>
+                    <select asp-for="ModelId"
+                            id="ModelId"
+                            asp-items="@(new SelectList(Model.ModelNos,
+                                    "ModelId",
+                                    "Model"))">
+                        <option value="">-- Select Model --</option>
                     </select>
                 </div>
+
             </div>
 
             <div class="form-row">
+
                 <div class="form-group">
                     <label>Part</label>
-                    <select id="part">
-                        <option>--select Part--</option>
+                    <select asp-for="PartId"
+                            id="PartId"
+                            asp-items="@(new SelectList(Model.PartNos,
+                                    "PartId",
+                                    "Part"))">
+                        <option value="">-- Select Part --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Machine</label>
-                    <select id="machine">
-                        <option>--select Machine--</option>
+                    <select asp-for="MachineId"
+                            id="MachineId"
+                            asp-items="@(new SelectList(Model.Machines,
+                                    "MachineId",
+                                    "Machine"))">
+                        <option value="">-- Select Machine --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Line Leader</label>
-                    <input type="text" placeholder="Production Line Leader">
+                    <label>Production Line Leader</label>
+                    <input asp-for="ProdLineLeader" />
                 </div>
+
             </div>
 
             <div class="form-row">
 
                 <div class="form-group">
                     <label>Checked By</label>
-                    <input type="text">
+                    <input asp-for="CheckedBy" />
                 </div>
 
                 <div class="form-group">
                     <label>Approved By</label>
-                    <input type="text">
+                    <input asp-for="ApprovedBy" />
                 </div>
 
-                <div class="form-group" style="justify-content:flex-end;">
-                    <label style="visibility:hidden;">btn</label>
-                    <button class="btn-search" onclick="loadData()">Search</button>
+                <div class="form-group"
+                     style="justify-content:flex-end;">
+
+                    <label style="visibility:hidden;">
+                        Search
+                    </label>
+
+                    <button type="submit"
+                            class="btn-search" >
+                        Search
+                    </button>
+
                 </div>
 
             </div>
 
         </div>
+
     </div>
 
-    <!-- TABLE -->
-    <div class="table">
+</form>
+
+
+<div class="table">
 
         <div class="table-header">
-            <div>Station No</div>
-            <div>Station Name</div>
-            <div>Equipment</div>
-            <div>Parameter</div>
-            <div>Unit</div>
-            <div>LSL</div>
-            <div>USL</div>
-            <div>Value</div>
+
+            <div>Work Station</div>
+            <div>Inspection Project</div>
+            <div>Inspection Specifications</div>
+            <div>Frequency</div>
+            <div>Section</div>
+            <div>Value1</div>
+            <div>Value2</div>
+            <div>Value3</div>
+            <div>Value4</div>
+            <div>Value5</div>
             <div>Action</div>
+
         </div>
 
-        <div id="body">
-            <div class="empty">No records found. Click Search.</div>
-        </div>
+    <div id="body">
+
+        @if (Model.dtChecklist != null &&
+             Model.dtChecklist.Rows.Count > 0)
+        {
+            foreach (System.Data.DataRow row in Model.dtChecklist.Rows)
+            {
+                    <div class="row">
+
+                        <div>@row["WorkStation"]</div>
+
+                        <div class="inspection-project">
+                            @row["InspectionProject"]
+                        </div>
+
+                        <div>@row["InspectionSpecifications"]</div>
+
+                        <div>@row["Frequency"]</div>
+
+                        <div>@row["Section"]</div>
+
+                        <div>
+                            <input type="text"
+                                   name="Value1"
+                                   style="width:90px;" />
+                        </div>
+
+                        <div>
+                            <input type="text"
+                                   name="Value2"
+                                   style="width:90px;" />
+                        </div>
+
+                        <div>
+                            <input type="text"
+                                   name="Value3"
+                                   style="width:90px;" />
+                        </div>
+
+                        <div>
+                            <input type="text"
+                                   name="Value4"
+                                   style="width:90px;" />
+                        </div>
+
+                        <div>
+                            <input type="text"
+                                   name="Value5"
+                                   style="width:90px;" />
+                        </div>
+
+                        <div>
+                            <button type="button"
+                                    class="btn-search">
+                                Save
+                            </button>
+                        </div>
+
+                    </div>
+            }
+        }
+        else
+        {
+            <div class="empty">
+                No records found. Click Search.
+            </div>
+        }
 
     </div>
 
-    <div style="margin-top:15px;">
-        <button class="btn-submit" onclick="submitData()">Submit</button>
-    </div>
+</div>
 
-    <script>
-        const data = [
-            {station:"S1", name:"Clamp Check", eq:"Machine A", param:"Torque", unit:"Nm", lsl:4, usl:6, value:""},
-            {station:"S2", name:"Vision Check", eq:"Camera B", param:"Defect", unit:"%", lsl:0, usl:2, value:""},
-            {station:"S3", name:"Pressure", eq:"Gauge C", param:"Bar", unit:"bar", lsl:2, usl:5, value:""}
-        ];
 
-        function loadData(){
+<div style="margin-top:15px;">
+    <button class="btn-submit"
+            type="button">
+        Submit
+    </button>
+</div>
 
-            const body = document.getElementById("body");
-            body.innerHTML="";
 
-            data.forEach((d,i)=>{
-                const row=document.createElement("div");
-                row.className="row";
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-                row.innerHTML=`
-                    <div>${d.station}</div>
-                    <div>${d.name}</div>
-                    <div>${d.eq}</div>
-                    <div>${d.param}</div>
-                    <div>${d.unit}</div>
-                    <div>${d.lsl}</div>
-                    <div>${d.usl}</div>
-                    <div>
-                        <input style="width:90px" oninput="data[${i}].value=this.value"/>
-                    </div>
-                    <div>
-                        <button class="btn-search" onclick="save(${i})">Save</button>
-                    </div>
-                `;
+<script>
 
-                body.appendChild(row);
-            });
-        }
+    $("#ProjectId").change(function () {
 
-        function save(i){
-            alert("Saved: "+data[i].station+" Value: "+data[i].value);
-        }
+        var projectId = $(this).val();
 
-        function submitData(){
-            alert("Submitted Successfully!");
-        }
-    </script>
+        $.ajax({
+            url: '/CCMCHI4SC/GetModelNoByProject',
+            type: 'POST',
+            data: { projectId: projectId },
+
+            success: function (data) {
+
+                $("#ModelId").empty();
+
+                $("#ModelId").append(
+                    '<option value="">-- Select Model --</option>'
+                );
+
+                $.each(data, function (i, item) {
+
+                    $("#ModelId").append(
+                        '<option value="' +
+                        item.modelId +
+                        '">' +
+                        item.model +
+                        '</option>'
+                    );
+                });
+            }
+        });
+    });
+
+
+    $("#ModelId").change(function () {
+
+        var modelId = $(this).val();
+
+        $.ajax({
+            url: '/CCMCHI4SC/GetPartNoByModel',
+            type: 'POST',
+            data: { modelId: modelId },
+
+            success: function (data) {
+
+                $("#PartId").empty();
+
+                $("#PartId").append(
+                    '<option value="">-- Select Part --</option>'
+                );
+
+                $.each(data, function (i, item) {
+
+                    $("#PartId").append(
+                        '<option value="' +
+                        item.partId +
+                        '">' +
+                        item.part +
+                        '</option>'
+                    );
+                });
+            }
+        });
+    });
+
+</script>
 
 </body>
 </html>

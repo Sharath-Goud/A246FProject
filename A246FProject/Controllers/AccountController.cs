@@ -34,6 +34,12 @@ namespace A246FProject.Controllers
                 return View();
             }
 
+            if (string.IsNullOrEmpty(user.Role))
+            {
+                ViewBag.Error = "Please select Role.";
+                return View(user);
+            }
+
             var exists = _context.Users
                 .FirstOrDefault(x => x.EmployeeId == user.EmployeeId);
 
@@ -73,6 +79,7 @@ namespace A246FProject.Controllers
             {
                 HttpContext.Session.SetString("User", user.EmployeeId);
                 HttpContext.Session.SetString("Name", user.Name);
+                HttpContext.Session.SetString("Role", user.Role);
                 HttpContext.Session.SetString("IsLoggedIn", "true");
                 return RedirectToAction("Index", "Dashboard");
             }

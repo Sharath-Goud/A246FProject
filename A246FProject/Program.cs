@@ -40,7 +40,6 @@ app.UseSession();
 
 app.UseAuthorization();
 
-// Default route → Login page
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
