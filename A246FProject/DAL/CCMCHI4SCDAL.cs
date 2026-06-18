@@ -197,8 +197,8 @@ namespace A246FProject.DAL
         {
             SqlParameter[] parms =
             {
-        new SqlParameter("@SectionId", sectionId)
-    };
+                new SqlParameter("@SectionId", sectionId)
+            };
 
             DataTable dt =
                 _db.ExecuteProcedureWithParameterForDataTable(

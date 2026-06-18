@@ -82,63 +82,9 @@ namespace A246FProject.Controllers.A246FProject
                 _bal.GetModelNoByProject(projectId));
         }
 
-        //    [HttpPost]
-        //    public JsonResult SaveA246FCCMMC1CheckList(
-        //[FromBody] CCMCHI4SCViewModel model)
-        //    {
-        //        try
-        //        {
-        //            DataTable dtChecklist = new DataTable();
-
-        //            dtChecklist.Columns.Add("Id", typeof(int));
-        //            dtChecklist.Columns.Add("SectionId", typeof(int));
-        //            dtChecklist.Columns.Add("Value1", typeof(decimal));
-        //            dtChecklist.Columns.Add("Value2", typeof(decimal));
-        //            dtChecklist.Columns.Add("Value3", typeof(decimal));
-        //            dtChecklist.Columns.Add("Value4", typeof(decimal));
-        //            dtChecklist.Columns.Add("Value5", typeof(decimal));
-        //            dtChecklist.Columns.Add("InspectionResults", typeof(string));
-
-        //            int uid = 1;
-
-        //            foreach (var row in model.CCMCHI4SCResults)
-        //            {
-        //                dtChecklist.Rows.Add(
-        //                    uid,
-        //                    row.SectionId,
-        //                    row.Value1 ?? 0,
-        //                    row.Value2 ?? 0,
-        //                    row.Value3 ?? 0,
-        //                    row.Value4 ?? 0,
-        //                    row.Value5 ?? 0,
-        //                    ""
-        //                );
-
-        //                uid++;
-        //            }
-
-        //            int result =
-        //                _bal.InsertBulkA246FCMMC1CheckList(
-        //                    dtChecklist,
-        //                    HttpContext.Session.GetString("User"),
-        //                    model.LineId,
-        //                    model.ProdLineLeader,
-        //                    model.CheckedBy,
-        //                    model.ApprovedBy,
-        //                    model.ModelId,
-        //                    model.PartId);
-
-        //            return Json(result);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return Json(ex.Message);
-        //        }
-        //    }
-
         [HttpPost]
         public JsonResult SaveA246FCCMMC1CheckList(
-[FromBody] CCMCHI4SCViewModel model)
+            [FromBody] CCMCHI4SCViewModel model)
         {
             try
             {
@@ -202,9 +148,16 @@ namespace A246FProject.Controllers.A246FProject
                     uid++;
                 }
 
+                string userId = HttpContext.Session.GetString("User");
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json("Session User is NULL");
+                }
+
                 int result = _bal.InsertBulkA246FCMMC1CheckList(
                     dtChecklist,
-                    HttpContext.Session.GetString("User"),
+                    userId,
                     model.LineId,
                     model.ProdLineLeader,
                     model.CheckedBy,
