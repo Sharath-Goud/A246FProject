@@ -42,18 +42,11 @@ namespace A246FProject.Models
 
     public class CCMCHI4SCResult
     {
-        public int InspectionId { get; set; }
-
         public int SectionId { get; set; }
-
-        public string Value1 { get; set; }
-
-        public string Value2 { get; set; }
-
-        public string Value3 { get; set; }
-
-        public string Value4 { get; set; }
-
-        public string Value5 { get; set; }
+        public decimal? Value1 { get; set; }
+        public decimal? Value2 { get; set; }
+        public decimal? Value3 { get; set; }
+        public decimal? Value4 { get; set; }
+        public decimal? Value5 { get; set; }
     }
 }

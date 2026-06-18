@@ -20,7 +20,7 @@ namespace A246FProject.BAL
         }
 
         public List<A246FMachines> GetMachines()
-        {
+        { 
             return _dal.GetMachines();
         }
 
@@ -48,6 +48,32 @@ namespace A246FProject.BAL
                 lineId,
                 projectId,
                 machineId);
+        }
+
+        public int InsertBulkA246FCMMC1CheckList(
+                DataTable dtChecklist,
+                string userId,
+                int lineId,
+                string prodLineLeader,
+                string checkedBy,
+                string approvedBy,
+                int modelId,
+                int partId)
+        {
+            return _dal.InsertBulkA246FCMMC1CheckList(
+                dtChecklist,
+                userId,
+                lineId,
+                prodLineLeader,
+                checkedBy,
+                approvedBy,
+                modelId,
+                partId);
+        }
+
+        public int GetInspectionIdBySection(int sectionId)
+        {
+            return _dal.GetInspectionIdBySection(sectionId);
         }
     }
 }

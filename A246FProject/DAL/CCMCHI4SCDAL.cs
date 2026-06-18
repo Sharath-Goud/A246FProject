@@ -18,7 +18,7 @@ namespace A246FProject.DAL
 
             DataTable dt =
                 _db.ExecuteProcedureForDataTable("ipqc.GetLine");
-
+             
             foreach (DataRow dr in dt.Rows)
             {
                 list.Add(new Line
@@ -164,6 +164,51 @@ namespace A246FProject.DAL
             return _db.ExecuteProcedureWithParameterForDataTable(
                 "ipqc.GetFromByA246FCCMMC1DataaNew",
                 parms);
+        }
+
+        public int InsertBulkA246FCMMC1CheckList(
+            DataTable dtChecklist,
+            string userId,
+            int lineId,
+            string prodLineLeader,
+            string checkedBy,
+            string approvedBy,
+            int modelId,
+            int partId)
+        {
+            SqlParameter[] parms =
+            {
+                new SqlParameter("@Checklist", dtChecklist),
+                new SqlParameter("@CreatedBy", userId),
+                new SqlParameter("@LineId", lineId),
+                new SqlParameter("@ProdLineLeader", prodLineLeader),
+                new SqlParameter("@CheckedBy", checkedBy),
+                new SqlParameter("@ApprovedBy", approvedBy),
+                new SqlParameter("@ModelId", modelId),
+                new SqlParameter("@PartId", partId)
+            };
+
+            return _db.ExecuteNonQueryWithParameter(
+                "ipqc.InsertBulkA246FCMMC1CheckList",
+                parms);
+        }
+
+        public int GetInspectionIdBySection(int sectionId)
+        {
+            SqlParameter[] parms =
+            {
+        new SqlParameter("@SectionId", sectionId)
+    };
+
+            DataTable dt =
+                _db.ExecuteProcedureWithParameterForDataTable(
+                    "ipqc.GetInspectionIdBySection",
+                    parms);
+
+            if (dt == null || dt.Rows.Count == 0)
+                return 0;
+
+            return Convert.ToInt32(dt.Rows[0]["InspectionId"]);
         }
     }
 }

@@ -350,41 +350,37 @@
 
                         <div>@row["Frequency"]</div>
 
-                        <div>@row["Section"]</div>
-
                         <div>
-                            <input type="text"
-                                   name="Value1"
-                                   style="width:90px;" />
+                            @row["Section"]
+
+                            <input type="hidden"
+                                   class="SectionId"
+                                   value="@row["SectionId"]" />
                         </div>
 
                         <div>
-                            <input type="text"
-                                   name="Value2"
-                                   style="width:90px;" />
+                            <input type="text" class="Value1" />
                         </div>
 
                         <div>
-                            <input type="text"
-                                   name="Value3"
-                                   style="width:90px;" />
+                            <input type="text" class="Value2" />
                         </div>
 
                         <div>
-                            <input type="text"
-                                   name="Value4"
-                                   style="width:90px;" />
+                            <input type="text" class="Value3" />
                         </div>
 
                         <div>
-                            <input type="text"
-                                   name="Value5"
-                                   style="width:90px;" />
+                            <input type="text" class="Value4" />
+                        </div>
+
+                        <div>
+                            <input type="text" class="Value5" />
                         </div>
 
                         <div>
                             <button type="button"
-                                    class="btn-search">
+                                    class="btn-search btnRowSave">
                                 Save
                             </button>
                         </div>
@@ -405,10 +401,11 @@
 
 
 <div style="margin-top:15px;">
-    <button class="btn-submit"
-            type="button">
-        Submit
-    </button>
+        <button id="btnSubmit"
+                class="btn-submit"
+                type="button">
+            Submit
+        </button>
 </div>
 
 
@@ -479,6 +476,103 @@
         });
     });
 
+            $(".btnRowSave").click(function () {
+
+            var row = $(this).closest(".row");
+
+            var data = {
+
+                LineId: $("#LineId").val(),
+                ProjectId: $("#ProjectId").val(),
+                ModelId: $("#ModelId").val(),
+                PartId: $("#PartId").val(),
+
+                ProdLineLeader: $("#ProdLineLeader").val(),
+                CheckedBy: $("#CheckedBy").val(),
+                ApprovedBy: $("#ApprovedBy").val(),
+
+                CCMCHI4SCResults: [
+                    {
+                        SectionId: row.find(".SectionId").val(),
+                        Value1: row.find(".Value1").val() === "" ? null : row.find(".Value1").val(),
+                        Value2: row.find(".Value2").val() === "" ? null : row.find(".Value2").val(),
+                        Value3: row.find(".Value3").val() === "" ? null : row.find(".Value3").val(),
+                        Value4: row.find(".Value4").val() === "" ? null : row.find(".Value4").val(),
+                        Value5: row.find(".Value5").val() === "" ? null : row.find(".Value5").val()
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: '/CCMCHI4SC/SaveA246FCCMMC1CheckList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+
+                success: function (result) {
+                    console.log('single row inserted : '+result);
+                    alert("Row Saved Successfully");
+
+                },
+                error: function () {
+
+                    alert("Error while saving");
+
+                }
+            });
+
+        });
+
+                $("#btnSubmit").click(function () {
+
+            var results = [];
+
+            $(".row").each(function () {
+
+                results.push({
+
+                    SectionId: $(this).find(".SectionId").val(),
+
+                    Value1: $(this).find(".Value1").val() || 0,
+                    Value2: $(this).find(".Value2").val() || 0,
+                    Value3: $(this).find(".Value3").val() || 0,
+                    Value4: $(this).find(".Value4").val() || 0,
+                    Value5: $(this).find(".Value5").val() || 0
+
+                });
+
+            });
+
+            var data = {
+
+                LineId: $("#LineId").val(),
+                ProjectId: $("#ProjectId").val(),
+                ModelId: $("#ModelId").val(),
+                PartId: $("#PartId").val(),
+
+                ProdLineLeader: $("#ProdLineLeader").val(),
+                CheckedBy: $("#CheckedBy").val(),
+                ApprovedBy: $("#ApprovedBy").val(),
+
+                CCMCHI4SCResults: results
+
+            };
+
+            $.ajax({
+
+                url: '/CCMCHI4SC/SaveA246FCCMMC1CheckList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+
+                success: function (result) {
+
+                    alert("All Rows Saved Successfully");
+
+                }
+            });
+
+        });
 </script>
 
 </body>
