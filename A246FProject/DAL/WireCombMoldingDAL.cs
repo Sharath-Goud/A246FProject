@@ -4,27 +4,28 @@ using System.Data;
 
 namespace A246FProject.DAL
 {
-    public class CCMCHI4SCDAL
+    public class WireCombMoldingDAL
     {
         DbClass _db;
 
-        public CCMCHI4SCDAL()
+        public WireCombMoldingDAL()
         {
             _db = DbClass.GetInstance();
         }
+
         public List<Line> GetLine()
         {
-            List<Line> list = new List<Line>();
+            List<Line> list = new();
 
             DataTable dt =
                 _db.ExecuteProcedureForDataTable("ipqc.GetLine");
-             
+
             foreach (DataRow dr in dt.Rows)
             {
                 list.Add(new Line
                 {
-                    LineId = Convert.ToInt32(dr[0]),
-                    LineName = dr[1].ToString()
+                    LineId = Convert.ToInt32(dr["LineId"]),
+                    LineName = dr["LineName"].ToString()
                 });
             }
 
@@ -33,14 +34,13 @@ namespace A246FProject.DAL
 
         public List<Project> GetProject()
         {
-            List<Project> list = new List<Project>();
+            List<Project> list = new();
 
             DataTable dt =
                 _db.ExecuteProcedureForDataTable("[ipqc].[GetProject]");
 
             foreach (DataRow dr in dt.Rows)
             {
-                // ProjectId = 31 (A246F)
                 if (Convert.ToInt32(dr["ProjectId"]) == 31)
                 {
                     list.Add(new Project
@@ -56,23 +56,18 @@ namespace A246FProject.DAL
 
         public List<A246FMachines> GetMachines()
         {
-            List<A246FMachines> list = new List<A246FMachines>();
+            List<A246FMachines> list = new();
 
             DataTable dt =
                 _db.ExecuteProcedureForDataTable("[ipqc].[GetA246FMachines]");
 
             foreach (DataRow dr in dt.Rows)
             {
-                int machineId = Convert.ToInt32(dr["MachineId"]);
-
-                if (machineId >= 1 && machineId <= 5)
+                list.Add(new A246FMachines
                 {
-                    list.Add(new A246FMachines
-                    {
-                        MachineId = machineId,
-                        Machine = dr["Machine"].ToString()
-                    });
-                }
+                    MachineId = Convert.ToInt32(dr["MachineId"]),
+                    Machine = dr["Machine"].ToString()
+                });
             }
 
             return list;
@@ -80,7 +75,7 @@ namespace A246FProject.DAL
 
         public List<ModelNo> GetModelNo()
         {
-            List<ModelNo> list = new List<ModelNo>();
+            List<ModelNo> list = new();
 
             DataTable dt =
                 _db.ExecuteProcedureForDataTable("[ipqc].[GetModelNo]");
@@ -97,40 +92,14 @@ namespace A246FProject.DAL
             return list;
         }
 
-        public List<PartNo> GetPartNoByModel(int modelId)
-        {
-            List<PartNo> list = new List<PartNo>();
-
-            SqlParameter[] parms =
-            {
-        new SqlParameter("@ModelId", modelId)
-    };
-
-            DataTable dt =
-                _db.ExecuteProcedureWithParameterForDataTable(
-                    "ipqc.GetPartNoByModel",
-                    parms);
-
-            foreach (DataRow dr in dt.Rows)
-            {
-                list.Add(new PartNo
-                {
-                    PartId = Convert.ToInt32(dr["PartId"]),
-                    Part = dr["Part"].ToString()
-                });
-            }
-
-            return list;
-        }
-
         public List<ModelNo> GetModelNoByProject(int projectId)
         {
-            List<ModelNo> list = new List<ModelNo>();
-
             SqlParameter[] parms =
             {
                 new SqlParameter("@ProjectId", projectId)
             };
+
+            List<ModelNo> list = new();
 
             DataTable dt =
                 _db.ExecuteProcedureWithParameterForDataTable(
@@ -149,51 +118,51 @@ namespace A246FProject.DAL
             return list;
         }
 
-        public DataTable GetCCMCHI4SCData(
-            int lineId,
+        public List<PartNo> GetPartNoByModel(int modelId)
+        {
+            SqlParameter[] parms =
+            {
+                new SqlParameter("@ModelId", modelId)
+            };
+
+            List<PartNo> list = new();
+
+            DataTable dt =
+                _db.ExecuteProcedureWithParameterForDataTable(
+                    "ipqc.GetPartNoByModel",
+                    parms);
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new PartNo
+                {
+                    PartId = Convert.ToInt32(dr["PartId"]),
+                    Part = dr["Part"].ToString()
+                });
+            }
+
+            return list;
+        }
+
+        public DataTable GetWireCombMoldingData(
             int projectId,
+            int lineId,
             int machineId)
         {
             SqlParameter[] parms =
             {
-                new SqlParameter("@LineId", lineId),
                 new SqlParameter("@ProjectId", projectId),
+                new SqlParameter("@LineId", lineId),
                 new SqlParameter("@MachineId", machineId)
             };
 
             return _db.ExecuteProcedureWithParameterForDataTable(
-                "ipqc.GetFromByA246FCCMMC1DataaNew",
+                "ipqc.GetFromByA246FWCMMC1Data",
                 parms);
         }
 
-        public int InsertBulkA246FCMMC1CheckList(
-            DataTable dtChecklist,
-            string userId,
-            int lineId,
-            string prodLineLeader,
-            string checkedBy,
-            string approvedBy,
-            int modelId,
-            int partId)
-        {
-            SqlParameter[] parms =
-            {
-                new SqlParameter("@Checklist", dtChecklist),
-                new SqlParameter("@CreatedBy", userId),
-                new SqlParameter("@LineId", lineId),
-                new SqlParameter("@ProdLineLeader", prodLineLeader),
-                new SqlParameter("@CheckedBy", checkedBy),
-                new SqlParameter("@ApprovedBy", approvedBy),
-                new SqlParameter("@ModelId", modelId),
-                new SqlParameter("@PartId", partId)
-            };
-
-            return _db.ExecuteNonQueryWithParameter(
-                "ipqc.InsertBulkA246FCMMC1CheckList",
-                parms);
-        }
-
-        public int GetInspectionIdBySection(int sectionId)
+        public int GetInspectionIdBySection(
+            int sectionId)
         {
             SqlParameter[] parms =
             {
@@ -203,12 +172,43 @@ namespace A246FProject.DAL
             DataTable dt =
                 _db.ExecuteProcedureWithParameterForDataTable(
                     "ipqc.GetInspectionIdBySection",
+
                     parms);
 
-            if (dt == null || dt.Rows.Count == 0)
+            if (dt.Rows.Count == 0)
                 return 0;
 
-            return Convert.ToInt32(dt.Rows[0]["InspectionId"]);
+            return Convert.ToInt32(
+                dt.Rows[0]["InspectionId"]);
+        }
+
+        public int InsertBulkA246FWCMMC1CheckList(
+            DataTable dtChecklist,
+            int lineId,
+            int projectId,
+            int modelId,
+            int partId,
+            string leader,
+            string checkedBy,
+            string approvedBy,
+            string createdBy)
+        {
+            SqlParameter[] parms =
+            {
+                new SqlParameter("@Checklist", dtChecklist),
+                new SqlParameter("@CreatedBy", createdBy),
+                new SqlParameter("@LineId", lineId),
+                new SqlParameter("@ProjectId", projectId),
+                new SqlParameter("@ProdLineLeader", leader),
+                new SqlParameter("@CheckedBy", checkedBy),
+                new SqlParameter("@ApprovedBy", approvedBy),
+                new SqlParameter("@ModelId", modelId),
+                new SqlParameter("@PartId", partId)
+            };
+
+            return _db.ExecuteNonQueryWithParameter(
+                "ipqc.InsertBulkA246FWCMMC1CheckList",
+                parms);
         }
     }
 }
