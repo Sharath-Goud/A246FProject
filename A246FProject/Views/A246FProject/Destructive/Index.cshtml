@@ -1,4 +1,6 @@
-﻿
+﻿@model A246FProject.Models.DestructiveViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -144,7 +146,7 @@
 
         .custom-table {
             width: 100%;
-            min-width: 1500px;
+            min-width: 900px;
             border-collapse: collapse;
         }
 
@@ -153,8 +155,8 @@
             }
 
                 .custom-table thead th {
-                    padding: 14px 12px;
-                    text-align: center;
+                    padding: 8px 6px;
+                    text-align: left;
                     font-size: 12px;
                     font-weight: 600;
                     color: rgba(255,255,255,.75);
@@ -163,8 +165,8 @@
                 }
 
             .custom-table tbody td {
-                padding: 12px;
-                text-align: center;
+                padding: 8px 6px;
+                text-align: left;
                 color: #e2e8f0;
                 border-top: 1px solid rgba(255,255,255,.05);
             }
@@ -188,6 +190,99 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            .custom-table thead tr {
+                background: rgba(167,139,250,.12);
+            }
+
+            .custom-table th {
+                padding: 12px 10px;
+                text-align: left;
+                color: #fff;
+                font-size: 13px;
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255,255,255,.08);
+            }
+
+            .custom-table td {
+                padding: 10px;
+                color: #fff;
+                font-size: 13px;
+                border-bottom: 1px solid rgba(255,255,255,.06);
+                vertical-align: top;
+                line-height: 1.5;
+            }
+
+        .value-box {
+            width: 80px;
+            height: 34px;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 4px;
+            background: rgba(255,255,255,.06);
+            color: #fff;
+            text-align: left;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            .custom-table td[rowspan] {
+                vertical-align: top;
+                padding-top: 12px;
+            }
+
+            .custom-table th:nth-child(1),
+            .custom-table td:nth-child(1) {
+                width: 120px;
+            }
+
+            .custom-table th:nth-child(2),
+            .custom-table td:nth-child(2) {
+                width: 420px;
+            }
+
+            .custom-table th:nth-child(3),
+            .custom-table td:nth-child(3) {
+                width: 220px;
+            }
+
+            .custom-table th:nth-child(4),
+            .custom-table td:nth-child(4) {
+                width: 120px;
+            }
+
+            .custom-table th:nth-child(5),
+            .custom-table td:nth-child(5) {
+                width: 80px;
+                text-align: left;
+            }
+
+            .custom-table th:nth-child(6),
+            .custom-table td:nth-child(6) {
+                width: 100px;
+            }
+
+            .custom-table th:nth-child(7),
+            .custom-table td:nth-child(7) {
+                width: 100px;
+            }
     </style>
 </head>
 
@@ -198,87 +293,114 @@
         <div class="form-card-header">
             Destructive
         </div>
+        <form asp-action="Index" method="post">
+            <div class="form-body">
 
-        <div class="form-body">
+                <!-- Row 1 -->
 
-            <!-- Row 1 -->
+                <div class="form-row">
 
-            <div class="form-row">
+                    <div class="form-group">
+                        <label>LINE</label>
+                        <select asp-for="LineId"
+                                id="LineId"
+                                asp-items="@(new SelectList(Model.Lines,
+                                "LineId",
+                                "LineName"))">
+                            <option value="">-- Select Line --</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>LINE</label>
-                    <select>
-                        <option>-- Select Line --</option>
-                    </select>
+                    <div class="form-group">
+                        <label>PROJECT</label>
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,
+                                "ProjectId",
+                                "ProjectName"))">
+                            <option value="">-- Select Project --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>MODEL</label>
+                        <select asp-for="ModelId"
+                                id="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos,
+                                "ModelId",
+                                "Model"))">
+                            <option value="">-- Select Model --</option>
+                        </select>
+                    </div>
+
                 </div>
 
-                <div class="form-group">
-                    <label>PROJECT</label>
-                    <select>
-                        <option>-- Select Project --</option>
-                    </select>
+                <!-- Row 2 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>PART</label>
+                        <select asp-for="PartId"
+                                id="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,
+                                "PartId",
+                                "Part"))">
+                            <option value="">-- Select Part --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>MACHINE</label>
+                        <select asp-for="MachineId"
+                                id="MachineId"
+                                asp-items="@(new SelectList(Model.Machines,
+                                "MachineId",
+                                "Machine"))">
+                            <option value="">-- Select Machine --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>LINE LEADER</label>
+                        <input asp-for="ProdLineLeader"
+                               id="ProdLineLeader"
+                               type="text"
+                               placeholder="Production Line Leader" />
+                    </div>
+
                 </div>
 
-                <div class="form-group">
-                    <label>MODEL</label>
-                    <select>
-                        <option>-- Select Model --</option>
-                    </select>
+                <!-- Row 3 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>CHECKED BY</label>
+                        <input asp-for="CheckedBy"
+                               id="CheckedBy"
+                               type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>APPROVED BY</label>
+                        <input asp-for="ApprovedBy"
+                               id="ApprovedBy"
+                               type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="submit"
+                                class="btn-search">
+                            Search
+                        </button>
+                    </div>
+
                 </div>
 
             </div>
-
-            <!-- Row 2 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>PART</label>
-                    <select>
-                        <option>-- Select Part --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>MACHINE</label>
-                    <select>
-                        <option>-- Select Machine --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>LINE LEADER</label>
-                    <input type="text"
-                           placeholder="Production Line Leader">
-                </div>
-
-            </div>
-
-            <!-- Row 3 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>CHECKED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>APPROVED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn-search">
-                        Search
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
-
+        </form>
     </div>
 
     <!-- TABLE -->
@@ -293,7 +415,7 @@
                     <tr>
                         <th>Work Station</th>
                         <th>Inspection Project</th>
-                        <th>InspectionSpecifications</th>
+                        <th>Inspection Specifications</th>
                         <th>Frequency</th>
                         <th>section</th>
                         <th>Value1</th>
@@ -303,11 +425,61 @@
 
                 <tbody>
 
-                    <tr>
-                        <td colspan="12" class="empty-row">
-                            No records found. Use search to load data.
-                        </td>
-                    </tr>
+                    @if (Model.dtChecklist != null &&
+                    Model.dtChecklist.Rows.Count > 0)
+                    {
+                        @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                        {
+                            <tr>
+
+                                <td>
+                                    <input type="hidden"
+                                           class="SectionId"
+                                           value="@Model.dtChecklist.Rows[i]["SectionId"]" />
+
+                                    @Model.dtChecklist.Rows[i]["WorkStation"]
+                                </td>
+
+                                <td>
+                                    @Model.dtChecklist.Rows[i]["InspectionProject"]
+                                </td>
+
+                                <td>
+                                    @Model.dtChecklist.Rows[i]["InspectionSpecifications"]
+                                </td>
+
+                                <td>
+                                    @Model.dtChecklist.Rows[i]["Frequency"]
+                                </td>
+
+                                <td>
+                                    @Model.dtChecklist.Rows[i]["Section"]
+                                </td>
+
+                                <td>
+                                    <input type="text"
+                                           class="value-box value1"
+                                           data-sectionid="@Model.dtChecklist.Rows[i]["SectionId"]" />
+                                </td>
+
+                                <td>
+                                    <button type="button"
+                                            class="btn-search btnRowSave">
+                                        Save
+                                    </button>
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="empty-row">
+                                No records found.
+                            </td>
+                        </tr>
+                    }
 
                 </tbody>
 
@@ -319,11 +491,185 @@
 
     <div class="actions">
 
-        <button class="btn-submit">
+        <button type="button"
+                id="btnSubmit"
+                class="btn-submit">
             Submit
         </button>
 
     </div>
 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+            $.ajax({
+                url: '/Destructive/GetModelNoByProject',
+                type: 'POST',
+                data: { projectId: projectId },
+
+                success: function (data) {
+
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>'
+                        );
+                    });
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+                }
+            });
+
+        });
+
+        $("#ModelId").change(function () {
+
+            var modelId = $(this).val();
+
+            $.ajax({
+                url: '/Destructive/GetPartNoByModel',
+                type: 'POST',
+                data: { modelId: modelId },
+
+                success: function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>'
+                        );
+                    });
+                }
+            });
+
+        });
+
+    </script>
+    <script>
+                $(document).on("click", ".btnRowSave", function () {
+
+            var row = $(this).closest("tr");
+
+            var data = {
+                lineId: $("#LineId").val(),
+                projectId: $("#ProjectId").val(),
+                modelId: $("#ModelId").val(),
+                partId: $("#PartId").val(),
+                machineId: $("#MachineId").val(),
+
+                prodLineLeader: $("#ProdLineLeader").val(),
+                checkedBy: $("#CheckedBy").val(),
+                approvedBy: $("#ApprovedBy").val(),
+
+                a246FMHB2CheckListResults: [
+                    {
+                        sectionId: parseInt(row.find(".SectionId").val()),
+                        value1: row.find(".value1").val() || 0,
+                        inspectionResults: ""
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: '/Destructive/SaveA246FMHB2CheckList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+
+                success: function (response) {
+                    if (response > 0) {
+                        alert("✔ Row inserted successfully!");
+                    } else {
+                        alert("❌ Row insert failed!");
+                    }
+                },
+
+                error: function () {
+                    alert("⚠ Error while saving row!");
+                }
+            });
+        });
+
+                        $("#btnSubmit").click(function () {
+
+            var results = [];
+
+            $("tbody tr").each(function () {
+
+                results.push({
+                    sectionId: $(this).find(".SectionId").val(),
+                    value1: $(this).find(".value1").val() || 0,
+                    inspectionResults: ""
+                });
+
+            });
+
+            var data = {
+                lineId: $("#LineId").val(),
+                projectId: $("#ProjectId").val(),
+                modelId: $("#ModelId").val(),
+                partId: $("#PartId").val(),
+                machineId: $("#MachineId").val(),
+
+                prodLineLeader: $("#ProdLineLeader").val(),
+                checkedBy: $("#CheckedBy").val(),
+                approvedBy: $("#ApprovedBy").val(),
+
+                a246FMHB2CheckListResults: results
+            };
+
+            $.ajax({
+                url: '/Destructive/SaveA246FMHB2CheckList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+
+                success: function (response) {
+
+                    if (response > 0) {
+                        alert("✔ Rows inserted successfully!");
+                        location.reload();
+                    } else {
+                        alert("❌ Submit failed!");
+                    }
+                },
+
+                error: function () {
+                    alert("⚠ Error while submitting data!");
+                }
+            });
+
+        });
+    </script>
 </body>
 </html>

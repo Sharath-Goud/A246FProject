@@ -12,6 +12,7 @@ namespace A246FProject.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            ViewBag.UserName = HttpContext.Session.GetString("Name");
             ViewBag.User = HttpContext.Session.GetString("User");
             return View();
         }

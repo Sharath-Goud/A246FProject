@@ -474,7 +474,7 @@
     </div>
 
     <div class="actions">
-        <button class="btn-submit">
+        <button type="button" class="btn-submit">
             Submit
         </button>
     </div>
@@ -577,6 +577,65 @@
                 data: JSON.stringify(data),
                 success: function () {
                     alert("Saved Successfully");
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).on("click", ".btn-submit", function (e) {
+
+            e.preventDefault();
+
+            var results = [];
+
+            $("#body tr.row").each(function () {
+
+                results.push({
+                    SectionId: parseInt($(this).find(".SectionId").val()) || 0,
+                    Value1: parseFloat($(this).find(".Value1").val()) || 0,
+                    Value2: parseFloat($(this).find(".Value2").val()) || 0,
+                    Value3: parseFloat($(this).find(".Value3").val()) || 0,
+                    Value4: parseFloat($(this).find(".Value4").val()) || 0,
+                    Value5: parseFloat($(this).find(".Value5").val()) || 0,
+                    CablesSerialNumber: $(this).find(".CableSerialNo").val()
+                });
+            });
+
+            var model = {
+                LineId: parseInt($("#LineId").val()) || 0,
+                ProjectId: parseInt($("#ProjectId").val()) || 0,
+                ModelId: parseInt($("#ModelId").val()) || 0,
+                PartId: parseInt($("#PartId").val()) || 0,
+                MachineId: parseInt($("#MachineId").val()) || 0,
+
+                ProdLineLeader: $("#ProdLineLeader").val(),
+                CheckedBy: $("#CheckedBy").val(),
+                ApprovedBy: $("#ApprovedBy").val(),
+
+                WireCombMoldingResults: results
+            };
+
+            console.log(model);
+
+            $.ajax({
+                url: '/WireCombMolding/SaveA246FWCMMCCheckList',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(model),
+
+                success: function (response) {
+                    alert("All Records Saved Successfully");
+                        $(".Value1").val("");
+                        $(".Value2").val("");
+                        $(".Value3").val("");
+                        $(".Value4").val("");
+                        $(".Value5").val("");
+                        $(".CableSerialNo").val("");
+                },
+
+                error: function (xhr) {
+                    console.log(xhr);
+                    alert("Save Failed");
                 }
             });
         });

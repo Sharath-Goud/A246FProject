@@ -10,7 +10,8 @@
     <title>@ViewData["Title"] - A246FProject</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    @* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"> *@
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <style>
 
@@ -89,7 +90,6 @@
             transform: rotate(180deg);
         }
 
-        /* dropdown animation */
         .dropdown {
             max-height: 0;
             overflow: hidden;
@@ -118,7 +118,6 @@
                 color: #d8b4fe;
             }
 
-        /* ================= HEADER ================= */
         .header {
             position: fixed;
             left: 280px;
@@ -154,13 +153,11 @@
                 width: 100%;
             }
 
-        /* ================= MAIN ================= */
         .main {
             margin-left: 280px;
             padding: 90px 20px 20px 20px;
         }
 
-        /* animations */
         @@keyframes fade {
             from {
                 opacity: 0;
@@ -177,12 +174,158 @@
             animation: fade .4s ease;
         }
 
+        .register-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: .3s;
+        }
+
+            .register-icon:hover {
+                background: #7c3aed;
+                color: white;
+            }
+
+        .logout-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: .3s;
+        }
+
+            .logout-icon:hover {
+                background: #7c3aed;
+                color: white;
+            }
+
+        .profile-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #7c3aed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+            .profile-avatar:hover {
+                transform: scale(1.05);
+            }
+
+        .profile-popup {
+            position: absolute;
+            top: 65px;
+            right: 20px;
+            width: 320px;
+            background: linear-gradient( 160deg, #1a1040 0%, #0d1b2a 100%);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 25px 50px rgba(0,0,0,.5);
+        }
+
+            .profile-popup.show {
+                display: block;
+                animation: popupShow .25s ease;
+            }
+
+        @@keyframes popupShow {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popup-top {
+            padding: 24px;
+            text-align: center;
+            background: rgba(124,58,237,.15);
+        }
+
+        .popup-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #7c3aed;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .popup-name {
+            margin-top: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .popup-role {
+            color: #c4b5fd;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .popup-body {
+            padding: 20px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+
+            .profile-row span {
+                color: #94a3b8;
+            }
+
+            .profile-row strong {
+                color: white;
+            }
+
+        .popup-footer {
+            padding: 16px;
+        }
+
+        .popup-logout {
+            display: block;
+            text-align: center;
+            background: #7c3aed;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ================= SIDEBAR ================= -->
     <div class="sidebar">
 
         <div class="logo">
@@ -237,9 +380,6 @@
             <div class="dd-item" onclick="go('/AOI/Index')">
                 AOI
             </div>
-            @* <div class="dd-item" onclick="go('/Hanking/Index')"> *@
-            @*     Hanking *@
-            @* </div> *@
             <div class="dd-item" onclick="go('/LaserEngraving/Index')">
                 Laser Engraving
             </div>
@@ -248,10 +388,77 @@
             </div>
 
         </div>
+        <button class="nav-btn" onclick="toggleReports()">
+            <i class="ti ti-report-analytics"></i>
+            Reports
+            <i class="ti ti-chevron-down chevron"></i>
+        </button>
 
+        <div class="dropdown" id="reportsMenu">
+
+            <div class="dd-item" onclick="go('/CTPParameterReport/Index')">
+                CTP Parameter Report
+            </div>
+
+            <div class="dd-item" onclick="go('/GlueWeighingReport/Index')">
+                Glue Weighing Report
+            </div>
+
+            <div class="dd-item" onclick="go('/SOPPORReport/Index')">
+                SOP/POR Report
+            </div>
+
+            <div class="dd-item" onclick="go('/FirstArticleInspectionReport/Index')">
+                First Article Inspection Report
+            </div>
+
+            <div class="dd-item" onclick="go('/FirstArticleDimensionReport/Index')">
+                First Article Dimension Report
+            </div>
+
+            <div class="dd-item" onclick="go('/VisualInspectionReport/Index')">
+                Visual Inspection Report
+            </div>
+
+            <div class="dd-item" onclick="go('/CCMCHI4SCReport/Index')">
+                CCM CHI 4SC Report
+            </div>
+
+            <div class="dd-item" onclick="go('/WireCombMoldingReport/Index')">
+                Wire Comb Molding Report
+            </div>
+
+            <div class="dd-item" onclick="go('/HotBarReport/Index')">
+                Hot Bar Report
+            </div>
+
+            <div class="dd-item" onclick="go('/DestructiveReport/Index')">
+                Destructive Report
+            </div>
+
+            <div class="dd-item" onclick="go('/ShellCrimpReport/Index')">
+                Shell Crimp Report
+            </div>
+
+            <div class="dd-item" onclick="go('/InnerMoldReport/Index')">
+                Inner Mold Report
+            </div>
+
+            <div class="dd-item" onclick="go('/AOIReport/Index')">
+                AOI Report
+            </div>
+
+            <div class="dd-item" onclick="go('/LaserEngravingReport/Index')">
+                Laser Engraving Report
+            </div>
+
+            <div class="dd-item" onclick="go('/NewHankingReport/Index')">
+                New Hanking Report
+            </div>
+
+        </div>
     </div>
 
-    <!-- ================= HEADER ================= -->
     <div class="header">
 
         <div class="search">
@@ -259,16 +466,70 @@
             <input placeholder="Search..." />
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;">
-            <div class="ti ti-bell"></div>
-            <div style="width:32px;height:32px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;">
-                A
+        <div style="display:flex;gap:16px;align-items:center;">
+
+            <a href="/Account/Register"
+               title="Registration"
+               class="register-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </a>
+
+            <a href="/Account/Logout"
+               title="Logout"
+               class="logout-icon">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+
+            <div class="profile-avatar"
+                 onclick="toggleProfilePopup()">
+
+                @Context.Session.GetString("Name")?.Substring(0, 1).ToUpper()
+
             </div>
+
+            <div id="profilePopup" class="profile-popup">
+
+                <div class="popup-top">
+
+                    <div class="popup-avatar">
+                        @Context.Session.GetString("Name")?.Substring(0, 1).ToUpper()
+                    </div>
+
+                    <div class="popup-name">
+                        @Context.Session.GetString("Name")
+                    </div>
+
+                    <div class="popup-role">
+                        @Context.Session.GetString("Role")
+                    </div>
+
+                </div>
+
+                <div class="popup-body">
+
+                    <div class="profile-row">
+                        <span>Employee ID</span>
+                        <strong>@Context.Session.GetString("User")</strong>
+                    </div>
+
+                    <div class="profile-row">
+                        <span>Name</span>
+                        <strong>@Context.Session.GetString("Name")</strong>
+                    </div>
+
+                    <div class="profile-row">
+                        <span>Role</span>
+                        <strong>@Context.Session.GetString("Role")</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
 
-    <!-- ================= PAGE CONTENT ================= -->
     <div class="main">
         @RenderBody()
     </div>
@@ -289,6 +550,36 @@
                 document.querySelectorAll('.dd-item').forEach(i => i.classList.remove('selected'));
                 this.classList.add('selected');
             });
+        });
+
+
+        function toggleReports() {
+            document.getElementById('reportsMenu')
+                    .classList.toggle('open');
+        }
+    </script>
+
+    <script>
+
+        function toggleProfilePopup() {
+            document
+                .getElementById("profilePopup")
+                .classList.toggle("show");
+        }
+
+        document.addEventListener("click", function(e) {
+
+            const popup =
+                document.getElementById("profilePopup");
+
+            const avatar =
+                document.querySelector(".profile-avatar");
+
+            if (!popup.contains(e.target) &&
+                !avatar.contains(e.target))
+            {
+                popup.classList.remove("show");
+            }
         });
 
     </script>

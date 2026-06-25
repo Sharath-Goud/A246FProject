@@ -79,13 +79,13 @@ namespace A246FProject.Controllers.A246FProject
         {
             try
             {
-                if (model == null || model.WireCombMoldingResults == null)
+                if (model?.WireCombMoldingResults == null)
                     return Json("No data received");
 
                 string userId = HttpContext.Session.GetString("User");
 
                 if (string.IsNullOrEmpty(userId))
-                    return Json("Session User is NULL");
+                    return Json("Session expired - login again");
 
                 DataTable dt = new DataTable();
 
@@ -128,11 +128,11 @@ namespace A246FProject.Controllers.A246FProject
                     userId
                 );
 
-                return Json(result);
+                return Json(new { success = true, result });
             }
             catch (Exception ex)
             {
-                return Json(ex.Message);
+                return Json(new { success = false, message = ex.Message });
             }
         }
     }

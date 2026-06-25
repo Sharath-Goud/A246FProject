@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.AOIViewModel
+
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -12,37 +15,34 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins',sans-serif;
         }
 
         body {
             background: linear-gradient(135deg,#0d0d1a,#0a0a2e,#0d1b2a);
             min-height: 100vh;
-            color: #e2e8f0;
             padding: 20px;
+            color: #fff;
         }
-
-        /* CARD */
 
         .form-card {
             background: rgba(255,255,255,.04);
             border: 1px solid rgba(255,255,255,.08);
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
             margin-bottom: 20px;
         }
 
         .form-card-header {
-            background: rgba(167,139,250,.12);
-            border-bottom: 1px solid rgba(167,139,250,.2);
-            padding: 14px 22px;
-            font-size: 18px;
+            padding: 14px 20px;
+            background: rgba(167,139,250,.15);
+            font-size: 16px;
             font-weight: 600;
             color: #fff;
         }
 
         .form-body {
-            padding: 22px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -60,23 +60,24 @@
         }
 
         label {
+            margin-bottom: 6px;
             font-size: 11px;
-            color: #8d95c7;
+            font-weight: 500;
+            color: rgba(255,255,255,.60);
             text-transform: uppercase;
             letter-spacing: .5px;
-            font-weight: 500;
-            margin-bottom: 8px;
         }
 
         input,
         select {
-            height: 44px;
+            width: 100%;
+            height: 42px;
+            padding: 0 12px;
             background: rgba(255,255,255,.06);
             border: 1px solid rgba(255,255,255,.12);
             border-radius: 8px;
-            padding: 0 14px;
-            font-size: 13px;
             color: #fff;
+            font-size: 13px;
             outline: none;
         }
 
@@ -94,45 +95,39 @@
                 background: rgba(167,139,250,.08);
             }
 
-        /* BUTTONS */
-
         .btn-search {
             width: 100%;
-            height: 44px;
+            height: 42px;
+            border: none;
+            border-radius: 8px;
             background: linear-gradient(135deg,#a78bfa,#7c3aed);
-            border: none;
-            border-radius: 8px;
             color: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg,#60a5fa,#2563eb);
-            border: none;
-            border-radius: 8px;
-            padding: 10px 24px;
-            color: #fff;
-            cursor: pointer;
             font-size: 13px;
-        }
-
-        .btn-save {
-            background: linear-gradient(135deg,#34d399,#059669);
-            border: none;
-            border-radius: 6px;
-            padding: 7px 14px;
-            color: #fff;
+            font-weight: 600;
             cursor: pointer;
         }
 
-        /* TABLE */
+ 
+        .btn-submit {
+            width: 120px;
+            height: 42px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg,#60a5fa,#2563eb);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .actions {
+            margin-top: 18px;
+        }
 
         .results-table {
             background: rgba(255,255,255,.04);
             border: 1px solid rgba(255,255,255,.08);
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
         }
 
@@ -143,145 +138,241 @@
 
         .custom-table {
             width: 100%;
-            min-width: 1700px;
+            min-width: 1200px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
             .custom-table thead {
-                background: rgba(167,139,250,.08);
+                background: rgba(167,139,250,.15);
             }
 
                 .custom-table thead th {
-                    padding: 14px 12px;
-                    text-align: center;
-                    font-size: 12px;
+                    padding: 12px 8px;
+                    text-align: left;
+                    font-size: 13px;
                     font-weight: 600;
-                    color: rgba(255,255,255,.85);
+                    color: #fff;
                     border-bottom: 1px solid rgba(255,255,255,.08);
-                    white-space: nowrap;
                 }
 
             .custom-table tbody td {
-                padding: 12px;
-                text-align: center;
-                color: #e2e8f0;
+                padding: 8px;
+                text-align: left;
+                vertical-align: middle;
                 border-top: 1px solid rgba(255,255,255,.05);
+                font-size: 13px;
             }
 
-                .custom-table tbody td input {
-                    width: 100%;
-                }
+            .custom-table th:nth-child(1),
+            .custom-table td:nth-child(1) {
+                width: 120px;
+            }
+
+            .custom-table th:nth-child(2),
+            .custom-table td:nth-child(2) {
+                width: 220px;
+            }
+
+            .custom-table th:nth-child(3),
+            .custom-table td:nth-child(3) {
+                width: 120px;
+            }
+
+            .custom-table th:nth-child(4),
+            .custom-table td:nth-child(4) {
+                width: 90px;
+            }
+
+            .custom-table th:nth-child(5),
+            .custom-table td:nth-child(5) {
+                width: 110px;
+            }
+
+            .custom-table th:nth-child(6),
+            .custom-table td:nth-child(6),
+            .custom-table th:nth-child(7),
+            .custom-table td:nth-child(7),
+            .custom-table th:nth-child(8),
+            .custom-table td:nth-child(8),
+            .custom-table th:nth-child(9),
+            .custom-table td:nth-child(9),
+            .custom-table th:nth-child(10),
+            .custom-table td:nth-child(10) {
+                width: 90px;
+            }
+
+            .custom-table th:nth-child(11),
+            .custom-table td:nth-child(11) {
+                width: 90px;
+            }
+
+            .custom-table td:nth-child(2),
+            .custom-table td:nth-child(3) {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                line-height: 18px;
+                text-align: left;
+            }
+
+            .custom-table tbody td input[type=text] {
+                width: 80px;
+                height: 34px;
+                padding: 4px;
+                border-radius: 6px;
+                font-size: 13px;
+                text-align: left;
+            }
 
         .empty-row {
-            height: 100px;
-            color: rgba(255,255,255,.25);
-            font-size: 13px;
+            height: 90px;
+            font-size: 14px;
+            color: rgba(255,255,255,.35);
+            text-align: left;
         }
 
-        .actions {
-            margin-top: 16px;
+        .table-scroll::-webkit-scrollbar {
+            height: 8px;
         }
 
-        @@media (max-width:900px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #7c3aed;
+            border-radius: 20px;
         }
-    </style>
+
+        .table-scroll::-webkit-scrollbar-track {
+            background: #1b1b2d;
+        }
+
+        @@media(max - width:900px) {
+            .form-row
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        .custom-table {
+            min-width: 1600px;
+        }
+
+        }</style>
 
 </head>
 
 <body>
 
-    <div class="form-card">
+    <form asp-action="Index" method="post">
 
-        <div class="form-card-header">
-            AOI
+        <div class="form-card">
+
+            <div class="form-card-header">
+                AOI Checklist
+            </div>
+
+            <div class="form-body">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Line</label>
+                        <select asp-for="LineId"
+                                id="LineId"
+                                asp-items="@(new SelectList(Model.Lines,
+                                    "LineId",
+                                    "LineName"))">
+                            <option value="">-- Select Line --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project</label>
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,
+                                    "ProjectId",
+                                    "ProjectName"))">
+                            <option value="">-- Select Project --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select asp-for="ModelId"
+                                id="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos,
+                                    "ModelId",
+                                    "Model"))">
+                            <option value="">-- Select Model --</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Part</label>
+                        <select asp-for="PartId"
+                                id="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,
+                                    "PartId",
+                                    "Part"))">
+                            <option value="">-- Select Part --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Machine</label>
+                        <select asp-for="MachineId"
+                                id="MachineId"
+                                asp-items="@(new SelectList(Model.Machines,
+                                    "MachineId",
+                                    "Machine"))">
+                            <option value="">-- Select Machine --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Production Line Leader</label>
+                        <input asp-for="ProdLineLeader" id="ProdLineLeader" />
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Checked By</label>
+                        <input asp-for="CheckedBy" id="CheckedBy" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Approved By</label>
+                        <input asp-for="ApprovedBy" id="ApprovedBy" />
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <label style="visibility:hidden;">
+                            Search
+                        </label>
+
+                        <button type="submit"
+                                class="btn-search">
+                            Search
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="form-body">
-
-            <!-- Row 1 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>LINE</label>
-                    <select>
-                        <option>-- Select Line --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>PROJECT</label>
-                    <select>
-                        <option>-- Select Project --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>MODEL</label>
-                    <select>
-                        <option>-- Select Model --</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <!-- Row 2 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>PART</label>
-                    <select>
-                        <option>-- Select Part --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>MACHINE</label>
-                    <select>
-                        <option>-- Select Machine --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>LINE LEADER</label>
-                    <input type="text"
-                           placeholder="Production LineLeader">
-                </div>
-
-            </div>
-
-            <!-- Row 3 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>CHECKED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>APPROVED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn-search">
-                        Search
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- TABLE -->
+    </form>
 
     <div class="results-table">
 
@@ -305,13 +396,51 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody id="body">
 
-                    <tr>
-                        <td colspan="14" class="empty-row">
-                            No records found. Use search to load data.
-                        </td>
-                    </tr>
+                    @if (Model.dtChecklist != null && Model.dtChecklist.Rows.Count > 0)
+                    {
+                        foreach (System.Data.DataRow row in Model.dtChecklist.Rows)
+                        {
+                            <tr class="row">
+
+                                <td>@row["WorkStation"]</td>
+                                <td>@row["InspectionProject"]</td>
+                                <td>@row["InspectionSpecifications"]</td>
+                                <td>@row["Frequency"]</td>
+                                <td>@row["Section"]</td>
+
+                                <td>
+                                    <input type="hidden"
+                                           class="SectionId"
+                                           value="@row["SectionId"]" />
+
+                                    <input type="text" class="Value1" />
+                                </td>
+
+                                <td><input type="text" class="Value2" /></td>
+                                <td><input type="text" class="Value3" /></td>
+                                <td><input type="text" class="Value4" /></td>
+                                <td><input type="text" class="Value5" /></td>
+
+                                <td>
+                                    <button type="button"
+                                            class="btn-search btnRowSave">
+                                        Save
+                                    </button>
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11">
+                                No Records Found
+                            </td>
+                        </tr>
+                    }
 
                 </tbody>
 
@@ -322,12 +451,218 @@
     </div>
 
     <div class="actions">
-
-        <button class="btn-submit">
+        <button type="button" class="btn-submit">
             Submit
         </button>
-
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+            $.ajax({
+                url: '@Url.Action("GetModelNoByProject","AOI")',
+                type: 'POST',
+                data: { projectId: projectId },
+
+                success: function (data) {
+
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>'
+                        );
+                    });
+                }
+            });
+        });
+
+        $("#ModelId").change(function () {
+
+            var modelId = $(this).val();
+
+            $.ajax({
+                url: '@Url.Action("GetPartNoByModel","AOI")',
+                type: 'POST',
+                data: { modelId: modelId },
+
+                success: function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>'
+                        );
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+        $(".btnRowSave").click(function () {
+
+            var row = $(this).closest("tr");
+
+            var data = {
+                LineId: $("#LineId").val(),
+                ProjectId: $("#ProjectId").val(),
+                ModelId: $("#ModelId").val(),
+                PartId: $("#PartId").val(),
+                MachineId: $("#MachineId").val(),
+
+                ProdLineLeader: $("#ProdLineLeader").val(),
+                CheckedBy: $("#CheckedBy").val(),
+                ApprovedBy: $("#ApprovedBy").val(),
+
+                AOIResults: [{
+                    SectionId: row.find(".SectionId").val(),
+                    Value1: row.find(".Value1").val(),
+                    Value2: row.find(".Value2").val(),
+                    Value3: row.find(".Value3").val(),
+                    Value4: row.find(".Value4").val(),
+                    Value5: row.find(".Value5").val(),
+                    InspectionResults: ""
+                }]
+            };
+
+            $.ajax({
+                url: '@Url.Action("Save","AOI")',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(data),
+                success: function (response) {
+
+                    console.log(response);
+
+                    if (response.success === true) {
+                        alert(response.message);
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+
+        $(document).on("click", ".btn-submit", function (e) {
+
+            e.preventDefault();
+
+            var results = [];
+
+            $("#body tr.row").each(function () {
+
+                results.push({
+
+                    SectionId: parseInt($(this).find(".SectionId").val()) || 0,
+
+                    Value1: parseFloat($(this).find(".Value1").val()) || 0,
+
+                    Value2: parseFloat($(this).find(".Value2").val()) || 0,
+
+                    Value3: parseFloat($(this).find(".Value3").val()) || 0,
+
+                    Value4: parseFloat($(this).find(".Value4").val()) || 0,
+
+                    Value5: parseFloat($(this).find(".Value5").val()) || 0,
+
+                    InspectionResults: ""
+
+                });
+
+            });
+
+            var model = {
+
+                LineId: parseInt($("#LineId").val()) || 0,
+
+                ProjectId: parseInt($("#ProjectId").val()) || 0,
+
+                ModelId: parseInt($("#ModelId").val()) || 0,
+
+                PartId: parseInt($("#PartId").val()) || 0,
+
+                MachineId: parseInt($("#MachineId").val()) || 0,
+
+                ProdLineLeader: $("#ProdLineLeader").val(),
+
+                CheckedBy: $("#CheckedBy").val(),
+
+                ApprovedBy: $("#ApprovedBy").val(),
+
+                AOIResults: results
+
+            };
+
+            $.ajax({
+
+                url: '@Url.Action("Save", "AOI")',
+
+                type: 'POST',
+
+                contentType: 'application/json',
+
+                data: JSON.stringify(model),
+
+                success: function (response) {
+
+                    console.log(response);
+
+                    if (response.success === true) {
+
+                        alert(response.message);
+
+                        $(".Value1").val("");
+                        $(".Value2").val("");
+                        $(".Value3").val("");
+                        $(".Value4").val("");
+                        $(".Value5").val("");
+
+                    }
+                    else {
+
+                        alert(response.message);
+
+                    }
+
+                },
+
+                error: function (xhr) {
+
+                    console.log(xhr);
+
+                    alert("Save Failed");
+
+                }
+
+            });
+
+        });
+
+    </script>
 </body>
 </html>

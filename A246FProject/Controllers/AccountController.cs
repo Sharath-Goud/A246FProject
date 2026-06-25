@@ -93,5 +93,6 @@ namespace A246FProject.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
+
     }
 }
