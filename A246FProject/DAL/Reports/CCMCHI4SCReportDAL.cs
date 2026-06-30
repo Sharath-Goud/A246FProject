@@ -3,16 +3,16 @@ using System.Data;
 
 namespace A246FProject.DAL.Reports
 {
-    public class A246FCTPParameterReportDAL
+    public class CCMCHI4SCReportDAL
     {
         private readonly DbClass _db;
 
-        public A246FCTPParameterReportDAL()
+        public CCMCHI4SCReportDAL()
         {
             _db = DbClass.GetInstance();
         }
 
-        public DataTable GetCTPParameterReport(
+        public DataTable GetCCMCHI4SCReport(
             string fromDate,
             int lineId,
             int shiftId,
@@ -29,7 +29,7 @@ namespace A246FProject.DAL.Reports
             };
 
             return _db.ExecuteProcedureWithParameterForDataTable(
-                "ipqc.Rpt_getParameterA246FCTPParameterChecklist",
+                "ipqc.Rpt_getParameterA246FCMMC1CheckList",
                 parms);
         }
     }

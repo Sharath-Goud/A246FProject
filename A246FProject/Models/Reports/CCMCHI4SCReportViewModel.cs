@@ -2,7 +2,7 @@
 
 namespace A246FProject.Models.Reports
 {
-    public class A246FCTPParameterReportViewModel
+    public class CCMCHI4SCReportViewModel
     {
         public DataTable dtReports { get; set; } = new DataTable();
 

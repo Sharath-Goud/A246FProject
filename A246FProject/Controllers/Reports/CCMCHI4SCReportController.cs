@@ -7,21 +7,21 @@ using System.Data;
 
 namespace A246FProject.Controllers.Reports
 {
-    public class A246FCTPParameterReportController : Controller
+    public class CCMCHI4SCReportController : Controller
     {
-        private readonly A246FCTPParameterReportBAL _bal;
+        private readonly CCMCHI4SCReportBAL _bal;
         private readonly MasterBAL _master;
 
-        public A246FCTPParameterReportController()
+        public CCMCHI4SCReportController()
         {
-            _bal = new A246FCTPParameterReportBAL();
+            _bal = new CCMCHI4SCReportBAL();
             _master = new MasterBAL();
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            A246FCTPParameterReportViewModel model = new();
+            CCMCHI4SCReportViewModel model = new();
 
             model.dtReports = new DataTable();
 
@@ -33,12 +33,12 @@ namespace A246FProject.Controllers.Reports
             model.ModelNos = new List<ModelNo>();
             model.PartNos = new List<PartNo>();
 
-            return View("~/Views/Reports/A246FCTPParamterReport.cshtml", model);
+            return View("~/Views/Reports/CCMCHI4SCReport.cshtml", model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(A246FCTPParameterReportViewModel model, string command)
+        public IActionResult Index(CCMCHI4SCReportViewModel model, string command)
         {
             model.Lines = _master.GetLine();
             model.Shifts = _master.GetShift();
@@ -57,7 +57,7 @@ namespace A246FProject.Controllers.Reports
             {
                 var date = model.FromDate?.ToString("MM/dd/yyyy");
 
-                model.dtReports = _bal.GetCTPParameterReport(
+                model.dtReports = _bal.GetCCMCHI4SCReport(
                     date,
                     model.LineId,
                     model.ShiftId,
@@ -67,7 +67,7 @@ namespace A246FProject.Controllers.Reports
                 HttpContext.Session.SetString("SearchDone", "true");
             }
 
-            return View("~/Views/Reports/A246FCTPParamterReport.cshtml", model);
+            return View("~/Views/Reports/CCMCHI4SCReport.cshtml", model);
         }
     }
 }

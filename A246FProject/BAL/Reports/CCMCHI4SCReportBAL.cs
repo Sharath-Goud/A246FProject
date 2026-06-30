@@ -3,23 +3,23 @@ using System.Data;
 
 namespace A246FProject.BAL.Reports
 {
-    public class A246FCTPParameterReportBAL
+    public class CCMCHI4SCReportBAL
     {
-        private readonly A246FCTPParameterReportDAL _dal;
+        private readonly CCMCHI4SCReportDAL _dal;
 
-        public A246FCTPParameterReportBAL()
+        public CCMCHI4SCReportBAL()
         {
-            _dal = new A246FCTPParameterReportDAL();
+            _dal = new CCMCHI4SCReportDAL();
         }
 
-        public DataTable GetCTPParameterReport(
+        public DataTable GetCCMCHI4SCReport(
             string fromDate,
             int lineId,
             int shiftId,
             int projectId,
             int machineId)
         {
-            return _dal.GetCTPParameterReport(
+            return _dal.GetCCMCHI4SCReport(
                 fromDate,
                 lineId,
                 shiftId,

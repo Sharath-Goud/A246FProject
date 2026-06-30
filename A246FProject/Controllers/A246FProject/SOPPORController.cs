@@ -42,37 +42,6 @@ namespace A246FProject.Controllers.A246FProject
                 model);
         }
 
-        [HttpPost]
-        public IActionResult Index(
-            SOPPORViewModel model)
-        {
-            model.Lines =
-                _commonBAL.GetLine();
-
-            model.Projects =
-                _commonBAL.GetProject();
-
-            model.ModelNos =
-                _commonBAL.GetModelNoByProject(
-                    model.ProjectId);
-
-            model.PartNos =
-                _commonBAL.GetPartNoByModel(
-                    model.ModelId);
-
-            model.Statuses =
-                _bal.GetResult();
-
-            model.dtChecklist =
-                _bal.GetSOPPORData(
-                    model.LineId,
-                    model.ProjectId);
-
-            return View(
-                "~/Views/A246FProject/SOPPOR/Index.cshtml",
-                model);
-        }
-
         [HttpGet]
         public JsonResult GetModels(
             int projectId)
@@ -92,5 +61,24 @@ namespace A246FProject.Controllers.A246FProject
                 .GetPartNoByModel(
                     modelId));
         }
+
+        [HttpPost]
+        public IActionResult Index(SOPPORViewModel model)
+        {
+            model.Lines = _commonBAL.GetLine();
+            model.Projects = _commonBAL.GetProject();
+
+            model.ModelNos = new List<ModelNo>();
+            model.PartNos = new List<PartNo>();
+
+            model.Statuses = _bal.GetResult();
+
+            model.dtChecklist =
+                _bal.GetSOPPORData(model.LineId, model.ProjectId);
+
+            return View("~/Views/A246FProject/SOPPOR/Index.cshtml", model);
+        }
+
+        
     }
 }

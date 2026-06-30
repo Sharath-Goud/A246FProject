@@ -1,0 +1,169 @@
+﻿using A246FProject.Models;
+using System.Data;
+
+namespace A246FProject.DAL
+{
+    public class MasterDAL
+    {
+        DbClass _db;
+
+        public MasterDAL()
+        {
+            _db = DbClass.GetInstance();
+        }
+
+        #region Line
+
+        public List<Line> GetLine()
+        {
+            List<Line> list = new();
+
+            DataTable dt = _db.ExecuteProcedureForDataTable("ipqc.GetLine");
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new Line
+                {
+                    LineId = Convert.ToInt32(dr["LineId"]),
+                    LineName = dr["LineName"].ToString()
+                });
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region Shift
+
+        public List<Shift> GetShift()
+        {
+            List<Shift> list = new();
+
+            DataTable dt = _db.ExecuteProcedureForDataTable("ipqc.GetShift");
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new Shift
+                {
+                    ShiftId = Convert.ToInt32(dr["ShiftId"]),
+                    ShiftName = dr["ShiftName"].ToString()
+                });
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region Project
+
+        public List<Project> GetProject()
+        {
+            List<Project> list = new();
+
+            DataTable dt = _db.ExecuteProcedureForDataTable("ipqc.GetProject");
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                if (Convert.ToInt32(dr["ProjectId"]) == 31)
+                {
+                    list.Add(new Project
+                    {
+                        ProjectId = Convert.ToInt32(dr["ProjectId"]),
+                        ProjectName = dr["ProjectName"].ToString()
+                    });
+                }
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region Machine
+
+        public List<A246FMachines> GetA246FMachines()
+        {
+            List<A246FMachines> list = new();
+
+            DataTable dt = _db.ExecuteProcedureForDataTable("ipqc.GetA246CMachines");
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                int machineId = Convert.ToInt32(dr["MachineId"]);
+
+                if (machineId >= 1 && machineId <= 5)
+                {
+                    list.Add(new A246FMachines
+                    {
+                        MachineId = machineId,
+                        Machine = dr["Machine"].ToString()
+                    });
+                }
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region Model
+
+        public List<ModelNo> GetModelNoByProject(int projectId)
+        {
+            List<ModelNo> list = new();
+
+            var parms = new[]
+            {
+                new Microsoft.Data.SqlClient.SqlParameter("@ProjectId", projectId)
+            };
+
+            DataTable dt = _db.ExecuteProcedureWithParameterForDataTable(
+                "ipqc.GetModelNoByProject",
+                parms);
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new ModelNo
+                {
+                    ModelId = Convert.ToInt32(dr["ModelId"]),
+                    Model = dr["Model"].ToString()
+                });
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region Part
+
+        public List<PartNo> GetPartNoByModel(int modelId)
+        {
+            List<PartNo> list = new();
+
+            var parms = new[]
+            {
+                new Microsoft.Data.SqlClient.SqlParameter("@ModelId", modelId)
+            };
+
+            DataTable dt = _db.ExecuteProcedureWithParameterForDataTable(
+                "ipqc.GetPartNoByModel",
+                parms);
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new PartNo
+                {
+                    PartId = Convert.ToInt32(dr["PartId"]),
+                    Part = dr["Part"].ToString()
+                });
+            }
+
+            return list;
+        }
+
+        #endregion
+    }
+}

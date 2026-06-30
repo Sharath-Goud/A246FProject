@@ -36,13 +36,11 @@
             width: 240px;
             background: linear-gradient(160deg, #1a1040 0%, #0d1b2a 100%);
             border-radius: 20px;
-            padding: 20px 14px;
             box-shadow: 0 20px 60px rgba(0,0,0,.4);
             border: 0.5px solid rgba(255,255,255,.06);
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            overflow-y: auto;
+            overflow: hidden; 
         }
 
         .logo {
@@ -79,6 +77,8 @@
             .nav-btn.active {
                 background: linear-gradient(90deg, rgba(167,139,250,.25), rgba(99,179,237,.12));
                 color: #fff;
+                border-left: 4px solid #ffffff;
+                box-shadow: 0 0 10px rgba(109,93,252,0.6);
             }
 
         .chevron {
@@ -321,6 +321,21 @@
             padding: 10px;
             border-radius: 10px;
         }
+
+        .sidebar-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+            .sidebar-scroll::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .sidebar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.15);
+                border-radius: 10px;
+            }
     </style>
 </head>
 
@@ -332,131 +347,153 @@
             <i class="ti ti-shield-check"></i>
             QA SYSTEM
         </div>
+            <div class="sidebar-scroll">
+            <button class="nav-btn" data-menu="menu" onclick="setActiveMenu(this, 'menu')">
+                    <i class="ti ti-forms"></i>
+                    A246F Forms
+                    <i class="ti ti-chevron-down chevron"></i>
+                </button>
 
-        <button class="nav-btn active" onclick="toggleMenu()">
-            <i class="ti ti-forms"></i>
-            A246F Forms
-            <i class="ti ti-chevron-down chevron"></i>
-        </button>
+                <div class="dropdown" id="menu">
 
-        <div class="dropdown" id="menu">
+                    <div class="dd-item" onclick="go('/CTPParameter/Index')">
+                        A246F CTP Parameters
+                    </div>
+                    <div class="dd-item" onclick="go('/GlueWeighing/Index')">
+                        Glue Weighing
+                    </div>
+                    <div class="dd-item" onclick="go('/SOPPOR/Index')">
+                        SOP/POR
+                    </div>
+                    <div class="dd-item" onclick="go('/FirstArticleInspection/Index')">
+                        First Article Inspection
+                    </div>
+                    <div class="dd-item" onclick="go('/FirstArticleDimension/Index')">
+                        First Article Dimension
+                        </div>
+                    <div class="dd-item" onclick="go('/VisualInspection/Index')">
+                        Visual Inspection
+                    </div>
+                    <div class="dd-item" onclick="go('/CCMCHI4SC/Index')">
+                        CCM &amp; CHI &amp; 4SC
+                    </div>
+                    <div class="dd-item" onclick="go('/WireCombMolding/Index')">
+                        Wire Comb Molding
+                    </div>
+                    <div class="dd-item" onclick="go('/HotBar/Index')">
+                        Hot Bar
+                    </div>
+                    <div class="dd-item" onclick="go('/Destructive/Index')">
+                        Destructive
+                    </div>
+                    <div class="dd-item" onclick="go('/ShellCrimp/Index')">
+                        Shell Crimp
+                    </div>
+                    <div class="dd-item" onclick="go('/InnerMold/Index')">
+                        Inner Mold
+                    </div>
+                    <div class="dd-item" onclick="go('/AOI/Index')">
+                        AOI
+                    </div>
+                    <div class="dd-item" onclick="go('/LaserEngraving/Index')">
+                        Laser Engraving
+                    </div>
+                    <div class="dd-item" onclick="go('/NewHanking/Index')">
+                        New Hanking
+                    </div>
 
-            <div class="dd-item" onclick="go('/CTPParameter/Index')">
-                A246F CTP Parameters
-            </div>
-            <div class="dd-item" onclick="go('/GlueWeighing/Index')">
-                Glue Weighing
-            </div>
-            <div class="dd-item" onclick="go('/SOPPOR/Index')">
-                SOP/POR
-            </div>
-            <div class="dd-item" onclick="go('/FirstArticleInspection/Index')">
-                First Article Inspection
-            </div>
-            <div class="dd-item" onclick="go('/FirstArticleDimension/Index')">
-                First Article Dimension
                 </div>
-            <div class="dd-item" onclick="go('/VisualInspection/Index')">
-                Visual Inspection
-            </div>
-            <div class="dd-item" onclick="go('/CCMCHI4SC/Index')">
-                CCM &amp; CHI &amp; 4SC
-            </div>
-            <div class="dd-item" onclick="go('/WireCombMolding/Index')">
-                Wire Comb Molding
-            </div>
-            <div class="dd-item" onclick="go('/HotBar/Index')">
-                Hot Bar
-            </div>
-            <div class="dd-item" onclick="go('/Destructive/Index')">
-                Destructive
-            </div>
-            <div class="dd-item" onclick="go('/ShellCrimp/Index')">
-                Shell Crimp
-            </div>
-            <div class="dd-item" onclick="go('/InnerMold/Index')">
-                Inner Mold
-            </div>
-            <div class="dd-item" onclick="go('/AOI/Index')">
-                AOI
-            </div>
-            <div class="dd-item" onclick="go('/LaserEngraving/Index')">
-                Laser Engraving
-            </div>
-            <div class="dd-item" onclick="go('/NewHanking/Index')">
-                New Hanking
-            </div>
+            <button class="nav-btn" data-menu="reportsMenu" onclick="setActiveMenu(this, 'reportsMenu')">
+                    <i class="ti ti-report-analytics"></i>
+                    Reports
+                    <i class="ti ti-chevron-down chevron"></i>
+                </button>
 
-        </div>
-        <button class="nav-btn" onclick="toggleReports()">
-            <i class="ti ti-report-analytics"></i>
-            Reports
-            <i class="ti ti-chevron-down chevron"></i>
-        </button>
+                <div class="dropdown" id="reportsMenu">
 
-        <div class="dropdown" id="reportsMenu">
+                    <div class="dd-item" onclick="go('/A246FCTPParameterReport/Index')">
+                        CTP Parameter Report
+                    </div>
 
-            <div class="dd-item" onclick="go('/CTPParameterReport/Index')">
-                CTP Parameter Report
+                    <div class="dd-item" onclick="go('/GlueWeighingReport/Index')">
+                        Glue Weighing Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/SOPPORReport/Index')">
+                        SOP/POR Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/FirstArticleInspectionReport/Index')">
+                        First Article Inspection Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/FirstArticleDimensionReport/Index')">
+                        First Article Dimension Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/VisualInspectionReport/Index')">
+                        Visual Inspection Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/CCMCHI4SCReport/Index')">
+                        CCM CHI 4SC Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/WireCombMoldingReport/Index')">
+                        Wire Comb Molding Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/HotBarReport/Index')">
+                        Hot Bar Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/DestructiveReport/Index')">
+                        Destructive Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/ShellCrimpReport/Index')">
+                        Shell Crimp Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/InnerMoldReport/Index')">
+                        Inner Mold Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/AOIReport/Index')">
+                        AOI Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/LaserEngravingReport/Index')">
+                        Laser Engraving Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/NewHankingReport/Index')">
+                        New Hanking Report
+                    </div>
+
+                </div>
+
+            <button class="nav-btn" data-menu="serinReportsMenu" onclick="setActiveMenu(this, 'serinReportsMenu')">
+                    <i class="ti ti-report-analytics"></i>
+                    Serin Reports
+                    <i class="ti ti-chevron-down chevron"></i>
+                </button>
+
+                <div class="dropdown" id="serinReportsMenu">
+
+                    <div class="dd-item" onclick="go('/CTPParameterReport/Index')">
+                        Glue Weighing Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/GlueWeighingReport/Index')">
+                        Destructive Report
+                    </div>
+
+                    <div class="dd-item" onclick="go('/SOPPORReport/Index')">
+                        Dimensions Report
+                    </div>
+                </div>
             </div>
-
-            <div class="dd-item" onclick="go('/GlueWeighingReport/Index')">
-                Glue Weighing Report
-            </div>
-
-            <div class="dd-item" onclick="go('/SOPPORReport/Index')">
-                SOP/POR Report
-            </div>
-
-            <div class="dd-item" onclick="go('/FirstArticleInspectionReport/Index')">
-                First Article Inspection Report
-            </div>
-
-            <div class="dd-item" onclick="go('/FirstArticleDimensionReport/Index')">
-                First Article Dimension Report
-            </div>
-
-            <div class="dd-item" onclick="go('/VisualInspectionReport/Index')">
-                Visual Inspection Report
-            </div>
-
-            <div class="dd-item" onclick="go('/CCMCHI4SCReport/Index')">
-                CCM CHI 4SC Report
-            </div>
-
-            <div class="dd-item" onclick="go('/WireCombMoldingReport/Index')">
-                Wire Comb Molding Report
-            </div>
-
-            <div class="dd-item" onclick="go('/HotBarReport/Index')">
-                Hot Bar Report
-            </div>
-
-            <div class="dd-item" onclick="go('/DestructiveReport/Index')">
-                Destructive Report
-            </div>
-
-            <div class="dd-item" onclick="go('/ShellCrimpReport/Index')">
-                Shell Crimp Report
-            </div>
-
-            <div class="dd-item" onclick="go('/InnerMoldReport/Index')">
-                Inner Mold Report
-            </div>
-
-            <div class="dd-item" onclick="go('/AOIReport/Index')">
-                AOI Report
-            </div>
-
-            <div class="dd-item" onclick="go('/LaserEngravingReport/Index')">
-                Laser Engraving Report
-            </div>
-
-            <div class="dd-item" onclick="go('/NewHankingReport/Index')">
-                New Hanking Report
-            </div>
-
-        </div>
     </div>
 
     <div class="header">
@@ -536,9 +573,23 @@
 
     <script>
 
-        function toggleMenu() {
-            document.querySelector('.nav-btn').classList.toggle('open');
-            document.getElementById('menu').classList.toggle('open');
+        function toggleMenu(menuId, btn) {
+
+            // close other dropdowns
+            document.querySelectorAll('.dropdown').forEach(x => {
+                if (x.id !== menuId) x.classList.remove('open');
+            });
+
+            // remove active state from other buttons
+            document.querySelectorAll('.nav-btn').forEach(x => {
+                if (x !== btn) x.classList.remove('open');
+            });
+
+            // toggle selected menu
+            document.getElementById(menuId).classList.toggle('open');
+
+            // toggle active button
+            btn.classList.toggle('open');
         }
 
         function go(url) {
@@ -556,6 +607,49 @@
         function toggleReports() {
             document.getElementById('reportsMenu')
                     .classList.toggle('open');
+        }
+
+        function toggleSerinReports() {
+            document.getElementById('serinReportsMenu')
+                    .classList.toggle('open');
+        }
+
+        function setActiveMenu(btn, menuId) {
+
+            const menu = document.getElementById(menuId);
+
+            const isOpen = menu.classList.contains("open");
+
+            document.querySelectorAll('.dropdown').forEach(x => {
+                x.classList.remove('open');
+            });
+
+            document.querySelectorAll('.nav-btn').forEach(x => {
+                x.classList.remove('active');
+            });
+
+            if (!isOpen) {
+                menu.classList.add("open");
+                btn.classList.add("active");
+                localStorage.setItem("activeMenu", menuId);
+            } else {
+                localStorage.removeItem("activeMenu");
+            }
+        }
+
+        window.onload = function () {
+
+            let savedMenu = localStorage.getItem("activeMenu");
+
+            if (savedMenu) {
+                let btn = document.querySelector(`[data-menu="${savedMenu}"]`);
+                let menu = document.getElementById(savedMenu);
+
+                if (btn && menu) {
+                    btn.classList.add("active");
+                    menu.classList.add("open");
+                }
+            }
         }
     </script>
 

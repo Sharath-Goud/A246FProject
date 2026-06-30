@@ -98,31 +98,14 @@ namespace A246FProject.DAL
             return list;
         }
 
-        public DataTable GetCTPParameterData(
-            int lineId,
-            int projectId,
-            int machineId)
-        {
-            SqlParameter[] parms =
-            {
-                new SqlParameter("@LineId", lineId),
-                new SqlParameter("@ProjectId", projectId),
-                new SqlParameter("@MachineId", machineId)
-            };
-
-            return _db.ExecuteProcedureWithParameterForDataTable(
-                "ipqc.GetFromByA246FCTPaameterMCChecklist",
-                parms);
-        }
-
         public List<PartNo> GetPartNoByModel(int modelId)
         {
             List<PartNo> list = new List<PartNo>();
 
             SqlParameter[] parms =
             {
-        new SqlParameter("@ModelId", modelId)
-    };
+                new SqlParameter("@ModelId", modelId)
+            };
 
             DataTable dt =
                 _db.ExecuteProcedureWithParameterForDataTable(
@@ -165,6 +148,23 @@ namespace A246FProject.DAL
             }
 
             return list;
+        }
+
+        public DataTable GetCTPParameterData(
+            int lineId,
+            int projectId,
+            int machineId)
+        {
+            SqlParameter[] parms =
+            {
+                new SqlParameter("@LineId", lineId),
+                new SqlParameter("@ProjectId", projectId),
+                new SqlParameter("@MachineId", machineId)
+            };
+
+            return _db.ExecuteProcedureWithParameterForDataTable(
+                "ipqc.GetFromByA246FCTPaameterMCChecklist",
+                parms);
         }
 
         public int InsertBulkA246FCTPParameter(

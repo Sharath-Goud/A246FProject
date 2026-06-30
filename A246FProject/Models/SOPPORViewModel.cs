@@ -38,11 +38,8 @@ namespace A246FProject.Models
     public class SOPPORResult
     {
         public int RiskId { get; set; }
-
         public int StatusId { get; set; }
-
-        public string Namee { get; set; }
-
+        public string IdNumber { get; set; }
         public string Image { get; set; }
     }
 
