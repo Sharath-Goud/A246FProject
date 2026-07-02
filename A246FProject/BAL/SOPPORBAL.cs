@@ -19,30 +19,28 @@ namespace A246FProject.BAL
             return _dal.GetResult();
         }
 
-        public int InsertSOPPORSingle(
-            int lineId,
-            int projectId,
-            int riskId,
-            int statusId,
-            string idNumber,
-            string leader,
-            string checkedBy,
-            string approvedBy)
-        {
-            return _dal.InsertSOPPORSingle(
-                lineId, projectId, riskId, statusId, idNumber,
-                leader, checkedBy, approvedBy);
-        }
-
         public int InsertBulkSOPPOR(
             DataTable dt,
             int lineId,
             int projectId,
             string leader,
             string checkedBy,
-            string approvedBy)
+            string approvedBy,
+            int modelId,
+            int partId,
+            string createdBy)
         {
-            return _dal.InsertBulkSOPPOR(dt, lineId, projectId, leader, checkedBy, approvedBy);
+            return _dal.InsertBulkSOPPOR(
+                dt,
+                lineId,
+                projectId,
+                leader,
+                checkedBy,
+                approvedBy,
+                modelId,
+                partId,
+                createdBy
+            );
         }
 
     }

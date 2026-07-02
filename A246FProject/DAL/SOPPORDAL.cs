@@ -49,53 +49,32 @@ namespace A246FProject.DAL
                 parms);
         }
 
-        public int InsertSOPPORSingle(
-           int lineId,
-           int projectId,
-           int riskId,
-           int statusId,
-           string idNumber,
-           string createdBy,
-           string checkedBy,
-           string approvedBy)
-        {
-            SqlParameter[] parms =
-            {
-                new SqlParameter("@LineId", lineId),
-                new SqlParameter("@ProjectId", projectId),
-                new SqlParameter("@RiskId", riskId),
-                new SqlParameter("@StatusId", statusId),
-                new SqlParameter("@IdNumber", idNumber),
-                new SqlParameter("@CreatedBy", createdBy),
-                new SqlParameter("@CheckedBy", checkedBy),
-                new SqlParameter("@ApprovedBy", approvedBy)
-            };
-
-            return _db.ExecuteNonQueryWithParameter(
-                "ipqc.InsertSOPPORSingle",
-                parms);
-        }
-
         public int InsertBulkSOPPOR(
-           DataTable dtChecklist,
-           int lineId,
-           int projectId,
-           string createdBy,
-           string checkedBy,
-           string approvedBy)
+            DataTable dtChecklist,
+            int lineId,
+            int projectId,
+            string leader,
+            string checkedBy,
+            string approvedBy,
+            int modelId,
+            int partId,
+            string createdBy)
         {
             SqlParameter[] parms =
             {
-                new SqlParameter("@Checklist", dtChecklist),
+                new SqlParameter("@LaserChecklist", dtChecklist),
+                new SqlParameter("@CreatedBy", createdBy),
                 new SqlParameter("@LineId", lineId),
                 new SqlParameter("@ProjectId", projectId),
-                new SqlParameter("@CreatedBy", createdBy),
+                new SqlParameter("@ProdLineLeader", leader),
                 new SqlParameter("@CheckedBy", checkedBy),
-                new SqlParameter("@ApprovedBy", approvedBy)
+                new SqlParameter("@ApprovedBy", approvedBy),
+                new SqlParameter("@ModelId", modelId),
+                new SqlParameter("@PartId", partId)
             };
 
             return _db.ExecuteNonQueryWithParameter(
-                "ipqc.InsertBulkSOPPOR",
+                "ipqc.InsertBulkA246FQualityAuditCheckList",
                 parms);
         }
     }

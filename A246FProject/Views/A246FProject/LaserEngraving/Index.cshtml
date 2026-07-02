@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.LaserEngravingViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Data
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -118,16 +121,6 @@
             font-size: 13px;
         }
 
-        .btn-save {
-            background: linear-gradient(135deg,#34d399,#059669);
-            border: none;
-            border-radius: 6px;
-            padding: 7px 14px;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        /* TABLE */
 
         .results-table {
             background: rgba(255,255,255,.04);
@@ -143,7 +136,7 @@
 
         .custom-table {
             width: 100%;
-            min-width: 1700px;
+            min-width: 1600px;
             border-collapse: collapse;
         }
 
@@ -153,7 +146,7 @@
 
                 .custom-table thead th {
                     padding: 14px 12px;
-                    text-align: center;
+                    text-align: left;
                     font-size: 12px;
                     font-weight: 600;
                     color: rgba(255,255,255,.85);
@@ -163,9 +156,10 @@
 
             .custom-table tbody td {
                 padding: 12px;
-                text-align: center;
+                text-align: left;
                 color: #e2e8f0;
                 border-top: 1px solid rgba(255,255,255,.05);
+                font-size: 12px;
             }
 
                 .custom-table tbody td input {
@@ -199,85 +193,113 @@
             Laser Engraving
         </div>
 
-        <div class="form-body">
+        <form id="mainForm" asp-action="Index" method="post">
 
-            <!-- Row 1 -->
+            <div class="form-body">
 
-            <div class="form-row">
+                <!-- Row 1 -->
 
-                <div class="form-group">
-                    <label>LINE</label>
-                    <select>
-                        <option>-- Select Line --</option>
-                    </select>
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Line</label>
+
+                        <select asp-for="LineId"
+                                id="LineId"
+                                asp-items="@(new SelectList(Model.Lines, "LineId", "LineName"))">
+                            <option value="">-- Select Line --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project</label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects, "ProjectId", "ProjectName"))">
+                            <option value="">-- Select Project --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select asp-for="ModelId"
+                                id="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos, "ModelId", "Model"))">
+                            <option value="">-- Select Model --</option>
+                        </select>
+
+                    </div>
+
                 </div>
 
-                <div class="form-group">
-                    <label>PROJECT</label>
-                    <select>
-                        <option>-- Select Project --</option>
-                    </select>
+                <!-- Row 2 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Part</label>
+
+                        <select asp-for="PartId"
+                                id="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,
+                                    "PartId",
+                                    "Part"))">
+                            <option value="">-- Select Part --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Machine</label>
+
+                        <select asp-for="MachineId"
+                                id="MachineId"
+                                asp-items="@(new SelectList(Model.Machines,
+                    "MachineId",
+                    "Machine"))">
+                            <option value="">-- Select Machine --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Production Line Leader</label>
+
+                        <input asp-for="ProdLineLeader"
+                               type="text"
+                               placeholder="Production Line Leader" />
+                    </div>
+
                 </div>
 
-                <div class="form-group">
-                    <label>MODEL</label>
-                    <select>
-                        <option>-- Select Model --</option>
-                    </select>
-                </div>
+                <!-- Row 3 -->
 
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Checked By</label>
+
+                        <input asp-for="CheckedBy"
+                               type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Approved By</label>
+
+                        <input asp-for="ApprovedBy"
+                               type="text" />
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+                            Search
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <!-- Row 2 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>PART</label>
-                    <select>
-                        <option>-- Select Part --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>MACHINE</label>
-                    <select>
-                        <option>-- Select Machine --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>LINE LEADER</label>
-                    <input type="text"
-                           placeholder="Production LineLeader">
-                </div>
-
-            </div>
-
-            <!-- Row 3 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>CHECKED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>APPROVED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn-search">
-                        Search
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
+        </form>
 
     </div>
 
@@ -285,53 +307,269 @@
 
     <div class="results-table">
 
-        <div class="table-scroll">
+        @if (Model.dtChecklist != null && Model.dtChecklist.Rows.Count > 0)
+        {
+            <div class="table-scroll">
 
-            <table class="custom-table">
+                <table class="custom-table">
 
-                <thead>
-                    <tr>
-                        <th>Locations</th>
-                        <th>Specification</th>
-                        <th>Minimum</th>
-                        <th>Maximum</th>
-                        <th>Value1</th>
-                        <th>SerialNumber1</th>
-                        <th>Value2</th>
-                        <th>SerialNumber2</th>
-                        <th>Value3</th>
-                        <th>SerialNumber3</th>
-                        <th>Value4</th>
-                        <th>SerialNumber4</th>
-                        <th>Value5</th>
-                        <th>SerialNumber5</th>
-                        <th>Save</th>
-                    </tr>
-                </thead>
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Specification</th>
+                            <th>Minimum</th>
+                            <th>Maximum</th>
 
-                <tbody>
+                            <th>Value 1</th>
+                            <th>Serial Number 1</th>
 
-                    <tr>
-                        <td colspan="14" class="empty-row">
-                            No records found. Use search to load data.
-                        </td>
-                    </tr>
+                            <th>Value 2</th>
+                            <th>Serial Number 2</th>
 
-                </tbody>
+                            <th>Value 3</th>
+                            <th>Serial Number 3</th>
 
-            </table>
+                            <th>Value 4</th>
+                            <th>Serial Number 4</th>
 
-        </div>
+                            <th>Value 5</th>
+                            <th>Serial Number 5</th>
+
+                            <th>Save</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.dtChecklist != null && Model.dtChecklist.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @Model.dtChecklist.Rows[i]["Locations"]
+
+                                        <input type="hidden"
+                                               name="LaserResults[@i].LocationId"
+                                               value="@Model.dtChecklist.Rows[i]["LocationId"]" />
+                                    </td>
+
+                                    <td>@Model.dtChecklist.Rows[i]["Specification"]</td>
+                                    <td>@Model.dtChecklist.Rows[i]["Min"]</td>
+                                    <td>@Model.dtChecklist.Rows[i]["Max"]</td>
+
+                                    <td><input name="LaserResults[@i].Value1" /></td>
+                                    <td><input name="LaserResults[@i].SerialNumber1" /></td>
+
+                                    <td><input name="LaserResults[@i].Value2" /></td>
+                                    <td><input name="LaserResults[@i].SerialNumber2" /></td>
+
+                                    <td><input name="LaserResults[@i].Value3" /></td>
+                                    <td><input name="LaserResults[@i].SerialNumber3" /></td>
+
+                                    <td><input name="LaserResults[@i].Value4" /></td>
+                                    <td><input name="LaserResults[@i].SerialNumber4" /></td>
+
+                                    <td><input name="LaserResults[@i].Value5" /></td>
+                                    <td><input name="LaserResults[@i].SerialNumber5" /></td>
+
+                                    <td>
+                                        <button type="button" class="btn-search" onclick="saveSingleRow(@i)">
+                                            Save
+                                        </button>
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="15" class="empty-row">
+                                    No records found
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-row" style="padding:40px;text-align:center;">
+                No records found. Use search to load data.
+            </div>
+        }
 
     </div>
 
     <div class="actions">
-
-        <button class="btn-submit">
+        <button type="button" class="btn-submit" onclick="SubmitAll();">
             Submit
         </button>
-
     </div>
 
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        $("#ProjectId").change(function () {
+            var projectId = $(this).val();
+
+            $.ajax({
+                url: '/LaserEngraving/GetModelNoByProject',
+                type: 'POST',
+                data: { projectId: projectId },
+
+                success: function (data) {
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append('<option value="">-- Select Model --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>');
+                    });
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append('<option value="">-- Select Part --</option>');
+                }
+            });
+        });
+
+        $("#ModelId").change(function () {
+
+            $.ajax({
+
+                url: '/LaserEngraving/GetPartNoByModel',
+
+                type: 'POST',
+
+                data: { modelId: $("#ModelId").val() },
+
+                success: function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append('<option value="">-- Select Part --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>');
+                    });
+                }
+            });
+        });
+
+                function saveSingleRow(index) {
+
+            var row = {
+                locationId: $("input[name='LaserResults[" + index + "].LocationId']").val(),
+
+                value1: $("input[name='LaserResults[" + index + "].Value1']").val(),
+                serialNumber1: $("input[name='LaserResults[" + index + "].SerialNumber1']").val(),
+
+                value2: $("input[name='LaserResults[" + index + "].Value2']").val(),
+                serialNumber2: $("input[name='LaserResults[" + index + "].SerialNumber2']").val(),
+
+                value3: $("input[name='LaserResults[" + index + "].Value3']").val(),
+                serialNumber3: $("input[name='LaserResults[" + index + "].SerialNumber3']").val(),
+
+                value4: $("input[name='LaserResults[" + index + "].Value4']").val(),
+                serialNumber4: $("input[name='LaserResults[" + index + "].SerialNumber4']").val(),
+
+                value5: $("input[name='LaserResults[" + index + "].Value5']").val(),
+                serialNumber5: $("input[name='LaserResults[" + index + "].SerialNumber5']").val()
+            };
+
+            var header = {
+                lineId: $("#LineId").val(),
+                projectId: $("#ProjectId").val(),
+                modelId: $("#ModelId").val(),
+                partId: $("#PartId").val(),
+                machineId: $("#MachineId").val(),
+                prodLineLeader: $("#ProdLineLeader").val(),
+                checkedBy: $("#CheckedBy").val(),
+                approvedBy: $("#ApprovedBy").val()
+            };
+
+            $.ajax({
+                url: '/LaserEngraving/SaveSingleRow',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ header: header, row: row }),
+                success: function (res) {
+                    alert(res.message);
+                }
+            });
+        }
+
+        function SubmitAll() {
+            var results = [];
+
+            $(".custom-table tbody tr").each(function (index) {
+
+                var locationId = $(this).find("input[name='LaserResults[" + index + "].LocationId']").val();
+
+                if (!locationId) return;
+
+                results.push({
+                    locationId: parseInt(locationId),
+                    value1: $(this).find("input[name='LaserResults[" + index + "].Value1']").val(),
+                    serialNumber1: $(this).find("input[name='LaserResults[" + index + "].SerialNumber1']").val(),
+                    value2: $(this).find("input[name='LaserResults[" + index + "].Value2']").val(),
+                    serialNumber2: $(this).find("input[name='LaserResults[" + index + "].SerialNumber2']").val(),
+                    value3: $(this).find("input[name='LaserResults[" + index + "].Value3']").val(),
+                    serialNumber3: $(this).find("input[name='LaserResults[" + index + "].SerialNumber3']").val(),
+                    value4: $(this).find("input[name='LaserResults[" + index + "].Value4']").val(),
+                    serialNumber4: $(this).find("input[name='LaserResults[" + index + "].SerialNumber4']").val(),
+                    value5: $(this).find("input[name='LaserResults[" + index + "].Value5']").val(),
+                    serialNumber5: $(this).find("input[name='LaserResults[" + index + "].SerialNumber5']").val()
+                });
+            });
+
+            var obj = {
+                lineId: $("#LineId").val(),
+                projectId: $("#ProjectId").val(),
+                modelId: $("#ModelId").val(),
+                partId: $("#PartId").val(),
+                machineId: $("#MachineId").val(),
+                prodLineLeader: $("input[name='ProdLineLeader']").val(),
+                checkedBy: $("input[name='CheckedBy']").val(),
+                approvedBy: $("input[name='ApprovedBy']").val(),
+                laserResults: results
+            };
+
+            $.ajax({
+                url: '/LaserEngraving/SaveLaserEngraving',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(obj),
+
+                success: function (res) {
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function () {
+                    alert("Save failed");
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>

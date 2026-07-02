@@ -332,8 +332,7 @@
 
                         <label>Line Leader</label>
 
-                        <input asp-for="ProdLineLeader"
-                               type="text" />
+                        <input asp-for="ProdLineLeader" id="ProdLineLeader" />
 
                     </div>
 
@@ -341,8 +340,7 @@
 
                         <label>Checked By</label>
 
-                        <input asp-for="CheckedBy"
-                               type="text" />
+                        <input asp-for="CheckedBy" id="CheckedBy" />
 
                     </div>
 
@@ -354,8 +352,7 @@
 
                         <label>Approved By</label>
 
-                        <input asp-for="ApprovedBy"
-                               type="text" />
+                        <input asp-for="ApprovedBy" id="ApprovedBy" />
 
                     </div>
 
@@ -493,14 +490,13 @@
                                 </td>
 
                                 <td>
-                                    <input type="file"
-                                           class="form-control" />
+                                    <input class="form-control" type="file" id="FileUpload1-@i" />
                                 </td>
 
                                 <td>
                                     <button type="button"
-                                            class="btn-submit"
-                                            >
+                                            class="btn-search"
+                                            onclick="SaveSingleRow(this,@i)">
                                         Save
                                     </button>
                                 </td>
@@ -528,7 +524,7 @@
 
             <button type="button"
                     class="btn-submit"
-                    >
+                    onclick="Save()">
                 Submit
             </button>
 
@@ -592,7 +588,162 @@
                 });
         });
 
-               
+        $(document).ready(function () {
+            var postedProjectId = "@Model.ProjectId";
+            var postedModelId = "@Model.ModelId";
+            var postedPartId = "@Model.PartId";
+
+            if (postedProjectId && postedProjectId !== "0") {
+                $.get('/SOPPOR/GetModels', { projectId: postedProjectId }, function (data) {
+                    $("#ModelId").empty();
+                    $("#ModelId").append('<option value="">-- Select Model --</option>');
+
+                    $.each(data, function (i, item) {
+                        var selected = (item.modelId == postedModelId) ? 'selected="selected"' : '';
+                        $("#ModelId").append(
+                            '<option value="' + item.modelId + '" ' + selected + '>' + item.model + '</option>'
+                        );
+                    });
+
+                    if (postedModelId && postedModelId !== "0") {
+                        $.get('/SOPPOR/GetParts', { modelId: postedModelId }, function (partData) {
+                            $("#PartId").empty();
+                            $("#PartId").append('<option value="">-- Select Part --</option>');
+
+                            $.each(partData, function (i, item) {
+                                var selected = (item.partId == postedPartId) ? 'selected="selected"' : '';
+                                $("#PartId").append(
+                                    '<option value="' + item.partId + '" ' + selected + '>' + item.part + '</option>'
+                                );
+                            });
+                        });
+                    }
+                });
+            }
+        });
+
+        function validateHeader() {
+            var LineId = $("#LineId").val();
+            var ProjectId = $("#ProjectId").val();
+            var ModelId = $("#ModelId").val();
+            var PartId = $("#PartId").val();
+            var ProdLineLeader = $("#ProdLineLeader").val();
+            var CheckedBy = $("#CheckedBy").val();
+            var ApprovedBy = $("#ApprovedBy").val();
+
+            if (!LineId || LineId == "0" ||
+                !ProjectId || ProjectId == "0" ||
+                !ModelId || ModelId == "0" ||
+                !PartId || PartId == "0" ||
+                !ProdLineLeader || !CheckedBy || !ApprovedBy) {
+                alert("Please fill Line, Project, Model, Part, Line Leader, Checked By and Approved By before saving.");
+                return false;
+            }
+            return true;
+        }
+
+        function Save() {
+            if (!validateHeader()) return;
+
+            var formData = new FormData();
+            formData.append("LineId", $("#LineId").val());
+            formData.append("ProjectId", $("#ProjectId").val());
+            formData.append("ModelId", $("#ModelId").val());
+            formData.append("PartId", $("#PartId").val());
+            formData.append("ProdLineLeader", $("#ProdLineLeader").val());
+            formData.append("CheckedBy", $("#CheckedBy").val());
+            formData.append("ApprovedBy", $("#ApprovedBy").val());
+
+            var count = 0;
+
+            $("input[name$='.RiskId']").each(function (index) {
+                var riskId = $("input[name='SOPPORResults[" + index + "].RiskId']").val();
+                var statusId = $("select[name='SOPPORResults[" + index + "].StatusId']").val();
+                var idNumber = $("input[name='SOPPORResults[" + index + "].IdNumber']").val();
+
+                if (statusId !== "" || idNumber !== "") {
+                    formData.append("SOPPORResults[" + count + "].RiskId", riskId);
+                    formData.append("SOPPORResults[" + count + "].StatusId", statusId);
+                    formData.append("SOPPORResults[" + count + "].IdNumber", idNumber);
+
+                    var fileInput = document.getElementById("FileUpload1-" + index);
+                    if (fileInput && fileInput.files.length > 0) {
+                        formData.append("SOPPORResults[" + count + "].ImageFile", fileInput.files[0]);
+                    }
+                    count++;
+                }
+            });
+
+            if (count === 0) {
+                alert("No rows to save");
+                return;
+            }
+
+            $.ajax({
+                url: '/SOPPOR/SaveBulkSOPPOR',
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (res) {
+                    alert(res);
+                    location.reload();
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    alert("Save Failed");
+                }
+            });
+        }
+
+
+        function SaveSingleRow(btn, index) {
+            if (!validateHeader()) return;
+
+            var riskId = $("input[name='SOPPORResults[" + index + "].RiskId']").val();
+            var statusId = $("select[name='SOPPORResults[" + index + "].StatusId']").val();
+            var idNumber = $("input[name='SOPPORResults[" + index + "].IdNumber']").val();
+
+            if ((!statusId || statusId === "") && idNumber === "") {
+                alert("Please enter data");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("LineId", $("#LineId").val());
+            formData.append("ProjectId", $("#ProjectId").val());
+            formData.append("ModelId", $("#ModelId").val());
+            formData.append("PartId", $("#PartId").val());
+            formData.append("ProdLineLeader", $("#ProdLineLeader").val());
+            formData.append("CheckedBy", $("#CheckedBy").val());
+            formData.append("ApprovedBy", $("#ApprovedBy").val());
+            formData.append("RiskId", riskId);
+            formData.append("StatusId", statusId || 0);
+            formData.append("IdNumber", idNumber);
+
+            var fileInput = document.getElementById("FileUpload1-" + index);
+            if (fileInput && fileInput.files.length > 0) {
+                formData.append("ImageFile", fileInput.files[0]);
+            }
+
+            $.ajax({
+                url: '/SOPPOR/SaveSingleSOPPOR',
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (res) {
+                    alert(res);
+                    $(btn).prop("disabled", true)
+                        .text("Saved")
+                        .css({ "background": "#28a745", "opacity": "0.7" });
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    alert("Save Failed");
+                }
+            });
+        }
     </script>
 
 </body>

@@ -29,6 +29,16 @@ namespace A246FProject.BAL
             return _dal.GetModelNo();
         }
 
+        public List<PartNo> GetPartNoByModel(int modelId)
+        {
+            return _dal.GetPartNoByModel(modelId);
+        }
+
+        public List<ModelNo> GetModelNoByProject(int projectId)
+        {
+            return _dal.GetModelNoByProject(projectId);
+        }
+
         public DataTable GetCTPParameterData(
             int lineId,
             int projectId,
@@ -38,16 +48,6 @@ namespace A246FProject.BAL
                 lineId,
                 projectId,
                 machineId);
-        }
-
-        public List<PartNo> GetPartNoByModel(int modelId)
-        {
-            return _dal.GetPartNoByModel(modelId);
-        }
-
-        public List<ModelNo> GetModelNoByProject(int projectId)
-        {
-            return _dal.GetModelNoByProject(projectId);
         }
 
         public int InsertBulkA246FCTPParameter(
