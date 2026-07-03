@@ -108,12 +108,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xBMjQ2RkNUUFBhcmFtdGVyUmVwb3J0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/AOIReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xBT0lSZXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/CCMCHI4SCReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xDQ01DSEk0U0NSZXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/DestructiveReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xEZXN0cnVjdGl2ZVJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/HotBarReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xIb3RCYXJSZXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/InnerMoldReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xJbm5lck1vbGRSZXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/LaserEngravingReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xMYXNlckVuZ3JhdmluZ1JlcG9ydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/2063907/my project/A246FProject-main/A246FProject/Views/Reports/ShellCrimpReport.cshtml]
