@@ -91,4 +91,11 @@ namespace A246FProject.Models
 
         public string Part { get; set; }
     }
+
+    public class Visuals
+    {
+        public int VisualsId { get; set; }
+
+        public string Visual { get; set; }
+    }
 }

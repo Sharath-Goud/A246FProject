@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.VisualInspectionViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Data
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -79,7 +83,6 @@
         label {
             font-size: 11px;
             color: rgba(255,255,255,.45);
-            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
@@ -107,18 +110,14 @@
                 background: rgba(167,139,250,.08);
             }
 
-        /* BUTTONS */
         .btn-search {
-            background: linear-gradient(135deg, #34d399, #059669);
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
             border: none;
             border-radius: 8px;
-            padding: 10px 24px;
+            padding: 10px 20px;
             color: #fff;
             cursor: pointer;
             font-size: 13px;
-            font-family: Poppins, sans-serif;
-            font-weight: 500;
-            transition: opacity .2s;
         }
 
             .btn-search:hover {
@@ -174,7 +173,6 @@
             padding: 12px 16px;
             font-size: 11px;
             color: rgba(255,255,255,.45);
-            text-transform: uppercase;
             letter-spacing: 0.5px;
             gap: 10px;
         }
@@ -253,74 +251,88 @@
 </head>
 <body>
 
-    <h1>Visual Inspection</h1>
+    <form asp-action="Index" method="post">
+        <div class="form-card">
+            <div class="form-card-header">SVisual Inspection</div>
+            <div class="form-body">
 
-    <!-- SEARCH FORM CARD -->
-    <div class="form-card">
-        <div class="form-card-header">Search Criteria</div>
-        <div class="form-body">
+                <!-- Row 1 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Line</label>
+                        <select asp-for="LineId"
+                                asp-items="@(new SelectList(Model.Lines,"LineId","LineName"))">
+                            <option value="">--Select Line--</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Project</label>
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,"ProjectId","ProjectName"))">
+                            <option value="">--Select Project--</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select asp-for="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos,"ModelId","Model"))"
+                                class="form-control"
+                                id="ModelId">
+                            <option value="">--Select Model--</option>
+                        </select>
+                    </div>
+                </div>
 
-            <!-- Row 1 -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Line</label>
-                    <select id="ddlLine">
-                        <option value="">-- Select Line --</option>
-                        <option>Line 1</option>
-                        <option>Line 2</option>
-                        <option>Line 3</option>
-                    </select>
+                <!-- Row 2 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Visual</label>
+
+                        <select asp-for="VisualsId"
+                                asp-items="@(new SelectList(Model.Visualss,"VisualsId","Visual"))"
+                                class="form-control"
+                                id="VisualsId">
+                            <option value="">--Select Inspection--</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Part Number</label>
+                        <select asp-for="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,"PartId","Part"))"
+                                class="form-control"
+                                id="PartId">
+                            <option value="">--Select Part--</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Production Line Leader</label>
+                        <input type="text" id="txtLineLeader" placeholder="Production Line Leader" />
+                    </div>
+                
                 </div>
-                <div class="form-group">
-                    <label>Project</label>
-                    <select id="ddlProject">
-                        <option value="">-- Select Project --</option>
-                        <option>A246F</option>
-                    </select>
+
+                <!-- Row 3 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Checked By</label>
+                        <input type="text" id="txtCheckedBy" placeholder="Checked By" />
+                    </div>
+                    <div class="form-group">
+                        <label>Approved By</label>
+                        <input type="text" id="txtApprovedBy" placeholder="Approved By" />
+                    </div>
+                    <div class="form-group" style="display:flex; justify-content:flex-end;">
+                        <label style="visibility:hidden;">Search</label>
+                        <button type="submit" class="btn-search">
+                            Search
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Model</label>
-                    <select id="ddlModel">
-                        <option value="">-- Select Model --</option>
-                        <option>A246F</option>
-                    </select>
-                </div>
+
             </div>
-
-            <!-- Row 2 -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Inspection</label>
-                    <select id="ddlPart">
-                        <option value="">-- Select Inspection --</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Production Line Leader</label>
-                    <input type="text" id="txtLineLeader" placeholder="Production Line Leader" />
-                </div>
-                <div class="form-group">
-                    <label>Checked By</label>
-                    <input type="text" id="txtCheckedBy" placeholder="Checked By" />
-                </div>
-            </div>
-
-            <!-- Row 3 -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Approved By</label>
-                    <input type="text" id="txtApprovedBy" placeholder="Approved By" />
-                </div>
-                <div class="form-group" style="display:flex; justify-content:flex-end;">
-                    <label style="visibility:hidden;">Search</label>
-                    <button class="btn-search" onclick="loadData()">
-                        Search
-                    </button>
-                </div>
-            </div>
-
         </div>
-    </div>
+    </form>
 
     <!-- NOTE BOX -->
     <div class="note-box">
@@ -351,89 +363,107 @@
     <div class="actions">
         <button class="btn-submit" onclick="submitData()">Submit</button>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Sample data — replace with real API/controller call
-        const sampleData = [
-            { station: "Station 01", item: "Dimension Check",    criteria: "± 0.05 mm",         status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 01", item: "Surface Finish",     criteria: "Ra ≤ 1.6 μm",        status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 02", item: "Hole Diameter",      criteria: "Ø 5.00 ± 0.02 mm",   status: "X-NG", result: "",  ngDesc: "" },
-            { station: "Station 02", item: "Thread Check",       criteria: "M6 × 1.0",            status: "N-NA", result: "",  ngDesc: "" },
-            { station: "Station 03", item: "Visual Inspection",  criteria: "No scratch/dent",     status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 03", item: "Torque Check",       criteria: "5 Nm ± 0.5",          status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 04", item: "Label Placement",    criteria: "As per drawing",      status: "N-NA", result: "",  ngDesc: "" },
-        ];
+                $("#ProjectId").change(function () {
 
-        function getBadge(status) {
-            if (status === "V-OK") return `<span class="badge badge-ok">V-OK</span>`;
-            if (status === "X-NG") return `<span class="badge badge-ng">X-NG</span>`;
-            return `<span class="badge badge-na">N-NA</span>`;
-        }
+            var projectId = $(this).val();
 
-        function loadData() {
-            const line = document.getElementById('ddlLine').value;
-            const project = document.getElementById('ddlProject').value;
+            // Load Model
+            $.ajax({
+                url: '/VisualInspection/GetModelNoByProject',
+                type: 'POST',
+                data: { projectId: projectId },
+                success: function (result) {
 
-            if (!line || !project) {
-                alert("Please select Line and Project.");
-                return;
-            }
+                    $("#ModelId").empty();
 
-            const body = document.getElementById('tableBody');
-            body.innerHTML = '';
+                    $("#ModelId").append(
+                        '<option value="">--Select Model--</option>');
 
-            sampleData.forEach((row, i) => {
-                const div = document.createElement('div');
-                div.className = 'data-row';
-                div.innerHTML = `
-                    <div>${row.station}</div>
-                    <div>${row.item}</div>
-                    <div>${row.criteria}</div>
-                    <div>${getBadge(row.status)}</div>
-                    <div>
-                        <select onchange="sampleData[${i}].result = this.value">
-                            <option value="">Select</option>
-                            <option value="N-NA"  ${row.result==='N-NA'?'selected':''}>N - NA</option>
-                            <option value="V-OK"  ${row.result==='V-OK'?'selected':''}>V - OK</option>
-                            <option value="X-NG"  ${row.result==='X-NG'?'selected':''}>X - NG</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="text" placeholder="NG description..."
-                               value="${row.ngDesc}"
-                               oninput="sampleData[${i}].ngDesc = this.value" />
-                    </div>
-                    <div>
-                        <button class="btn-search" style="padding:5px 12px;font-size:11px;"
-                                onclick="saveRow(${i})">Save</button>
-                    </div>
-                `;
-                body.appendChild(div);
+                    $.each(result, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>');
+
+                    });
+
+                }
             });
-        }
 
-        function saveRow(i) {
-            const row = sampleData[i];
-            if (!row.result) {
-                alert(`Please select a Result for: ${row.item}`);
-                return;
-            }
-            alert(`Saved: ${row.station} — ${row.item}\nResult: ${row.result}`);
-        }
+            // Load Visual Inspection
 
-        function submitData() {
-            const body = document.getElementById('tableBody');
-            if (body.querySelector('.empty')) {
-                alert("No data loaded. Please search first.");
-                return;
-            }
-            const incomplete = sampleData.filter(r => !r.result);
-            if (incomplete.length > 0) {
-                alert(`Please fill Result for all ${incomplete.length} pending row(s).`);
-                return;
-            }
-            alert("All inspection records submitted successfully!");
-        }
+            $.ajax({
+
+                url: '/VisualInspection/GetVisuals',
+
+                type: 'POST',
+
+                data: { projectId: projectId },
+
+                success: function (result) {
+
+                    $("#VisualsId").empty();
+
+                    $("#VisualsId").append(
+                        '<option value="">--Select Inspection--</option>');
+
+                    $.each(result, function (i, item) {
+
+                        $("#VisualsId").append(
+                            '<option value="' +
+                            item.visualsId +
+                            '">' +
+                            item.visual +
+                            '</option>');
+
+                    });
+
+                }
+
+            });
+
+        });
+
+         $("#ModelId").change(function () {
+
+            var modelId = $(this).val();
+
+            $.ajax({
+
+                url: '/VisualInspection/GetPartNoByModel',
+
+                type: 'POST',
+
+                data: { modelId: modelId },
+
+                success: function (result) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">--Select Part--</option>');
+
+                    $.each(result, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>');
+
+                    });
+
+                }
+
+            });
+
+        });
     </script>
 </body>
 </html>
