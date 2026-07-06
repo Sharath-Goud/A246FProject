@@ -35,7 +35,24 @@ namespace A246FProject.Models
         public string CheckedBy { get; set; }
 
         public string ApprovedBy { get; set; }
+
+        public string Model { get; set; }
+
+        public List<VisualInspectionResultModel> VisualInspectionResults
+        {
+            get;
+            set;
+        }
     }
 
+    public class VisualInspectionResultModel
+    {
+        public int Id { get; set; }
 
+        public int DataId { get; set; }
+
+        public string Section1 { get; set; }
+
+        public string DefectiveNumber { get; set; }
+    }
 }

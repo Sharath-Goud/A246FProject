@@ -38,15 +38,37 @@ public class VisualInspectionBAL
     public DataTable GetVisualInspectionData(
     int lineId,
     int projectId,
-    int modelId,
-    int partId,
     int visualsId)
     {
         return _dal.GetVisualInspectionData(
             lineId,
             projectId,
-            modelId,
-            partId,
             visualsId);
+    }
+
+    public int InsertBulkVisualInspection(
+        DataTable dt,
+        string userId,
+        int lineId,
+        int projectId,
+        string model,
+        string leader,
+        string checkedBy,
+        string approvedBy,
+        int modelId,
+        int partId)
+    {
+        return _dal.InsertBulkVisualInspection(
+            dt,
+            userId,
+            lineId,
+            projectId,
+            model,
+            leader,
+            checkedBy,
+            approvedBy,
+            modelId,
+            partId
+        );
     }
 }

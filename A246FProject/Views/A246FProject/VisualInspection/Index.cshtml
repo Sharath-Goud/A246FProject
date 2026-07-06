@@ -166,41 +166,11 @@
             margin-bottom: 16px;
         }
 
-        .header-row {
-            display: grid;
-            grid-template-columns: 160px 1fr 1fr 120px 120px 180px 120px;
-            background: rgba(167,139,250,.08);
-            padding: 12px 16px;
-            font-size: 11px;
-            color: rgba(255,255,255,.45);
-            letter-spacing: 0.5px;
-            gap: 10px;
-        }
 
-        .data-row {
-            display: grid;
-            grid-template-columns: 160px 1fr 1fr 120px 120px 180px 120px;
-            padding: 10px 16px;
-            font-size: 13px;
-            border-top: 0.5px solid rgba(255,255,255,.05);
-            gap: 10px;
-            align-items: center;
-            transition: background .15s;
-        }
-
-            .data-row:hover {
-                background: rgba(255,255,255,.03);
-            }
-
-            .data-row input, .data-row select {
-                padding: 6px 10px;
-                font-size: 12px;
-                width: 100%;
-            }
 
         .empty {
             padding: 40px;
-            text-align: center;
+            text-align: left;
             color: rgba(255,255,255,.25);
             font-size: 13px;
         }
@@ -211,7 +181,84 @@
             gap: 10px;
         }
 
-        /* STATUS BADGES */
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+            .table-custom thead {
+                background: rgba(167,139,250,.10);
+            }
+
+            .table-custom th {
+                padding: 14px;
+                text-align: left;
+                font-size: 13px;
+                font-weight: 600;
+                color: #fff;
+                border-bottom: 1px solid rgba(255,255,255,.15);
+            }
+
+            .table-custom td {
+                padding: 12px;
+                font-size: 12px;
+                text-align: left;
+                border-bottom: 1px solid rgba(255,255,255,.08);
+                vertical-align: middle;
+            }
+
+            .table-custom tr:hover {
+                background: rgba(255,255,255,.04);
+            }
+
+        .table-select,
+        .table-input {
+            width: 100%;
+            min-width: 100px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+            .table-select option {
+                background: #1a1040;
+            }
+
+        .table-custom td:nth-child(1) {
+            width: 70px;
+        }
+
+        .table-custom td:nth-child(2) {
+            width: 180px;
+        }
+
+        .table-custom td:nth-child(3) {
+            width: 250px;
+        }
+
+        .table-custom td:nth-child(4) {
+            width: 120px;
+        }
+
+        .table-custom td:nth-child(5) {
+            width: 250px;
+        }
+
+        .table-custom td:nth-child(6) {
+            width: 150px;
+        }
+
+        .table-custom td:nth-child(7) {
+            width: 150px;
+        }
+
+        .table-custom td:nth-child(8) {
+            width: 100px;
+        }
+
         .badge {
             display: inline-block;
             padding: 3px 10px;
@@ -253,7 +300,7 @@
 
     <form asp-action="Index" method="post">
         <div class="form-card">
-            <div class="form-card-header">SVisual Inspection</div>
+            <div class="form-card-header">Visual Inspection</div>
             <div class="form-body">
 
                 <!-- Row 1 -->
@@ -344,19 +391,92 @@
 
     <!-- RESULTS TABLE -->
     <div class="results-table">
-        <div class="header-row">
-            <div>SNO</div>
-            <div>Station Name</div>
-            <div>Inspection Project</div>
-            <div>Sample Size</div>
-            <div>Inspection Specifaction</div>
-            <div>Result</div>
-            <div>Defective Number</div>
-            <div>Save</div>
-        </div>
-        <div id="tableBody">
-            <div class="empty">No records found. Use Search to load data.</div>
-        </div>
+        <table class="table-custom">
+
+            <thead>
+                <tr>
+                    <th>SNO</th>
+                    <th>Station Name</th>
+                    <th>Inspection Project</th>
+                    <th>Sample Size</th>
+                    <th>Inspection Specification</th>
+                    <th>Result</th>
+                    <th>Defective Number</th>
+                    <th>Save</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model.dtChecklist != null && Model.dtChecklist.Rows.Count > 0)
+                {
+                    string previousStation = "";
+
+                    foreach (DataRow row in Model.dtChecklist.Rows)
+                    {
+                        bool isFirstRow = previousStation != row["StationName"].ToString();
+
+                        <tr>
+
+                            <input type="hidden" class="dataid" value="@row["DataId"]" />
+                            <td>
+                                @row["SNo"]
+                            </td>
+
+                            <!-- Station Name -->
+                            @if (isFirstRow)
+                            {
+                                <td class="station-first">
+                                    @row["StationName"]
+                                </td>
+
+                                previousStation = row["StationName"].ToString();
+                            }
+                            else
+                            {
+                                <td class="station-continue"></td>
+                            }
+
+                            <td>@row["InpectionProject"]</td>
+
+                            <td>@row["SampleSize"]</td>
+
+                            <td>@row["InspectionSpecifaction"]</td>
+
+                            <td>
+                                <select class="table-select result">
+                                    <option value="">Select</option>
+                                    <option value="OK">OK</option>
+                                    <option value="NG">NG</option>
+                                    <option value="NA">NA</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <input type="text" class="table-input defective" />
+                            </td>
+
+                            <td>
+                                <button type="button" class="btn-save-row btn-search">
+                                    Save
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="empty">
+                            No records found.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
     </div>
 
     <!-- ACTIONS -->
@@ -437,7 +557,7 @@
 
                 url: '/VisualInspection/GetPartNoByModel',
 
-                type: 'POST',
+                type: 'POST',   
 
                 data: { modelId: modelId },
 
@@ -464,6 +584,100 @@
             });
 
         });
+
+         $(document).on("click", ".btn-save-row", function () {
+
+            var row = $(this).closest("tr");
+
+            var model = {
+                VisualInspectionResults: [{
+                    DataId: row.find(".dataid").val(),
+                    Section1: row.find(".result").val(),
+                    DefectiveNumber: row.find(".defective").val()
+                }],
+                LineId: $("#LineId").val(),
+                ProjectId: $("#ProjectId").val(),
+                ModelId: $("#ModelId").val(),
+                PartId: $("#PartId").val(),
+                VisualsId: $("#VisualsId").val(),
+                ProdLineLeader: $("#txtLineLeader").val(),
+                CheckedBy: $("#txtCheckedBy").val(),
+                ApprovedBy: $("#txtApprovedBy").val()
+            };
+
+            $.ajax({
+                url: '/VisualInspection/SaveSingle',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: function (res) {
+                    alert("Row Saved successfully");
+                }
+            });
+        });
+
+        function submitData() {
+
+            var list = [];
+
+            $("tbody tr").each(function () {
+
+                var row = $(this);
+
+                var dataId = row.find(".dataid").val();
+                var result = row.find(".result").val();
+                var defective = row.find(".defective").val();
+
+                if (dataId && result !== "") {
+
+                    list.push({
+                        DataId: parseInt(dataId),
+                        Section1: result,
+                        DefectiveNumber: defective ? parseInt(defective) : 0
+                    });
+                }
+            });
+
+            if (list.length === 0) {
+                alert("Please enter at least one inspection result.");
+                return;
+            }
+
+            var model = {
+                VisualInspectionResults: list,
+                LineId: $("#LineId").val(),
+                ProjectId: $("#ProjectId").val(),
+                ModelId: $("#ModelId").val(),
+                PartId: $("#PartId").val(),
+                VisualsId: $("#VisualsId").val(),
+                ProdLineLeader: $("#txtLineLeader").val(),
+                CheckedBy: $("#txtCheckedBy").val(),
+                ApprovedBy: $("#txtApprovedBy").val()
+            };
+
+            $.ajax({
+                url: '/VisualInspection/Submit',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: function (res) {
+
+                    if (res.success) {
+                        alert("Data Submitted successfully");
+
+                        $(".result").val('');
+                        $(".defective").val('');
+
+                        $("#txtLineLeader").val('');
+                        $("#txtCheckedBy").val('');
+                        $("#txtApprovedBy").val('');
+
+                    } else {
+                        alert("Save failed");
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

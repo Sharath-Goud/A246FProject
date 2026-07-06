@@ -151,21 +151,60 @@ public class VisualInspectionDAL
     public DataTable GetVisualInspectionData(
     int lineId,
     int projectId,
-    int modelId,
-    int partId,
     int visualsId)
     {
         SqlParameter[] parms =
         {
-        new SqlParameter("@LineId", lineId),
         new SqlParameter("@ProjectId", projectId),
-        new SqlParameter("@ModelId", modelId),
-        new SqlParameter("@PartId", partId),
+        new SqlParameter("@LineId", lineId),
         new SqlParameter("@VisualsId", visualsId)
     };
 
         return _db.ExecuteProcedureWithParameterForDataTable(
             "ipqc.GetVisualInspectionChecklist",
             parms);
+    }
+
+    public int InsertBulkVisualInspection(
+        DataTable dtChecklist,
+        string userId,
+        int LineId,
+        int ProjectId,
+        string Model,
+        string ProdLineLeader,
+        string CheckedBy,
+        string ApprovedBy,
+        int ModelId,
+        int PartId)
+    {
+        int result = 0;
+
+        try
+        {
+            SqlParameter[] parameters =
+            {
+                new SqlParameter("@Checklist", dtChecklist),
+                new SqlParameter("@CreatedBy", userId),
+                new SqlParameter("@LineId", LineId),
+                new SqlParameter("@ProjectId", ProjectId),
+                new SqlParameter("@Model", Model),
+                new SqlParameter("@ProdLineLeader", ProdLineLeader),
+                new SqlParameter("@CheckedBy", CheckedBy),
+                new SqlParameter("@ApprovedBy", ApprovedBy),
+                new SqlParameter("@ModelId", ModelId),
+                new SqlParameter("@PartId", PartId)
+            };
+
+            result = _db.ExecuteNonQueryWithParameter(
+                "ipqc.InsertBulkVisualInspection",
+                parameters
+            );
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
+        return result;
     }
 }

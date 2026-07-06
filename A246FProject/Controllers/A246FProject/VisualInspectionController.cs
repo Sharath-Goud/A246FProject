@@ -11,6 +11,24 @@ public class VisualInspectionController : Controller
         _bal = new VisualInspectionBAL();
     }
 
+    [HttpPost]
+    public JsonResult GetModelNoByProject(int projectId)
+    {
+        return Json(_bal.GetModelNoByProject(projectId));
+    }
+
+    [HttpPost]
+    public JsonResult GetPartNoByModel(int modelId)
+    {
+        return Json(_bal.GetPartNoByModel(modelId));
+    }
+
+    [HttpPost]
+    public JsonResult GetVisuals(int projectId)
+    {
+        return Json(_bal.GetVisuals(projectId));
+    }
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -59,12 +77,9 @@ public class VisualInspectionController : Controller
             ? _bal.GetVisuals(model.ProjectId)
             : new List<Visuals>();
 
-        model.dtChecklist =
-            _bal.GetVisualInspectionData(
+        model.dtChecklist = _bal.GetVisualInspectionData(
                 model.LineId,
                 model.ProjectId,
-                model.ModelId,
-                model.PartId,
                 model.VisualsId);
 
         return View(
@@ -73,20 +88,86 @@ public class VisualInspectionController : Controller
     }
 
     [HttpPost]
-    public JsonResult GetModelNoByProject(int projectId)
+    public IActionResult SaveSingle([FromBody] VisualInspectionViewModel model)
     {
-        return Json(_bal.GetModelNoByProject(projectId));
+        try
+        {
+            string userId = HttpContext.Session.GetString("User");
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Id");
+            dt.Columns.Add("DataId");
+            dt.Columns.Add("Section1");
+            dt.Columns.Add("DefectiveNumber");
+
+            var row = model.VisualInspectionResults.First();
+
+            dt.Rows.Add(1, row.DataId, row.Section1, row.DefectiveNumber);
+
+            int result = _bal.InsertBulkVisualInspection(
+                dt,
+                userId,
+                model.LineId,
+                model.ProjectId,
+                model.ModelId.ToString(),
+                model.ProdLineLeader,
+                model.CheckedBy,
+                model.ApprovedBy,
+                model.ModelId,
+                model.PartId
+            );
+
+            return Json(new { success = result > 0 });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
 
     [HttpPost]
-    public JsonResult GetPartNoByModel(int modelId)
+    public IActionResult Submit([FromBody] VisualInspectionViewModel model)
     {
-        return Json(_bal.GetPartNoByModel(modelId));
-    }
+        try
+        {
+            string userId = HttpContext.Session.GetString("User");
 
-    [HttpPost]
-    public JsonResult GetVisuals(int projectId)
-    {
-        return Json(_bal.GetVisuals(projectId));
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Id");
+            dt.Columns.Add("DataId");
+            dt.Columns.Add("Section1");
+            dt.Columns.Add("DefectiveNumber");
+
+            int i = 1;
+
+            foreach (var row in model.VisualInspectionResults)
+            {
+                dt.Rows.Add(
+                    i++,
+                    row.DataId,
+                    row.Section1,
+                    row.DefectiveNumber
+                );
+            }
+
+            int result = _bal.InsertBulkVisualInspection(
+                dt,
+                userId,
+                model.LineId,
+                model.ProjectId,
+                model.ModelId.ToString(),
+                model.ProdLineLeader,
+                model.CheckedBy,
+                model.ApprovedBy,
+                model.ModelId,
+                model.PartId
+            );
+
+            return Json(new { success = result > 0 });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
     }
 }

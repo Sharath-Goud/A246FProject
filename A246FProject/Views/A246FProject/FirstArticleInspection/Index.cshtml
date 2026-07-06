@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.FirstArticleInspectionViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -79,7 +82,6 @@
         label {
             font-size: 11px;
             color: rgba(255,255,255,.45);
-            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
@@ -107,18 +109,14 @@
                 background: rgba(167,139,250,.08);
             }
 
-        /* BUTTONS */
         .btn-search {
-            background: linear-gradient(135deg, #34d399, #059669);
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
             border: none;
             border-radius: 8px;
-            padding: 10px 24px;
+            padding: 10px 20px;
             color: #fff;
             cursor: pointer;
             font-size: 13px;
-            font-family: Poppins, sans-serif;
-            font-weight: 500;
-            transition: opacity .2s;
         }
 
             .btn-search:hover {
@@ -169,24 +167,23 @@
 
         .header-row {
             display: grid;
-            grid-template-columns: 160px 1fr 1fr 120px 120px 180px 120px;
+            grid-template-columns: 240px 180px 1fr 120px 120px 180px 120px;
             background: rgba(167,139,250,.08);
             padding: 12px 16px;
             font-size: 11px;
             color: rgba(255,255,255,.45);
-            text-transform: uppercase;
             letter-spacing: 0.5px;
             gap: 10px;
         }
 
         .data-row {
             display: grid;
-            grid-template-columns: 160px 1fr 1fr 120px 120px 180px 120px;
+            grid-template-columns: 240px 180px 1fr 120px 120px 180px 120px;
             padding: 10px 16px;
             font-size: 13px;
             border-top: 0.5px solid rgba(255,255,255,.05);
             gap: 10px;
-            align-items: center;
+            align-items: start;
             transition: background .15s;
         }
 
@@ -202,7 +199,7 @@
 
         .empty {
             padding: 40px;
-            text-align: center;
+            text-align: left;
             color: rgba(255,255,255,.25);
             font-size: 13px;
         }
@@ -241,53 +238,49 @@
         }
 
         @@media (max-width: 900px) {
-            .form-row, .form-row-2
+            .form-row, .form-row-2 {
+                grid-template-columns: 1fr;
+            }
 
-        {
-            grid-template-columns: 1fr;
-        }
-
-        .header-row, .data-row {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
+            .header-row, .data-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>First Article Assurance Inspection Record</h1>
-    <p class="sub">FAAIR — Quality Inspection Form</p>
-
-    <!-- SEARCH FORM CARD -->
     <div class="form-card">
-        <div class="form-card-header">Search Criteria</div>
+        <div class="form-card-header">First Article Assurance Inspection Record</div>
         <div class="form-body">
 
             <!-- Row 1 -->
             <div class="form-row">
                 <div class="form-group">
                     <label>Line</label>
-                    <select id="ddlLine">
+                    <select asp-for="LineId"
+                            id="ddlLine"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.Lines, "LineId", "LineName"))">
                         <option value="">-- Select Line --</option>
-                        <option>Line 1</option>
-                        <option>Line 2</option>
-                        <option>Line 3</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Project</label>
-                    <select id="ddlProject">
+                    <select asp-for="ProjectId"
+                            id="ddlProject"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.Projects, "ProjectId", "ProjectName"))">
                         <option value="">-- Select Project --</option>
-                        <option>A246F</option>
-                        <option>B312G</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Model</label>
-                    <select id="ddlModel">
+                    <select asp-for="ModelId"
+                            id="ddlModel"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.ModelNos, "ModelId", "Model"))">
                         <option value="">-- Select Model --</option>
-                        <option>A246F</option>
                     </select>
                 </div>
             </div>
@@ -296,7 +289,10 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Part</label>
-                    <select id="ddlPart">
+                    <select asp-for="PartId"
+                            id="ddlPart"
+                            class="form-control"
+                            asp-items="@(new SelectList(Model.PartNos, "PartId", "Part"))">
                         <option value="">-- Select Part --</option>
                     </select>
                 </div>
@@ -368,92 +364,274 @@
         </div>
     </div>
 
-    <!-- ACTIONS -->
     <div class="actions">
         <button class="btn-submit" onclick="submitData()">Submit</button>
     </div>
-
+    <input type="hidden" id="hdnCreatedBy" value="@ViewBag.CreatedBy" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        // Sample data — replace with real API/controller call
-        const sampleData = [
-            { station: "Station 01", item: "Dimension Check",    criteria: "± 0.05 mm",         status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 01", item: "Surface Finish",     criteria: "Ra ≤ 1.6 μm",        status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 02", item: "Hole Diameter",      criteria: "Ø 5.00 ± 0.02 mm",   status: "X-NG", result: "",  ngDesc: "" },
-            { station: "Station 02", item: "Thread Check",       criteria: "M6 × 1.0",            status: "N-NA", result: "",  ngDesc: "" },
-            { station: "Station 03", item: "Visual Inspection",  criteria: "No scratch/dent",     status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 03", item: "Torque Check",       criteria: "5 Nm ± 0.5",          status: "V-OK", result: "",  ngDesc: "" },
-            { station: "Station 04", item: "Label Placement",    criteria: "As per drawing",      status: "N-NA", result: "",  ngDesc: "" },
-        ];
+        $(document).ready(function () {
 
-        function getBadge(status) {
-            if (status === "V-OK") return `<span class="badge badge-ok">V-OK</span>`;
-            if (status === "X-NG") return `<span class="badge badge-ng">X-NG</span>`;
-            return `<span class="badge badge-na">N-NA</span>`;
-        }
+            $("#ddlProject").change(function () {
+
+                $.ajax({
+                    url: '/FirstArticleInspection/GetModelNoByProject',
+                    type: 'POST',
+                    data: {
+                        projectId: $(this).val()
+                    },
+                    success: function (data) {
+
+                        $("#ddlModel").empty();
+                        $("#ddlModel").append("<option value=''>--Select Model--</option>");
+
+                        $.each(data, function (i, item) {
+
+                            $("#ddlModel").append(
+                                "<option value='" + item.modelId + "'>" +
+                                item.model +
+                                "</option>");
+                        });
+
+                    }
+                });
+
+            });
+
+        });
+
+         $("#ddlModel").change(function () {
+
+            $.ajax({
+                url: '/FirstArticleInspection/GetPartNoByModel',
+                type: 'POST',
+                data: { modelId: $(this).val() },
+                success: function (data) {
+
+                    $("#ddlPart").empty();
+                    $("#ddlPart").append("<option value=''>--Select Part--</option>");
+
+                    $.each(data, function (i, item) {
+
+                        $("#ddlPart").append(
+                            "<option value='" + item.partId + "'>" +
+                            item.part +
+                            "</option>");
+                    });
+                }
+            });
+
+        });
 
         function loadData() {
-            const line = document.getElementById('ddlLine').value;
-            const project = document.getElementById('ddlProject').value;
 
-            if (!line || !project) {
-                alert("Please select Line and Project.");
-                return;
-            }
+            $.ajax({
+                url: '/FirstArticleInspection/GetInspectionData',
+                type: 'POST',
+                data: {
+                    lineId: $("#ddlLine").val(),
+                    projectId: $("#ddlProject").val()
+                },
+                        success: function (data) {
 
-            const body = document.getElementById('tableBody');
-            body.innerHTML = '';
+                    let html = "";
 
-            sampleData.forEach((row, i) => {
-                const div = document.createElement('div');
-                div.className = 'data-row';
-                div.innerHTML = `
-                    <div>${row.station}</div>
-                    <div>${row.item}</div>
-                    <div>${row.criteria}</div>
-                    <div>${getBadge(row.status)}</div>
-                    <div>
-                        <select onchange="sampleData[${i}].result = this.value">
-                            <option value="">Select</option>
-                            <option value="N-NA"  ${row.result==='N-NA'?'selected':''}>N - NA</option>
-                            <option value="V-OK"  ${row.result==='V-OK'?'selected':''}>V - OK</option>
-                            <option value="X-NG"  ${row.result==='X-NG'?'selected':''}>X - NG</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="text" placeholder="NG description..."
-                               value="${row.ngDesc}"
-                               oninput="sampleData[${i}].ngDesc = this.value" />
-                    </div>
-                    <div>
-                        <button class="btn-search" style="padding:5px 12px;font-size:11px;"
-                                onclick="saveRow(${i})">Save</button>
-                    </div>
-                `;
-                body.appendChild(div);
+                    if (data.length === 0) {
+                        html = "<div class='empty'>No records found</div>";
+                    }
+                    else {
+
+                                let previousStation = "";
+                                let previousItem = "";
+
+                                $.each(data, function (i, item) {
+
+                                    let stationHtml = "";
+                                    let itemHtml = "";
+
+                                    if (item.stationName != previousStation) {
+
+                                        stationHtml = item.stationName;
+                                        previousStation = item.stationName;
+
+                                        previousItem = "";
+                                    }
+
+                                    if (item.itemName != previousItem) {
+
+                                        itemHtml = item.itemName;
+                                        previousItem = item.itemName;
+                                    }
+
+                                    html += `
+                                    <div class="data-row">
+
+                                        <input type="hidden" class="contentId" value="${item.contentId}" />
+
+                                        <div class="station">${stationHtml}</div>
+
+                                        <div class="item">${itemHtml}</div>
+
+                                        <div>${item.content}</div>
+
+                                        <div>
+                                            <select class="status">
+                                                <option value="OK">OK</option>
+                                                <option value="NG">NG</option>
+                                                <option value="NA">NA</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <input type="text" class="result"/>
+                                        </div>
+
+                                        <div>
+                                            <input type="text" class="ngdesc"/>
+                                        </div>
+
+                                        <div>
+                                            <button class="btn-search" onclick="saveRow(this)">Save</button>
+                                        </div>
+
+                                    </div>`;
+                                });
+                    }
+
+                    $("#tableBody").html(html);
+                }
             });
         }
 
-        function saveRow(i) {
-            const row = sampleData[i];
-            if (!row.result) {
-                alert(`Please select a Result for: ${row.item}`);
-                return;
-            }
-            alert(`Saved: ${row.station} — ${row.item}\nResult: ${row.result}`);
+         function saveRow(btn) {
+
+            let row = $(btn).closest(".data-row");
+
+            let data = {
+
+                ContentId: row.find(".contentId").val(),
+                SRId: row.find(".status").val()=="OK"?1:row.find(".status").val()=="NG"?2:3,
+                Result: row.find(".result").val(),
+                RejectDescribe: row.find(".ngdesc").val(),
+
+                LineId: $("#ddlLine").val(),
+                ProjectId: $("#ddlProject").val(),
+                ModelId: $("#ddlModel").val(),
+                PartId: $("#ddlPart").val(),
+
+                ProductName: $("#txtProductName").val(),
+                WorkOrder: $("#txtWorkOrder").val(),
+                DrawingVersion: $("#txtDrawingVersion").val(),
+                PackVersion: $("#txtPackVersion").val(),
+                SamplingQty: $("#txtSamplingQty").val(),
+
+                ProdLineLeader: $("#txtLineLeader").val(),
+                CheckedBy: $("#txtCheckedBy").val(),
+                ApprovedBy: $("#txtApprovedBy").val(),
+                CreatedBy: $("#hdnCreatedBy").val()
+            };
+
+            $.ajax({
+                url: "/FirstArticleInspection/SaveInspection",
+                type: "POST",
+                data: data,
+                success: function (res) {
+
+                    if(res.success)
+                        alert("Row Saved Successfully");
+                    else
+                        alert("Save Failed");
+                }
+            });
         }
 
         function submitData() {
-            const body = document.getElementById('tableBody');
-            if (body.querySelector('.empty')) {
-                alert("No data loaded. Please search first.");
-                return;
-            }
-            const incomplete = sampleData.filter(r => !r.result);
-            if (incomplete.length > 0) {
-                alert(`Please fill Result for all ${incomplete.length} pending row(s).`);
-                return;
-            }
-            alert("All inspection records submitted successfully!");
+
+            let list = [];
+
+            $(".data-row").each(function () {
+
+                list.push({
+
+                    ContentId: $(this).find(".contentId").val(),
+
+                    SRId: $(this).find(".status").val()=="OK"?1:
+                          $(this).find(".status").val()=="NG"?2:3,
+
+                    Result: $(this).find(".result").val(),
+
+                    RejectDescribe: $(this).find(".ngdesc").val()
+                });
+
+            });
+
+            let model = {
+
+                LineId: $("#ddlLine").val(),
+
+                ProjectId: $("#ddlProject").val(),
+
+                ModelId: $("#ddlModel").val(),
+
+                PartId: $("#ddlPart").val(),
+
+                ProductName: $("#txtProductName").val(),
+
+                WorkOrder: $("#txtWorkOrder").val(),
+
+                DrawingVersion: $("#txtDrawingVersion").val(),
+
+                PackVersion: $("#txtPackVersion").val(),
+
+                SamplingQty: $("#txtSamplingQty").val(),
+
+                ProdLineLeader: $("#txtLineLeader").val(),
+
+                CheckedBy: $("#txtCheckedBy").val(),
+
+                ApprovedBy: $("#txtApprovedBy").val(),
+
+                CreatedBy: $("#hdnCreatedBy").val(),
+
+                CheckListFirstArticleInspections: list
+
+            };
+
+            $.ajax({
+
+                url: "/FirstArticleInspection/SubmitInspection",
+
+                type: "POST",
+
+                contentType: "application/json",
+
+                data: JSON.stringify(model),
+
+                success: function(res){
+
+                    if(res.success)
+                        alert("Bulk Data Submitted Successfully");
+                        $("#ddlLine").val("");
+                        $("#ddlProject").val("");
+                        $("#ddlModel").empty().append("<option value=''>-- Select Model --</option>");
+                        $("#ddlPart").empty().append("<option value=''>-- Select Part --</option>");
+
+                        $("#txtLineLeader").val("");
+                        $("#txtCheckedBy").val("");
+                        $("#txtApprovedBy").val("");
+                        $("#txtProductName").val("");
+                        $("#txtWorkOrder").val("");
+                        $("#txtDrawingVersion").val("");
+                        $("#txtPackVersion").val("");
+                        $("#txtSamplingQty").val("");
+
+                        $("#tableBody").html("<div class='empty'>No records found. Use Search to load data.</div>");
+                    else
+                        alert("Submit Failed");
+                }
+
+            });
+
         }
     </script>
 </body>
