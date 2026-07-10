@@ -1,4 +1,5 @@
 ﻿using A246FProject.Models;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace A246FProject.DAL
@@ -33,6 +34,32 @@ namespace A246FProject.DAL
         }
 
         #endregion
+
+        public List<Visuals> GetVisuals(int projectId)
+        {
+            SqlParameter[] p =
+            {
+            new SqlParameter("@ProjectId",projectId)
+        };
+
+            DataTable dt =
+                _db.ExecuteProcedureWithParameterForDataTable(
+                    "ipqc.GetA246FVisualsByproject",
+                    p);
+
+            List<Visuals> list = new();
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new Visuals
+                {
+                    VisualsId = Convert.ToInt32(dr["VisualsId"]),
+                    Visual = dr["Visual"].ToString()
+                });
+            }
+
+            return list;
+        }
 
         #region Shift
 

@@ -1,0 +1,715 @@
+﻿@model A246FProject.Models.Reports.FirstArticleDimensionReportViewModel
+
+
+@{
+    ViewData["Title"] = "First Article Dimension Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+
+<style>
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #14142a;
+        font-family: 'Poppins',sans-serif;
+        color: #ffffff;
+    }
+
+    .form-card {
+        width: 100%;
+        background: #1c1d3c;
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 25px;
+        box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+
+    .form-card-header {
+        background: #2a2b52;
+        color: #fff;
+        padding: 18px 25px;
+        font-size: 22px;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+        .form-group label {
+            color: #A7ACD6;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 7px;
+            letter-spacing: 1px;
+        }
+
+        .form-group input,
+        .form-group select {
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #46496d;
+            background: #2d2f4f;
+            color: #fff;
+            padding: 0 14px;
+            font-size: 14px;
+            transition: .3s;
+        }
+
+            .form-group input::placeholder {
+                color: #8d90ba;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #8c68ff;
+                box-shadow: 0 0 0 3px rgba(140,104,255,.18);
+                background: #313456;
+            }
+
+            .form-group select option {
+                background: #2d2f4f;
+                color: #fff;
+            }
+
+    .btn-search {
+        width: 100%;
+        height: 46px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient( 90deg, #9B7CFF, #7B34F5);
+        transition: .30s;
+    }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(123,52,245,.45);
+        }
+
+    .btn-submit {
+        border: none;
+        padding: 12px 35px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 600;
+        font-size: 15px;
+        background: linear-gradient( 90deg, #58b8ff, #1d7cff);
+        transition: .30s;
+    }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(29,124,255,.35);
+        }
+
+    .results-table {
+        margin-top: 20px;
+        background: #1c1d3c;
+        border-radius: 18px;
+        overflow: auto;
+        border: 1px solid rgba(255,255,255,.06);
+        max-height: 550px;
+        box-shadow: 0 12px 28px rgba(0,0,0,.30);
+    }
+
+        .results-table::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .results-table::-webkit-scrollbar-track {
+            background: #202243;
+        }
+
+        .results-table::-webkit-scrollbar-thumb {
+            background: #8c68ff;
+            border-radius: 20px;
+        }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        /* HEADER */
+        .custom-table thead th {
+            position: sticky;
+            top: 0;
+            background: #2a2b52;
+            color: #BFC5FF;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #444870;
+        }
+
+        /* BODY CELLS */
+        .custom-table tbody td {
+            background: #232542;
+            color: #fff;
+            padding: 12px 10px;
+            font-size: 12px;
+            border-bottom: 1px solid #36395c;
+            /* 🔥 IMPORTANT FIX */
+            text-align: left;
+            vertical-align: middle;
+        }
+
+            /* LEFT ALIGN ONLY FOR TEXT COLUMNS */
+            .custom-table tbody td:nth-child(2),
+            .custom-table tbody td:nth-child(3),
+            .custom-table tbody td:nth-child(4) {
+                text-align: left;
+                padding-left: 14px;
+            }
+
+            /* VALUE + RESULT PERFECT ALIGN */
+            .custom-table tbody td:nth-child(8),
+            .custom-table tbody td:nth-child(9) {
+                font-weight: 600;
+                letter-spacing: 0.3px;
+            }
+
+        /* ROWSPAN CELLS CENTER FIX */
+        .custom-table td[rowspan] {
+            vertical-align: middle !important;
+            text-align: left;
+        }
+
+        .custom-table tbody tr:hover td {
+            background: #2c2f52;
+        }
+
+        .custom-table th:nth-child(1),
+        .custom-table td:nth-child(1) {
+            width: 200px;
+        }
+
+        .custom-table th:nth-child(2),
+        .custom-table td:nth-child(2) {
+            width: 120px;
+        }
+
+        .custom-table th:nth-child(3),
+        .custom-table td:nth-child(3),
+        .custom-table th:nth-child(5),
+        .custom-table td:nth-child(5),
+        .custom-table th:nth-child(7),
+        .custom-table td:nth-child(7),
+        .custom-table th:nth-child(9),
+        .custom-table td:nth-child(9),
+        .custom-table th:nth-child(11),
+        .custom-table td:nth-child(11) {
+            width: 100px;
+        }
+
+        .custom-table th:nth-child(4),
+        .custom-table td:nth-child(4),
+        .custom-table th:nth-child(6),
+        .custom-table td:nth-child(6),
+        .custom-table th:nth-child(8),
+        .custom-table td:nth-child(8),
+        .custom-table th:nth-child(10),
+        .custom-table td:nth-child(10),
+        .custom-table th:nth-child(11),
+        .custom-table td:nth-child(11),
+        .custom-table th:nth-child(12),
+        .custom-table td:nth-child(12){
+            width: 80px;
+        }
+
+
+    .value-box {
+        width: 90px;
+        height: 36px;
+        background: #2d2f4f;
+        border: 1px solid #555a86;
+        border-radius: 6px;
+        color: #fff;
+        text-align: left;
+        outline: none;
+    }
+
+        .value-box:focus {
+            border-color: #8c68ff;
+        }
+
+    .text-success {
+        color: #37f47c !important;
+        font-weight: 600;
+    }
+
+    .text-danger {
+        color: #ff5577 !important;
+        font-weight: 600;
+    }
+
+    .empty {
+        padding: 45px;
+        text-align: left;
+        color: #8f92bd;
+        font-size: 15px;
+    }
+
+    .actions {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: left;
+        gap: 15px;
+    }
+
+    @@media(max - width:992px) {
+        .form-row {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media(max - width:768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-card-header {
+            font-size: 18px;
+        }
+
+        .custom-table {
+            min-width: 1100px;
+        }
+
+        .btn-search,
+        .btn-submit {
+            width: 100%;
+        }
+    }
+
+    /* DatePicker Popup */
+    .ui-datepicker {
+        background: #2d2f4f;
+        border: 1px solid #6d5dfc;
+        border-radius: 10px;
+        padding: 8px;
+        color: #fff;
+        font-size: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.4);
+        z-index: 9999 !important;
+    }
+
+    /* Header */
+    .ui-datepicker-header {
+        background: #6d5dfc;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+    }
+
+    /* Month & Year Dropdowns */
+    .ui-datepicker select.ui-datepicker-month,
+    .ui-datepicker select.ui-datepicker-year {
+        background: #fff;
+        color: #000;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    /* Day Names */
+    .ui-datepicker th {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Days */
+    .ui-datepicker td a {
+        background: transparent;
+        color: #fff;
+        text-align: left;
+        border-radius: 5px;
+        padding: 5px;
+    }
+
+        /* Hover */
+        .ui-datepicker td a:hover {
+            background: #8c68ff;
+            color: #fff;
+        }
+
+    /* Selected Day */
+    .ui-datepicker .ui-state-active {
+        background: #8c68ff !important;
+        color: #fff !important;
+        border: none;
+    }
+
+    /* Today's Date */
+    .ui-datepicker .ui-state-highlight {
+        background: #4caf50;
+        color: #fff;
+    }
+
+    /* Previous & Next */
+    .ui-datepicker-prev,
+    .ui-datepicker-next {
+        cursor: pointer;
+    }
+
+        .ui-datepicker-prev span,
+        .ui-datepicker-next span {
+            filter: brightness(10);
+        }
+</style>
+
+@using (Html.BeginForm("Index", "FirstArticleDimensionReport", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+            First Article Dimension Report
+        </div>
+
+        <div class="form-body">
+
+            <div class="box padding">
+
+                <div class="row" style="padding-top:15px;">
+
+                    <div class="col-lg-12">
+
+                        <div class="form-row">
+
+                            <!-- Line -->
+                            <div class="form-group">
+                                <label>Line</label>
+                                <select asp-for="LineId"
+                                        asp-items="@(new SelectList(Model.Lines,"LineId","LineName"))"
+                                        class="form-control">
+                                    <option value="">--Select Line--</option>
+                                </select>
+                            </div>
+
+                            <!-- Shift -->
+                            <div class="form-group">
+                                <label>Shift</label>
+                                <select asp-for="ShiftId"
+                                        asp-items="@(new SelectList(Model.Shifts,"ShiftId","ShiftName"))"
+                                        class="form-control">
+                                    <option value="">--Select Shift--</option>
+                                </select>
+                            </div>
+
+                            <!-- Date -->
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input asp-for="FromDate"
+                                       type="text"
+                                       id="datepicker"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       placeholder="Select Date" />
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-row">
+
+                            <!-- Project -->
+                            <div class="form-group">
+                                <label>Project</label>
+                                <select asp-for="ProjectId"
+                                        asp-items="@(new SelectList(Model.Projects,"ProjectId","ProjectName"))"
+                                        class="form-control">
+                                    <option value="">--Select Project--</option>
+                                </select>
+                            </div>
+
+                            <!-- Machine -->
+                            <div class="form-group">
+                                <label>Machine</label>
+                                <select asp-for="MachineId"
+                                        asp-items="@(new SelectList(Model.Machines,"MachineId","Machine"))"
+                                        class="form-control">
+                                    <option value="">--Select Machine--</option>
+                                </select>
+                            </div>
+
+                            <!-- Search Button -->
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn-search"
+                                        type="submit"
+                                        name="command"
+                                        value="Search">
+                                    Search
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- TABLE -->
+
+            <div class="box padding">
+
+                <div class="results-table">
+
+                    <table class="custom-table"
+                           id="tblReport">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Station Name</th>
+
+                                <th>Specification</th>
+
+                                <th>Check 1</th>
+
+                                <th>SerialNo1</th>
+
+                                <th>Check 2</th>
+
+                                <th>SerialNo2</th>
+
+                                <th>Check 3</th>
+
+                                <th>SerialNo3</th>
+
+                                <th>Check 4</th>
+
+                                <th>SerialNo4</th>
+
+                                <th>Check 5</th>
+
+                                <th>SerialNo5</th>
+
+                                <th>Result</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @if (Model.dtReports != null && Model.dtReports.Rows.Count > 0)
+                            {
+                                string previousStation = "";
+                                int stationRowCount = 0;
+                                int currentRow = 0;
+
+
+                                foreach (System.Data.DataRow item in Model.dtReports.Rows)
+                                {
+
+                                    string stationName = item["StationName"].ToString();
+
+
+                                    if (stationName != previousStation)
+                                    {
+                                        stationRowCount = 0;
+
+                                        foreach (System.Data.DataRow r in Model.dtReports.Rows)
+                                        {
+                                            if (r["StationName"].ToString() == stationName)
+                                            {
+                                                stationRowCount++;
+                                            }
+                                        }
+
+                                        currentRow = 0;
+                                    }
+
+
+                                    <tr>
+
+                                        @if (currentRow == 0)
+                                        {
+                                            <td rowspan="@stationRowCount">
+                                                @item["StationName"]
+                                            </td>
+                                        }
+
+
+                                        <td>
+                                            @item["Specification"]
+                                        </td>
+
+
+                                        <td>
+                                            @(Convert.ToDecimal(item["Check1"]).ToString("0.00"))
+                                        </td>
+
+
+                                        <td>
+                                            @item["SerialNo1"]
+                                        </td>
+
+
+                                        <td>
+                                            @(Convert.ToDecimal(item["Check2"]).ToString("0.00"))
+                                        </td>
+
+
+                                        <td>
+                                            @item["SerialNo2"]
+                                        </td>
+
+
+                                        <td>
+                                            @(Convert.ToDecimal(item["Check3"]).ToString("0.00"))
+                                        </td>
+
+
+                                        <td>
+                                            @item["SerialNo3"]
+                                        </td>
+
+
+                                        <td>
+                                            @(Convert.ToDecimal(item["Check4"]).ToString("0.00"))
+                                        </td>
+
+
+                                        <td>
+                                            @item["SerialNo4"]
+                                        </td>
+
+
+                                        <td>
+                                            @(Convert.ToDecimal(item["Check5"]).ToString("0.00"))
+                                        </td>
+
+
+                                        <td>
+                                            @item["SerialNo5"]
+                                        </td>
+
+
+                                        <td style="color:@item["Color"]">
+                                            @item["Result"]
+                                        </td>
+
+                                    </tr>
+
+
+                                    previousStation = stationName;
+
+
+                                    currentRow++;
+
+
+                                    if (currentRow == stationRowCount)
+                                    {
+                                        currentRow = 0;
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="13" style="text-align:center">
+                                        No Records Found
+                                    </td>
+                                </tr>
+                            }
+                            
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            @if (Model.dtReports != null && Model.dtReports.Rows.Count > 0)
+            {
+
+                <div class="actions">
+
+                    <div class="col-lg-2"></div>
+
+                    <div class="col-lg-2">
+
+                        <label>
+
+                            Export Format File :
+
+                        </label>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <select asp-for="ExportType"
+                                asp-items="@(new SelectList(Model.ExportTypes))"
+                                class="form-control">
+                        </select>
+
+                    </div>
+
+                    <div class="col-lg-2">
+
+                        <button class="btn-submit">
+                            Export File
+                        </button>
+
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+}
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#datepicker").datepicker({
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            showAnim: "fadeIn"
+        });
+
+    });
+</script>

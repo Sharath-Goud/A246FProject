@@ -483,7 +483,10 @@
                                         </div>
 
                                         <div>
-                                            <input type="text" class="result"/>
+                                            <input type="text"
+                                                   class="result"
+                                                   maxlength="10"
+                                                   oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'');" />
                                         </div>
 
                                         <div>
@@ -510,7 +513,10 @@
             let data = {
 
                 ContentId: row.find(".contentId").val(),
-                SRId: row.find(".status").val()=="OK"?1:row.find(".status").val()=="NG"?2:3,
+                SRId: row.find(".status").val()=="OK" ? 5 :
+                row.find(".status").val()=="NG" ? 6 : 7,
+                Result: row.find(".result").val(),
+                RejectDescribe: row.find(".ngdesc").val(),
                 Result: row.find(".result").val(),
                 RejectDescribe: row.find(".ngdesc").val(),
 
@@ -555,8 +561,8 @@
 
                     ContentId: $(this).find(".contentId").val(),
 
-                    SRId: $(this).find(".status").val()=="OK"?1:
-                          $(this).find(".status").val()=="NG"?2:3,
+                      SRId: $(this).find(".status").val()=="OK" ? 5 :
+                    $(this).find(".status").val()=="NG" ? 6 : 7,
 
                     Result: $(this).find(".result").val(),
 
@@ -607,10 +613,12 @@
 
                 data: JSON.stringify(model),
 
-                success: function(res){
+                success: function (res) {
 
-                    if(res.success)
+                    if (res.success) {
+
                         alert("Bulk Data Submitted Successfully");
+
                         $("#ddlLine").val("");
                         $("#ddlProject").val("");
                         $("#ddlModel").empty().append("<option value=''>-- Select Model --</option>");
@@ -626,8 +634,13 @@
                         $("#txtSamplingQty").val("");
 
                         $("#tableBody").html("<div class='empty'>No records found. Use Search to load data.</div>");
-                    else
+
+                    }
+                    else {
+
                         alert("Submit Failed");
+
+                    }
                 }
 
             });

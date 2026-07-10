@@ -136,36 +136,42 @@ public class FirstArticleInspectionDAL
     {
         DataTable dt = new DataTable();
 
-        dt.Columns.Add("Id");
-        dt.Columns.Add("ContentId");
-        dt.Columns.Add("SRId");
-        dt.Columns.Add("Result");
-        dt.Columns.Add("RejectDescribe");
+        dt.Columns.Add("Id", typeof(int));
+        dt.Columns.Add("ContentId", typeof(int));
+        dt.Columns.Add("Result", typeof(string));
+        dt.Columns.Add("SRId", typeof(int));
+        dt.Columns.Add("RejectDescribe", typeof(string));
 
         dt.Rows.Add(
             1,
             model.ContentId,
-            model.SRId,
             model.Result,
+            model.SRId,
             model.RejectDescribe);
+
+
+        SqlParameter checklistParam = new SqlParameter("@Checklist1", SqlDbType.Structured);
+        checklistParam.TypeName = "ipqc.A246FA246FFirstAirticleInspections3";
+        checklistParam.Value = dt;
+
 
         SqlParameter[] p =
         {
-            new SqlParameter("@Checklist1", dt),
-            new SqlParameter("@CreatedBy", model.CreatedBy),
-            new SqlParameter("@LineId", model.LineId),
-            new SqlParameter("@ProjectId", model.ProjectId),
-            new SqlParameter("@ProdLineLeader", model.ProdLineLeader),
-            new SqlParameter("@CheckedBy", model.CheckedBy),
-            new SqlParameter("@ApprovedBy", model.ApprovedBy),
-            new SqlParameter("@ModelId", model.ModelId),
-            new SqlParameter("@PartId", model.PartId),
-            new SqlParameter("@ProductName", model.ProductName),
-            new SqlParameter("@WorkOrder", model.WorkOrder),
-            new SqlParameter("@DrawingVersion", model.DrawingVersion),
-            new SqlParameter("@PackVersion", model.PackVersion),
-            new SqlParameter("@SamplingQty", model.SamplingQty)
-        };
+        checklistParam,
+        new SqlParameter("@CreatedBy", model.CreatedBy),
+        new SqlParameter("@LineId", model.LineId),
+        new SqlParameter("@ProjectId", model.ProjectId),
+        new SqlParameter("@ProdLineLeader", model.ProdLineLeader),
+        new SqlParameter("@CheckedBy", model.CheckedBy),
+        new SqlParameter("@ApprovedBy", model.ApprovedBy),
+        new SqlParameter("@ModelId", model.ModelId),
+        new SqlParameter("@PartId", model.PartId),
+        new SqlParameter("@ProductName", model.ProductName),
+        new SqlParameter("@WorkOrder", model.WorkOrder),
+        new SqlParameter("@DrawingVersion", model.DrawingVersion),
+        new SqlParameter("@PackVersion", model.PackVersion),
+        new SqlParameter("@SamplingQty", model.SamplingQty)
+    };
 
         return _db.ExecuteNonQueryWithParameter(
             "ipqc.InsertBulkA246FFirstArticleInspection",
@@ -176,27 +182,31 @@ public class FirstArticleInspectionDAL
     {
         DataTable dt = new DataTable();
 
-        dt.Columns.Add("Id");
-        dt.Columns.Add("ContentId");
-        dt.Columns.Add("SRId");
-        dt.Columns.Add("Result");
-        dt.Columns.Add("RejectDescribe");
+        dt.Columns.Add("Id", typeof(int));
+        dt.Columns.Add("ContentId", typeof(int));
+        dt.Columns.Add("Result", typeof(string));
+        dt.Columns.Add("SRId", typeof(int));
+        dt.Columns.Add("RejectDescribe", typeof(string));
 
         int id = 1;
 
         foreach (var row in model.CheckListFirstArticleInspections)
         {
             dt.Rows.Add(
-                id++,
-                row.ContentId,
-                row.SRId,
-                row.Result,
-                row.RejectDescribe);
+            id++,
+            row.ContentId,
+            row.Result,
+            row.SRId,
+            row.RejectDescribe);
         }
+
+        SqlParameter checklistParam = new SqlParameter("@Checklist1", SqlDbType.Structured);
+        checklistParam.TypeName = "ipqc.A246FA246FFirstAirticleInspections3";
+        checklistParam.Value = dt;
 
         SqlParameter[] p =
         {
-            new SqlParameter("@Checklist1", dt),
+            checklistParam,
             new SqlParameter("@CreatedBy", model.CreatedBy),
             new SqlParameter("@LineId", model.LineId),
             new SqlParameter("@ProjectId", model.ProjectId),

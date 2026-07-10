@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.NewHankingViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Data
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -118,16 +122,9 @@
             font-size: 13px;
         }
 
-        .btn-save {
-            background: linear-gradient(135deg,#34d399,#059669);
-            border: none;
-            border-radius: 6px;
-            padding: 7px 14px;
-            color: #fff;
-            cursor: pointer;
+        tbody tr td {
+            font-size: 12px;
         }
-
-        /* TABLE */
 
         .results-table {
             background: rgba(255,255,255,.04);
@@ -143,7 +140,7 @@
 
         .custom-table {
             width: 100%;
-            min-width: 1700px;
+            min-width: 1200px;
             border-collapse: collapse;
         }
 
@@ -153,7 +150,7 @@
 
                 .custom-table thead th {
                     padding: 14px 12px;
-                    text-align: center;
+                    text-align: left;
                     font-size: 12px;
                     font-weight: 600;
                     color: rgba(255,255,255,.85);
@@ -163,7 +160,7 @@
 
             .custom-table tbody td {
                 padding: 12px;
-                text-align: center;
+                text-align: left;
                 color: #e2e8f0;
                 border-top: 1px solid rgba(255,255,255,.05);
             }
@@ -199,85 +196,119 @@
             New Hanking
         </div>
 
-        <div class="form-body">
+        <form asp-action="Index" method="post">
 
-            <!-- Row 1 -->
+            <div class="form-body">
 
-            <div class="form-row">
+                <!-- Row 1 -->
 
-                <div class="form-group">
-                    <label>LINE</label>
-                    <select>
-                        <option>-- Select Line --</option>
-                    </select>
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Line</label>
+
+                        <select asp-for="LineId"
+                                id="LineId"
+                                asp-items="@(new SelectList(Model.Lines,
+                    "LineId",
+                    "LineName"))">
+                            <option value="">-- Select Line --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project</label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,
+                                    "ProjectId",
+                                    "ProjectName"))">
+                            <option value="">-- Select Project --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Model</label>
+
+                        <select asp-for="ModelId"
+                                id="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos,
+                                    "ModelId",
+                                    "Model"))">
+                            <option value="">-- Select Model --</option>
+                        </select>
+                    </div>
+
                 </div>
 
-                <div class="form-group">
-                    <label>PROJECT</label>
-                    <select>
-                        <option>-- Select Project --</option>
-                    </select>
+                <!-- Row 2 -->
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Part</label>
+
+                        <select asp-for="PartId"
+                                id="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,
+                                    "PartId",
+                                    "Part"))">
+                            <option value="">-- Select Part --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Machine</label>
+
+                        <select asp-for="MachineId"
+                                id="MachineId"
+                                asp-items="@(new SelectList(Model.Machines,
+                    "MachineId",
+                    "Machine"))">
+                            <option value="">-- Select Machine --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Production Line Leader</label>
+
+                        <input asp-for="ProdLineLeader"
+                               type="text"
+                               placeholder="Production Line Leader" />
+                    </div>
+
                 </div>
 
-                <div class="form-group">
-                    <label>MODEL</label>
-                    <select>
-                        <option>-- Select Model --</option>
-                    </select>
-                </div>
+                <!-- Row 3 -->
 
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Checked By</label>
+
+                        <input asp-for="CheckedBy"
+                               type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Approved By</label>
+
+                        <input asp-for="ApprovedBy"
+                               type="text" />
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+                            Search
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <!-- Row 2 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>PART</label>
-                    <select>
-                        <option>-- Select Part --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>MACHINE</label>
-                    <select>
-                        <option>-- Select Machine --</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>LINE LEADER</label>
-                    <input type="text"
-                           placeholder="Production LineLeader">
-                </div>
-
-            </div>
-
-            <!-- Row 3 -->
-
-            <div class="form-row">
-
-                <div class="form-group">
-                    <label>CHECKED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>APPROVED BY</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <button class="btn-search">
-                        Search
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
+        </form>
 
     </div>
 
@@ -308,13 +339,39 @@
                 </thead>
 
                 <tbody>
+                    @if (Model.dtChecklist != null && Model.dtChecklist.Rows.Count > 0)
+                    {
+                        foreach (System.Data.DataRow row in Model.dtChecklist.Rows)
+                        {
+                            <tr data-section-id="@row["SectionId"]">
+                                <td>@row["WorkStation"]</td>
+                                <td>@row["InspectionProject"]</td>
+                                <td>@row["InspectionSpecifications"]</td>
+                                <td>@row["Frequency"]</td>
+                                <td>@row["Section"]</td>
 
-                    <tr>
-                        <td colspan="14" class="empty-row">
-                            No records found. Use search to load data.
-                        </td>
-                    </tr>
+                                <td><input type="text" class="val-input" data-slot="1" /></td>
+                                <td><input type="text" class="val-input" data-slot="2" /></td>
+                                <td><input type="text" class="val-input" data-slot="3" /></td>
+                                <td><input type="text" class="val-input" data-slot="4" /></td>
+                                <td><input type="text" class="val-input" data-slot="5" /></td>
 
+                                <td>
+                                    <button type="button" class="btn-search row-save-btn">
+                                        Save
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11" class="empty-row">
+                                No records found. Use search to load data.
+                            </td>
+                        </tr>
+                    }
                 </tbody>
 
             </table>
@@ -330,6 +387,196 @@
         </button>
 
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+                $("#ProjectId").change(function () {
 
+            var projectId = $(this).val();
+
+            $.ajax({
+                url: '/NewHanking/GetModelNoByProject',
+                type: 'POST',
+                data: { projectId: projectId },
+
+                success: function (data) {
+
+                    $("#ModelId").empty();
+                    $("#ModelId").append('<option value="">-- Select Model --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' + item.modelId + '">' + item.model + '</option>'
+                        );
+                    });
+
+                },
+                error: function (xhr) {
+
+                    alert("Ajax Error");
+                }
+            });
+
+        });
+
+        $("#ModelId").change(function () {
+
+            var modelId = $("#ModelId").val();
+
+            $.ajax({
+                url: '/NewHanking/GetPartNoByModel',
+                type: 'POST',
+                data: { modelId: modelId },
+
+                success: function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>'
+                        );
+                    });
+                }
+            });
+
+        });
+    </script>
+    <script>
+    function buildItemFromRow($row) {
+        var sectionId = parseInt($row.data("section-id"), 10);
+        var vals = {};
+        $row.find(".val-input").each(function () {
+            var slot = $(this).data("slot");
+            var raw = $(this).val();
+            if (raw === "" || raw === null) {
+                vals["value" + slot] = null;
+            }
+            else if (isNaN(raw)) {
+                alert("Please enter only numeric values.");
+                throw "Invalid value";
+            }
+            else {
+                vals["value" + slot] = parseFloat(raw);
+            }
+        });
+
+        return {
+            sectionId: sectionId,
+            value1: vals.value1,
+            value2: vals.value2,
+            value3: vals.value3,
+            value4: vals.value4,
+            value5: vals.value5
+        };
+    }
+
+    function getHeaderContext() {
+        return {
+            lineId: parseInt($("#LineId").val(), 10) || 0,
+            projectId: parseInt($("#ProjectId").val(), 10) || 0,
+            modelId: parseInt($("#ModelId").val(), 10) || 0,
+            partId: parseInt($("#PartId").val(), 10) || 0,
+            machineId: parseInt($("#MachineId").val(), 10) || 0,
+            prodLineLeader: $("input[name='ProdLineLeader']").val(),
+            checkedBy: $("input[name='CheckedBy']").val(),
+            approvedBy: $("input[name='ApprovedBy']").val()
+        };
+    }
+
+    function submitItems(items) {
+        var ctx = getHeaderContext();
+
+        var payload = {
+            lineId: ctx.lineId,
+            projectId: ctx.projectId,
+            modelId: ctx.modelId,
+            partId: ctx.partId,
+            machineId: ctx.machineId,
+            prodLineLeader: ctx.prodLineLeader,
+            checkedBy: ctx.checkedBy,
+            approvedBy: ctx.approvedBy,
+            items: items
+        };
+
+        return $.ajax({
+            url: '/NewHanking/SubmitChecklist',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload)
+        });
+    }
+
+    $(document).on("click", ".row-save-btn", function () {
+        var btn = $(this);
+    btn.prop("disabled", true);
+        var $row = $(this).closest("tr");
+        var item = buildItemFromRow($row);
+
+        submitItems([item])
+            .done(function (res) {
+                if (res.success) {
+                    alert("Row saved.");
+                } else {
+                    alert("Save failed: " + res.message);
+                }
+            })
+            .fail(function (xhr) {
+                alert("Save error.");
+            });
+    });
+
+    $(".btn-submit").on("click", function (e) {
+        e.preventDefault();
+
+        var items = [];
+        $(".custom-table tbody tr[data-section-id]").each(function () {
+            items.push(buildItemFromRow($(this)));
+        });
+
+        if (items.length === 0) {
+            alert("No data to submit.");
+            return;
+        }
+
+        submitItems(items)
+        .done(function (res) {
+
+            if (res.success) {
+
+                alert("All rows saved successfully.");
+
+                $(".val-input").val("");
+
+                $("#LineId").val("");
+                $("#ProjectId").val("");
+                $("#ModelId").empty().append('<option value="">-- Select Model --</option>');
+                $("#PartId").empty().append('<option value="">-- Select Part --</option>');
+                $("#MachineId").val("");
+
+                $("input[name='ProdLineLeader']").val("");
+                $("input[name='CheckedBy']").val("");
+                $("input[name='ApprovedBy']").val("");
+
+            }
+            else {
+                alert("Submit failed: " + res.message);
+            }
+
+        })
+        .fail(function (xhr) {
+            alert("Submit error.");
+        });
+    });
+</script>
 </body>
 </html>

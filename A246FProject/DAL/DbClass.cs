@@ -43,7 +43,7 @@ namespace A246FProject.DAL
             string procedureName,
             SqlParameter[] parameters)
         {
-            DataTable dt = new DataTable();
+            DataTable dt = new DataTable(); 
 
             using (SqlConnection con =
                 new SqlConnection(_connectionString))

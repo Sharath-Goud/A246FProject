@@ -3,33 +3,19 @@ using A246FProject.Models;
 
 namespace A246FProject.BAL
 {
-    public class MasterBAL
+    public class FirstArticleDimensionBAL
     {
-        MasterDAL _dal;
 
-        public MasterBAL()
-        {
-            _dal = new MasterDAL();
-        }
+        FirstArticleDimensionDAL _dal = new FirstArticleDimensionDAL();
 
         public List<Line> GetLine()
         {
             return _dal.GetLine();
         }
 
-        public List<Shift> GetShift()
-        {
-            return _dal.GetShift();
-        }
-
         public List<Project> GetProject()
         {
             return _dal.GetProject();
-        }
-
-        public List<A246FMachines> GetA246FMachines()
-        {
-            return _dal.GetA246FMachines();
         }
 
         public List<ModelNo> GetModelNoByProject(int projectId)
@@ -42,9 +28,20 @@ namespace A246FProject.BAL
             return _dal.GetPartNoByModel(modelId);
         }
 
-        public List<Visuals> GetVisuals(int projectId)
+        public List<DimensionDto> GetDimensionData(int lineId, int projectId)
         {
-            return _dal.GetVisuals(projectId);
+            return _dal.GetDimensionData(lineId, projectId);
+        }
+
+        public int SaveDimension(SaveDimensionDto model)
+        {
+            return _dal.SaveDimension(model);
+        }
+
+        public int SubmitDimension(FirstArticleDimensionViewModel model)
+        {
+            return _dal.SubmitDimension(model);
         }
     }
+
 }
