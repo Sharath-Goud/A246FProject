@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@model A246FProject.Models.GlueWeighingViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Data
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -75,7 +78,18 @@
         label {
             font-size: 11px;
             color: rgba(255,255,255,.45);
-            text-transform: uppercase;
+        }
+
+        .actual-input {
+            width: 90px;
+            height: 35px;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            color: #fff;
+            font-size: 13px;
+            text-align: center;
         }
 
         input, select {
@@ -125,30 +139,23 @@
             overflow: hidden;
         }
 
-        /* HEADER */
         .header-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
             gap: 0;
             background: rgba(167,139,250,.08);
             padding: 12px 16px;
-            font-size: 11px;
-            color: rgba(255,255,255,.6);
-            text-transform: uppercase;
-            font-weight: 500;
-            letter-spacing: 0.5px;
             align-items: center;
+            font-size: 13px;
         }
 
-        /* DATA ROW (future use) */
         .table-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
             padding: 12px 16px;
             border-top: 0.5px solid rgba(255,255,255,.06);
             align-items: center;
-            font-size: 13px;
-            color: rgba(255,255,255,.85);
+            font-size: 12px;
         }
 
         /* EMPTY STATE */
@@ -182,96 +189,392 @@
 </head>
 
 <body>
+   
+    <form asp-action="GetGlueWeighingData" method="post">
 
-    <div class="form-card">
-        <div class="form-card-header">Glue Weighing</div>
+        <div class="form-card">
 
-        <div class="form-body">
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Line</label>
-                    <select>
-                        <option>-- Select Line --</option>
-                        <option>Line 1</option>
-                        <option>Line 2</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Project</label>
-                    <select>
-                        <option>-- Select Project --</option>
-                        <option>A246F</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Model</label>
-                    <select>
-                        <option>-- Select Model --</option>
-                        <option>A246F</option>
-                    </select>
-                </div>
+            <div class="form-card-header">
+                Glue Weighing
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Part</label>
-                    <select>
-                        <option>-- Select Part --</option>
-                    </select>
+
+            <div class="form-body">
+
+
+                <div class="form-row">
+
+
+                    <div class="form-group">
+
+                        <label>Line</label>
+
+                        <select asp-for="LineId"
+                                id="LineId"
+                                asp-items="@(new SelectList(Model.Lines,"LineId","LineName"))">
+
+                            <option value="">
+                                -- Select Line --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>Project</label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,"ProjectId","ProjectName"))">
+
+                            <option value="">
+                                -- Select Project --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label>Model</label>
+
+                        <select asp-for="ModelId"
+                                id="ModelId"
+                                asp-items="@(new SelectList(Model.ModelNos,"ModelId","Model"))">
+
+                            <option value="">
+                                -- Select Model --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
                 </div>
 
-                <div class="form-group">
-                    <label>Machine</label>
-                    <select>
-                        <option>-- Select Adhesive --</option>
-                    </select>
+
+
+
+                <div class="form-row">
+
+
+                    <div class="form-group">
+
+                        <label>Part</label>
+
+
+                        <select asp-for="PartId"
+                                id="PartId"
+                                asp-items="@(new SelectList(Model.PartNos,"PartId","Part"))">
+
+
+                            <option value="">
+                                -- Select Part --
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+
+
+                        <label>Adhesive</label>
+
+
+                        <select asp-for="AdhesiveId"
+                                id="AdhesiveId"
+                                asp-items="@(new SelectList(Model.Adhesives,"AdhesiveId","AdhesiveName"))">
+
+
+                            <option value="">
+                                -- Select Adhesive --
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+                    <div class="form-group">
+
+
+                        <label>Line Leader</label>
+
+
+                        <input asp-for="ProdLineLeader"
+                               type="text"
+                               placeholder="Production Line Leader" />
+
+
+                    </div>
+
+
                 </div>
 
-                <div class="form-group">
-                    <label>Line Leader</label>
-                    <input type="text" placeholder="Production Line Leader">
+
+                <div class="form-row">
+
+
+                    <div class="form-group">
+
+
+                        <label>Checked By</label>
+
+
+                        <input asp-for="CheckedBy"
+                               type="text" />
+
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Approved By</label>
+
+                        <input asp-for="ApprovedBy"
+                               type="text" />
+
+
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+
+                            Search
+
+                        </button>
+
+
+                    </div>
+
+
                 </div>
+
+
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Checked By</label>
-                    <input type="text">
+
+        </div>
+
+
+    </form>
+
+    <form asp-action="SaveGlueWeighing" method="post">
+
+        <input type="hidden" asp-for="LineId" />
+
+        <input type="hidden" asp-for="ProjectId" />
+
+        <input type="hidden" asp-for="ModelId" />
+
+        <input type="hidden" asp-for="PartId" />
+
+        <input type="hidden" asp-for="ProdLineLeader" />
+
+        <input type="hidden" asp-for="CheckedBy" />
+
+        <input type="hidden" asp-for="ApprovedBy" />
+
+        <div class="results-table">
+
+            <div class="header-row">
+
+
+                <div>
+                    Testing Parameter
                 </div>
 
-                <div class="form-group">
-                    <label>Approved By</label>
-                    <input type="text">
+
+                <div>
+                    LSL
                 </div>
 
-                <div class="form-group" style="justify-content:flex-end;">
-                    <button class="btn-search">Search</button>
+
+                <div>
+                    Mean Value
                 </div>
+
+
+                <div>
+                    USL
+                </div>
+
+
+                <div>
+                    Actual Value
+                </div>
+
+
+                <div>
+                    Action
+                </div>
+
+
             </div>
 
+            @if (Model.dtChecklist != null &&
+            Model.dtChecklist.Rows.Count > 0)
+            {
+
+                int index = 0;
+                foreach (DataRow row in Model.dtChecklist.Rows)
+                {
+                    <div class="table-row">
+
+                        <div>
+                            @row["Adhesive"]
+                        </div>
+
+                        <div>
+                            @row["LowerLimit"]
+                        </div>
+
+                        <div>
+                            @row["CenterLimit"]
+                        </div>
+
+                        <div>
+                            @row["UpperLimit"]
+                        </div>
+
+                        <div>
+
+                            <input type="hidden"
+                                   name="GlueWeighingResults[@index].AdhesiveId"
+                                   value="@row["AdhesiveId"]" />
+
+                            <input type="text"
+                                   name="GlueWeighingResults[@index].DataValue"
+                                   class="actual-input"
+                                   placeholder="Enter Value" />
+
+                            <input type="hidden"
+                                   name="GlueWeighingResults[@index].RootCause"
+                                   value="" />
+
+                        </div>
+
+                        <div>
+                            <button type="button"
+                                    class="btn-search">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                    index++;
+                }
+            }
+            else
+            {
+                <div class="empty">
+                    No records found.
+                </div>
+            }
         </div>
-    </div>
 
-    <div class="results-table">
-        <div class="header-row">
-            <div>Testing Parameter</div>
-            <div>LSL</div>
-            <div>Mean Value</div>
-            <div>USL</div>
-            <div>Actual Value</div>
+        <div class="actions">
+            <button type="submit"
+                    class="btn-submit">
+                Submit
+            </button>
         </div>
+    </form>
 
-        <div class="empty">
-            No records found. Use search to load data.
-        </div>
-    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $("#ProjectId").change(function () {
 
-    <div class="actions">
-        <button class="btn-submit">Submit</button>
-    </div>
+            var projectId = $(this).val();
 
+            $.ajax({
+                url: "/GlueWeighing/GetModelNoByProject",
+                type: "POST",
+                data: { projectId: projectId },
+                success:function(data){
+                    $("#ModelId").empty();
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>'
+                    );
+                    $.each(data,function(i,item){
+
+                        $("#ModelId").append(
+                            '<option value="'+item.modelId+'">'
+                            +item.model+
+                            '</option>'
+                        );
+                    });
+                }
+
+            });
+
+            $.ajax({
+                url:"/GlueWeighing/GetAdhesiveByProject",
+                type:"POST",
+                data:{projectId:projectId},
+                success:function(data){
+                    $("#AdhesiveId").empty();
+                    $("#AdhesiveId").append(
+                        '<option value="">-- Select Adhesive --</option>'
+                    );
+
+                    $.each(data,function(i,item){
+
+                        $("#AdhesiveId").append(
+                            '<option value="'+item.adhesiveId+'">'
+                            +item.adhesiveName+
+                            '</option>'
+                        );
+                    });
+                }
+
+            });
+        });
+
+
+        $("#ModelId").change(function(){
+
+            var modelId=$(this).val();
+            $.ajax({
+                url:"/GlueWeighing/GetPartNoByModel",
+                type:"POST",
+                data:{modelId:modelId},
+                success:function(data){
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>'
+                    );
+                    $.each(data,function(i,item){
+                        $("#PartId").append(
+
+                            '<option value="'+item.partId+'">'
+                            +item.part+
+                            '</option>'
+
+                        );
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -192,5 +192,74 @@ namespace A246FProject.DAL
         }
 
         #endregion
+
+        public List<Adhesive> GetAdhesive(int projectId)
+        {
+            List<Adhesive> list = new();
+
+            SqlParameter[] parms =
+            {
+        new SqlParameter("@ProjectId", projectId)
+    };
+
+            DataTable dt =
+                _db.ExecuteProcedureWithParameterForDataTable(
+                    "ipqc.GetAdhesive",
+                    parms);
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                list.Add(new Adhesive
+                {
+                    AdhesiveId = Convert.ToInt32(dr["AdhesiveId"]),
+                    AdhesiveName = dr["Adhesive"].ToString()
+                });
+            }
+
+            return list;
+        }
+
+        public DataTable GetFormByA246FAdhesive(int lineId, int projectId, int adhesiveId)
+        {
+            SqlParameter[] parms =
+            {
+                new SqlParameter("@LineId", lineId),
+                new SqlParameter("@ProjectId", projectId),
+                new SqlParameter("@AdhesiveId", adhesiveId)
+            };
+
+            return _db.ExecuteProcedureWithParameterForDataTable(
+                "ipqc.GetFormByA246FAdhesive",
+                parms);
+        }
+
+        public int InsertBulkGlueWeighingData(
+    DataTable dtChecklist,
+    string createdBy,
+    int lineId,
+    int projectId,
+    string prodLineLeader,
+    string checkedBy,
+    string approvedBy,
+    int modelId,
+    int partId)
+        {
+            SqlParameter[] parms =
+            {
+        new SqlParameter("@LaserChecklist", dtChecklist),
+        new SqlParameter("@CreatedBy", createdBy),
+        new SqlParameter("@LineId", lineId),
+        new SqlParameter("@ProjectId", projectId),
+        new SqlParameter("@ProdLineLeader", prodLineLeader),
+        new SqlParameter("@CheckedBy", checkedBy),
+        new SqlParameter("@ApprovedBy", approvedBy),
+        new SqlParameter("@ModelId", modelId),
+        new SqlParameter("@PartId", partId)
+    };
+
+            return _db.ExecuteNonQueryWithParameter(
+                "ipqc.InsertBulkGlueWeighingData",
+                parms);
+        }
     }
 }

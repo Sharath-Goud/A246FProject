@@ -1,5 +1,6 @@
 ﻿using A246FProject.DAL;
 using A246FProject.Models;
+using System.Data;
 
 namespace A246FProject.BAL
 {
@@ -45,6 +46,39 @@ namespace A246FProject.BAL
         public List<Visuals> GetVisuals(int projectId)
         {
             return _dal.GetVisuals(projectId);
+        }
+
+        public List<Adhesive> GetAdhesive(int projectId)
+        {
+            return _dal.GetAdhesive(projectId);
+        }
+
+        public DataTable GetFormByA246FAdhesive(int lineId, int projectId, int adhesiveId)
+        {
+            return _dal.GetFormByA246FAdhesive(lineId, projectId, adhesiveId);
+        }
+
+        public int InsertBulkGlueWeighingData(
+            DataTable dtChecklist,
+            string createdBy,
+            int lineId,
+            int projectId,
+            string prodLineLeader,
+            string checkedBy,
+            string approvedBy,
+            int modelId,
+            int partId)
+        {
+            return _dal.InsertBulkGlueWeighingData(
+                dtChecklist,
+                createdBy,
+                lineId,
+                projectId,
+                prodLineLeader,
+                checkedBy,
+                approvedBy,
+                modelId,
+                partId);
         }
     }
 }
