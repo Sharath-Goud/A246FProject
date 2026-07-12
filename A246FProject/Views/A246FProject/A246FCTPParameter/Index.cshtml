@@ -496,18 +496,36 @@
                                        name="A246FCTPParameterResults[@i].LimitId"
                                        value="@Model.dtChecklist.Rows[i]["LimitId"]" />
 
+                                <input type="hidden"
+                                       id="IsSaved_@i"
+                                       value="@Model.dtChecklist.Rows[i]["IsSaved"]" />
+
                                 <input type="text"
                                        class="value-box"
-                                       name="A246FCTPParameterResults[@i].Value" />
+                                       name="A246FCTPParameterResults[@i].Value"
+                                       value="@Model.dtChecklist.Rows[i]["Value"]"
+                                       @(Convert.ToInt32(Model.dtChecklist.Rows[i]["IsSaved"]) == 1 ? "disabled" : "") />
 
                             </td>
 
                             <td>
-                                <button type="button"
-                                        class="btn-search"
-                                        onclick="SaveSingleRow(this,@i)">
-                                    Save
-                                </button>
+                                @if (Convert.ToInt32(Model.dtChecklist.Rows[i]["IsSaved"]) == 1)
+                                {
+                                    <button type="button"
+                                            class="btn-search"
+                                            disabled
+                                            style="background:#28a745;cursor:not-allowed;opacity:.7;">
+                                        Saved
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="btn-search"
+                                            onclick="SaveSingleRow(this,@i)">
+                                        Save
+                                    </button>
+                                }
                             </td>
 
                         </tr>
