@@ -12,6 +12,7 @@ namespace A246FProject.DAL.Reports
             _db = DbClass.GetInstance();
         }
 
+
         public DataTable GetGlueWeighingReport(
             string fromDate,
             int lineId,
@@ -19,17 +20,30 @@ namespace A246FProject.DAL.Reports
             int projectId,
             int adhesiveId)
         {
+
             SqlParameter[] parms =
             {
-                new SqlParameter("@Date", fromDate ?? (object)DBNull.Value),
-                new SqlParameter("@LineId", lineId),
-                new SqlParameter("@ShiftId", shiftId),
-                new SqlParameter("@ProjectId", projectId),
-                new SqlParameter("@adhesiveId", adhesiveId)
+                new SqlParameter("@Date",
+                    string.IsNullOrEmpty(fromDate)
+                    ? DBNull.Value
+                    : fromDate),
+
+                new SqlParameter("@lineId",
+                    lineId),
+
+                new SqlParameter("@ShiftId",
+                    shiftId),
+
+                new SqlParameter("@ProjectId",
+                    projectId),
+
+                new SqlParameter("@AdhesiveId",
+                    adhesiveId)
             };
 
+
             return _db.ExecuteProcedureWithParameterForDataTable(
-                "ipqc.Rpt_GlueWeighingSerinData",
+                "ipqc.Rpt_GetGlueWeighingReport",
                 parms);
         }
     }

@@ -489,17 +489,23 @@
 
                         <thead>
                             <tr>
-
-                                @foreach (System.Data.DataColumn column in Model.dtReports.Columns)
+                                @if (Model.dtReports != null)
                                 {
-                                    <th>
-                                        @column.ColumnName
-                                    </th>
-                                }
+                                    foreach (System.Data.DataColumn column in Model.dtReports.Columns)
+                                    {
+                                        if (column.ColumnName == "2")
+                                        {
+                                            break;
+                                        }
 
+                                        if (column.ColumnName != "color")
+                                        {
+                                            <th>@column.ColumnName</th>
+                                        }
+                                    }
+                                }
                             </tr>
                         </thead>
-
 
                         <tbody>
 
@@ -508,25 +514,45 @@
                                 foreach (System.Data.DataRow item in Model.dtReports.Rows)
                                 {
                                     <tr>
+
                                         @for (int i = 0; i < Model.dtReports.Columns.Count; i++)
                                         {
                                             string columnName = Model.dtReports.Columns[i].ColumnName;
 
+                                            if (columnName == "2")
+                                            {
+                                                break;
+                                            }
+
+                                            if (columnName == "color")
+                                            {
+                                                continue;
+                                            }
+
                                             if (columnName == "DataValue" || columnName == "RootCause")
                                             {
-                                                <td style="color:@(Model.dtReports.Columns.Contains("color") ? item["color"] : null)">
-                                                    @item[i]
+                                                <td style="color:@(Model.dtReports.Columns.Contains("color") ? item["color"] : "")">
+                                                    @item[columnName]
                                                 </td>
                                             }
-                                            else if (columnName != "color")
+                                            else
                                             {
                                                 <td>
-                                                    @item[i]
+                                                    @item[columnName]
                                                 </td>
                                             }
                                         }
+
                                     </tr>
                                 }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="21" style="text-align:center;">
+                                        No Records Found
+                                    </td>
+                                </tr>
                             }
 
                         </tbody>

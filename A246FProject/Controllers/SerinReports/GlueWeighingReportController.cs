@@ -62,14 +62,22 @@ namespace A246FProject.Controllers.Reports
 
             if (command == "Search")
             {
-                var date = model.FromDate?.ToString("MM/dd/yyyy");
+                string date = null;
+
+                if (model.FromDate.HasValue)
+                {
+                    date = model.FromDate.Value.ToString("MM/dd/yyyy");
+                }
+
 
                 model.dtReports = _bal.GetGlueWeighingReport(
                     date,
                     model.LineId,
                     model.ShiftId,
                     model.ProjectId,
-                    model.AdhesiveId);
+                    model.AdhesiveId
+                );
+
 
                 HttpContext.Session.SetString("SearchDone", "true");
             }
