@@ -1,7 +1,7 @@
-﻿@model A246FProject.Models.SerinReports.SerinDestructiveReportViewModel
+﻿@model A246FProject.Models.SerinReports.SerinDimensionReportViewModel
 
 @{
-    ViewData["Title"] = "Serin Destructive Report";
+    ViewData["Title"] = "Serin Dimension Report";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
@@ -388,14 +388,14 @@
         }
 </style>
 
-@using (Html.BeginForm("Index", "SerinDestructiveReport", FormMethod.Post))
+@using (Html.BeginForm("Index", "SerinDimensionReport", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-card">
 
         <div class="form-card-header">
-            Serin Destructive Report
+            Serin Dimension Report
         </div>
 
         <div class="form-body">
@@ -497,6 +497,7 @@
                                 {
                                     foreach (System.Data.DataColumn column in Model.dtReports.Columns)
                                     {
+
                                         if (column.ColumnName != "color")
                                         {
                                             <th>@column.ColumnName</th>
