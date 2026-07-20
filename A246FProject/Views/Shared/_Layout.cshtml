@@ -47,7 +47,7 @@
             font-size: 17px;
             font-weight: 600;
             margin-bottom: 14px;
-            padding-bottom: 12px;
+            padding: 20px;
             border-bottom: 0.5px solid rgba(255,255,255,.08);
             display: flex;
             align-items: center;
@@ -83,10 +83,12 @@
 
         .chevron {
             margin-left: auto;
-            transition: .3s;
+            font-size: 12px;
+            transition: transform .3s ease;
+            opacity: .8;
         }
 
-        .nav-btn.open .chevron {
+        .nav-btn.active .chevron {
             transform: rotate(180deg);
         }
 
@@ -351,7 +353,7 @@
             <button class="nav-btn" data-menu="menu" onclick="setActiveMenu(this, 'menu')">
                     <i class="ti ti-forms"></i>
                     A246F Forms
-                    <i class="ti ti-chevron-down chevron"></i>
+                    <i class="fa-solid fa-chevron-down chevron"></i>
                 </button>
 
                 <div class="dropdown" id="menu">
@@ -406,7 +408,7 @@
             <button class="nav-btn" data-menu="reportsMenu" onclick="setActiveMenu(this, 'reportsMenu')">
                     <i class="ti ti-report-analytics"></i>
                     Reports
-                    <i class="ti ti-chevron-down chevron"></i>
+                    <i class="fa-solid fa-chevron-down chevron"></i>
                 </button>
 
                 <div class="dropdown" id="reportsMenu">
@@ -476,7 +478,7 @@
             <button class="nav-btn" data-menu="serinReportsMenu" onclick="setActiveMenu(this, 'serinReportsMenu')">
                     <i class="ti ti-report-analytics"></i>
                     Serin Reports
-                    <i class="ti ti-chevron-down chevron"></i>
+                    <i class="fa-solid fa-chevron-down chevron"></i>
                 </button>
 
                 <div class="dropdown" id="serinReportsMenu">
