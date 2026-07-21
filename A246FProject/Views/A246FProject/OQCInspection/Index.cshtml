@@ -1,0 +1,521 @@
+﻿@model A246FProject.Models.OQCInspectionViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Data
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OQC Inspection</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .form-card {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 0.5px solid rgba(167,139,250,.2);
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+        }
+
+        input, select {
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+        }
+
+            select option {
+                background: #1a1040;
+            }
+
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
+        .btn-search {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            .custom-table thead tr {
+                background: rgba(167,139,250,.12);
+            }
+
+            .custom-table th {
+                padding: 12px 10px;
+                text-align: left;
+                color: #fff;
+                font-size: 13px;
+                font-weight: 600;
+                border-bottom: 1px solid rgba(255,255,255,.08);
+            }
+
+            .custom-table td {
+                padding: 10px 10px;
+                color: #fff;
+                font-size: 13px;
+                border-bottom: 1px solid rgba(255,255,255,.06);
+                vertical-align: top;
+                line-height: 1.5;
+            }
+
+          
+
+        .value-box {
+            width: 80px;
+            height: 34px;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 4px;
+            background: rgba(255,255,255,.06);
+            color: #fff;
+            text-align: center;
+        }
+
+        .btn-save {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 7px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+            .btn-save:hover {
+                background: #2980b9;
+            }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            background: rgba(167,139,250,.08);
+            padding: 12px;
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+        }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 16px;
+        }
+
+        @@media (max-width: 900px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-row {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+
+        .search-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            flex-wrap: nowrap;
+        }
+
+        .search-item {
+            display: flex;
+            flex-direction: column;
+            width: 260px;
+        }
+
+            .search-item label {
+                margin-bottom: 6px;
+                font-size: 13px;
+                color: #d8d8d8;
+            }
+
+        .search-btn {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .customer-section {
+            margin-top: 20px;
+            background: #67696d;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+            .customer-section h4 {
+                margin-bottom: 20px;
+                color: #000;
+            }
+
+        .customer-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 15px;
+        }
+
+        .customer-item {
+            display: flex;
+            flex-direction: column;
+            width: 350px;
+        }
+
+            .customer-item label {
+                color: #000;
+                font-weight: 600;
+                margin-bottom: 6px;
+            }
+
+            .customer-item input {
+                width: 100%;
+                background: #fff;
+                color: #000;
+                border: 1px solid #ccc;
+            }
+
+        .inspection-method {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #67696d;
+            color: #000;
+        }
+
+            .inspection-method label {
+                color: #000;
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+            OQC Inspection checklist
+        </div>
+
+        <form asp-action="Index" method="post">
+
+            <div class="form-body">
+                <div class="search-row">
+
+                    <div class="search-item">
+                        <label>Project</label>
+                        <select asp-for="ProjectId"
+                                asp-items="@(new SelectList(Model.Projects,"ProjectId","ProjectName"))">
+                            <option value="">--Select Project--</option>
+                        </select>
+                    </div>
+
+                    <div class="search-item">
+                        <label>Checked By</label>
+                        <input asp-for="CheckedBy" />
+                    </div>
+
+                    <div class="search-item">
+                        <label>Approved By</label>
+                        <input asp-for="ApprovedBy" />
+                    </div>
+
+                    <div class="search-btn">
+                        <button type="submit" class="btn-search">
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="customer-section">
+
+                <h4>Customer : APPLE</h4>
+
+                <!-- Row 1 -->
+
+                <div class="customer-row">
+
+                    <div class="customer-item">
+                        <label>Customer P/N</label>
+                        <input type="text" />
+                    </div>
+
+                    <div class="customer-item">
+                        <label>Lot Size</label>
+                        <input type="text" />
+                    </div>
+
+                    <div class="customer-item">
+                        <label>Date</label>
+                        <input type="text"
+                               value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss")"
+                               readonly />
+                    </div>
+
+                </div>
+
+                <!-- Row 2 -->
+
+                <div class="customer-row">
+
+                    <div class="customer-item">
+                        <label>Finished Product No</label>
+                        <input type="text" />
+                    </div>
+
+                    <div class="customer-item">
+                        <label>Rev</label>
+                        <input type="text" />
+                    </div>
+
+                    <div class="customer-item">
+                        <label>Packing List No</label>
+                        <input type="text" />
+                    </div>
+
+                </div>
+
+                <!-- Row 3 -->
+
+                <div class="customer-row">
+
+                    <div class="customer-item">
+                        <label>Sim Tool Part Number</label>
+                        <input type="text" />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="inspection-method">
+
+                <span>Inspection Method</span>
+
+                <label>
+                    <input type="checkbox" />
+                    Sampling Inspection
+                </label>
+
+                <label>
+                    <input type="checkbox" />
+                    100% Inspection
+                </label>
+
+                <label>
+                    <input type="checkbox" />
+                    Others
+                </label>
+
+            </div>
+        </form>
+    </div>
+
+    <div class="results-table">
+
+        @if (Model.dtChecklist != null &&
+        Model.dtChecklist.Rows.Count > 0)
+        {
+            <table class="custom-table">
+                <thead>
+
+                    <tr>
+
+                        <th>Inspection Items</th>
+
+                        <th>Inspection Spec</th>
+
+                        <th>Inspection Contents</th>
+
+                        <th>Value</th>
+
+                    </tr>
+
+                </thead>
+                <tbody>
+
+                    @foreach (DataRow row in Model.dtChecklist.Rows)
+                    {
+                        <tr>
+
+                            <td>@row["Item"]</td>
+
+                            <td>@row["Inspecs"]</td>
+
+                            <td>@row["Contents"]</td>
+
+                            <td>
+
+                                <input class="value-box"
+                                       type="text"
+                                       name="Value" />
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty">
+                No records found. Use search to load data.
+            </div>
+        }
+    </div>
+    <div class="actions">
+        <button type="button"
+                class="btn-submit"
+                onclick="Save();">
+            Submit
+        </button>
+
+    </div>
+    <script>
+        var LoggedInRole = '@ViewBag.Role';
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+            $.ajax({
+                url: '/CTPParameter/GetModelNoByProject',
+                type: 'POST',
+                data: { projectId: projectId },
+
+                success: function (data) {
+
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>'
+                    );
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>'
+                        );
+
+                    });
+                 
+                }
+            });
+
+        });
+
+    </script>
+</body>
+</html>
