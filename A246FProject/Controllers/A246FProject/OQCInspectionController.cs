@@ -43,5 +43,23 @@ namespace A246FProject.Controllers.A246FProject
                 "~/Views/A246FProject/OQCInspection/Index.cshtml",
                 model);
         }
+
+        [HttpPost]
+        public IActionResult Save([FromBody] OQCInspectionViewModel model)
+        {
+            model.CreatedBy = HttpContext.Session.GetString("User") ?? "";
+
+            model.InspectResult =
+                model.SamplingInspection ||
+                model.HundredPercentInspection ||
+                model.OtherInspection;
+
+            _bal.SaveInspection(model);
+
+            return Json(new
+            {
+                success = true
+            });
+        }
     }
 }

@@ -129,7 +129,7 @@
         .custom-table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: auto;
         }
 
             .custom-table thead tr {
@@ -154,11 +154,9 @@
                 line-height: 1.5;
             }
 
-          
-
         .value-box {
-            width: 80px;
-            height: 34px;
+            width: 110px;
+            height: 32px;
             border: 1px solid rgba(255,255,255,.15);
             border-radius: 4px;
             background: rgba(255,255,255,.06);
@@ -174,6 +172,27 @@
             border-radius: 3px;
             cursor: pointer;
             font-size: 13px;
+        }
+
+        .custom-table th:nth-child(1),
+        .custom-table td:nth-child(1) {
+            width: 18%;
+        }
+
+        .custom-table th:nth-child(2),
+        .custom-table td:nth-child(2) {
+            width: 18%;
+        }
+
+        .custom-table th:nth-child(3),
+        .custom-table td:nth-child(3) {
+            width: 50%;
+        }
+
+        .custom-table th:nth-child(4),
+        .custom-table td:nth-child(4) {
+            width: 14%;
+            text-align: center;
         }
 
             .btn-save:hover {
@@ -297,7 +316,7 @@
             OQC Inspection checklist
         </div>
 
-        <form asp-action="Index" method="post">
+        <form method="post">
 
             <div class="form-body">
                 <div class="search-row">
@@ -339,12 +358,12 @@
 
                     <div class="customer-item">
                         <label>Customer P/N</label>
-                        <input type="text" />
+                        <input asp-for="CustomerPN" />
                     </div>
 
                     <div class="customer-item">
                         <label>Lot Size</label>
-                        <input type="text" />
+                        <input asp-for="LotSize" />
                     </div>
 
                     <div class="customer-item">
@@ -362,17 +381,17 @@
 
                     <div class="customer-item">
                         <label>Finished Product No</label>
-                        <input type="text" />
+                        <input asp-for="FinishedProductNo" />
                     </div>
 
                     <div class="customer-item">
                         <label>Rev</label>
-                        <input type="text" />
+                        <input asp-for="Rev" />
                     </div>
 
                     <div class="customer-item">
                         <label>Packing List No</label>
-                        <input type="text" />
+                        <input asp-for="PackingListNo" />
                     </div>
 
                 </div>
@@ -383,7 +402,7 @@
 
                     <div class="customer-item">
                         <label>Sim Tool Part Number</label>
-                        <input type="text" />
+                        <input asp-for="SimToolPartNumber" />
                     </div>
 
                 </div>
@@ -395,85 +414,101 @@
                 <span>Inspection Method</span>
 
                 <label>
-                    <input type="checkbox" />
+                    <input asp-for="SamplingInspection" type="checkbox" />
                     Sampling Inspection
                 </label>
 
+
                 <label>
-                    <input type="checkbox" />
+                    <input asp-for="HundredPercentInspection" type="checkbox" />
                     100% Inspection
                 </label>
 
+
                 <label>
-                    <input type="checkbox" />
+                    <input asp-for="OtherInspection" type="checkbox" />
                     Others
                 </label>
 
             </div>
-        </form>
-    </div>
+            <div class="results-table">
 
-    <div class="results-table">
+                @if (Model.dtChecklist != null &&
+                Model.dtChecklist.Rows.Count > 0)
+                {
+                    <table class="custom-table">
+                        <thead>
 
-        @if (Model.dtChecklist != null &&
-        Model.dtChecklist.Rows.Count > 0)
-        {
-            <table class="custom-table">
-                <thead>
+                            <tr>
 
-                    <tr>
+                                <th>Inspection Items</th>
 
-                        <th>Inspection Items</th>
+                                <th>Inspection Spec</th>
 
-                        <th>Inspection Spec</th>
+                                <th>Inspection Contents</th>
 
-                        <th>Inspection Contents</th>
+                                <th>Value</th>
 
-                        <th>Value</th>
+                            </tr>
 
-                    </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                            {
+                                var row = Model.dtChecklist.Rows[i];
 
-                </thead>
-                <tbody>
+                                <tr>
+                                    <td>@row["Item"]</td>
 
-                    @foreach (DataRow row in Model.dtChecklist.Rows)
-                    {
-                        <tr>
+                                    <td>@row["Inspecs"]</td>
 
-                            <td>@row["Item"]</td>
+                                    <td>@row["Contents"]</td>
 
-                            <td>@row["Inspecs"]</td>
+                                    <td>
 
-                            <td>@row["Contents"]</td>
+                                        <input type="hidden"
+                                               name="Checklist[@i].Id"
+                                               value="@(i + 1)" />
 
-                            <td>
+                                        <input type="hidden"
+                                               name="Checklist[@i].ItemId"
+                                               value="@row["ItemId"]" />
 
-                                <input class="value-box"
-                                       type="text"
-                                       name="Value" />
+                                        <input type="hidden"
+                                               name="Checklist[@i].SpecId"
+                                               value="@row["SpecId"]" />
 
-                            </td>
+                                        <input type="hidden"
+                                               name="Checklist[@i].ContentId"
+                                               value="@row["ContentId"]" />
 
-                        </tr>
-                    }
+                                        <input class="value-box"
+                                               type="text"
+                                               name="Checklist[@i].Result" />
 
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="empty">
-                No records found. Use search to load data.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="empty">
+                        No records found. Use search to load data.
+                    </div>
+                }
             </div>
-        }
-    </div>
-    <div class="actions">
-        <button type="button"
-                class="btn-submit"
-                onclick="Save();">
-            Submit
-        </button>
+            <div class="actions">
+                <button type="button"
+                        id="btnSave"
+                        onclick="SaveInspection()"
+                        class="btn-submit">
+                    Submit
+                </button>
 
+            </div>
+        </form>
     </div>
     <script>
         var LoggedInRole = '@ViewBag.Role';
@@ -510,11 +545,84 @@
                         );
 
                     });
-                 
+
                 }
             });
 
         });
+
+        function SaveInspection()
+        {
+            var checklist = [];
+
+            $(".custom-table tbody tr").each(function () {
+
+                checklist.push({
+
+                    Id: $(this).find("input[name$='.Id']").val(),
+
+                    ItemId: $(this).find("input[name$='.ItemId']").val(),
+
+                    SpecId: $(this).find("input[name$='.SpecId']").val(),
+
+                    ContentId: $(this).find("input[name$='.ContentId']").val(),
+
+                    Result: $(this).find("input[name$='.Result']").val()
+
+                });
+
+            });
+
+            var model = {
+
+                ProjectId: $("#ProjectId").val(),
+
+                CheckedBy: $("#CheckedBy").val(),
+
+                ApprovedBy: $("#ApprovedBy").val(),
+
+                CustomerPN: $("#CustomerPN").val(),
+
+                LotSize: $("#LotSize").val(),
+
+                FinishedProductNo: $("#FinishedProductNo").val(),
+
+                Rev: $("#Rev").val(),
+
+                PackingListNo: $("#PackingListNo").val(),
+
+                SimToolPartNumber: $("#SimToolPartNumber").val(),
+
+                SamplingInspection: $("#SamplingInspection").is(":checked"),
+
+                HundredPercentInspection: $("#HundredPercentInspection").is(":checked"),
+
+                OtherInspection: $("#OtherInspection").is(":checked"),
+
+                Checklist: checklist
+
+            };
+
+            $.ajax({
+
+                url: "/OQCInspection/Save",
+
+                type: "POST",
+
+                contentType: "application/json",
+
+                data: JSON.stringify(model),
+
+                success: function () {
+
+                    alert("Saved Successfully");
+
+                    location.reload();
+
+                }
+
+            });
+        }
 
     </script>
 </body>

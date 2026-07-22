@@ -17,5 +17,10 @@ namespace A246FProject.BAL
         {
             return _dal.GetInspectionData(projectId);
         }
+
+        public void SaveInspection(OQCInspectionViewModel model)
+        {
+            _dal.SaveInspection(model);
+        }
     }
 }
