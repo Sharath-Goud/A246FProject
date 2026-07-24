@@ -1,0 +1,761 @@
+﻿@model A246FProject.Models.NegativeValidationViewModel
+@using System.Data
+@using Microsoft.AspNetCore.Mvc.Rendering
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Negative Validation</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 0.5px solid rgba(167,139,250,.2);
+            padding: 14px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+        }
+
+        input, select {
+            background: rgba(255,255,255,.06);
+            border: 0.5px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 13px;
+            color: #fff;
+            outline: none;
+        }
+
+            select option {
+                background: #1a1040;
+            }
+
+            input:focus, select:focus {
+                border-color: rgba(167,139,250,.5);
+                background: rgba(167,139,250,.08);
+            }
+
+        .note-box {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-left: 4px solid #ef4444;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            color: #ff6b6b;
+            font-size: 14px;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+
+            .note-box strong {
+                color: #ff4040;
+                font-size: 15px;
+            }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            .custom-table th {
+                background: rgba(167,139,250,.12);
+                color: #fff;
+                padding: 12px;
+                font-size: 12px;
+                text-align: left;
+                border-bottom: 1px solid rgba(255,255,255,.1);
+            }
+
+            .custom-table td {
+                padding: 10px;
+                font-size: 12px;
+                color: #fff;
+                border-bottom: 1px solid rgba(255,255,255,.06);
+                vertical-align: top;
+                word-wrap: break-word;
+            }
+
+            .custom-table select,
+            .custom-table input {
+                width: 100%;
+                font-size: 12px;
+                border-radius: 4px;
+            }
+
+                .custom-table input[type="file"] {
+                    font-size: 11px;
+                }
+
+            .custom-table td {
+                white-space: normal;
+            }
+
+                .custom-table td[rowspan] {
+                    vertical-align: top;
+                    font-weight: 500;
+                }
+
+              
+        .btn-search {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* TABLE */
+        .results-table {
+            background: rgba(255,255,255,.04);
+            border: 0.5px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            background: rgba(167,139,250,.08);
+            padding: 12px;
+            font-size: 11px;
+            color: rgba(255,255,255,.45);
+        }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 16px;
+        }
+
+        @@media (max-width: 900px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-row {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <form asp-action="Index" asp-controller="NegativeValidation" method="post" enctype="multipart/form-data">
+
+        <div class="form-card">
+
+            <div class="form-card-header">
+                Negative Validation
+            </div>
+
+            <div class="form-body">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Line</label>
+
+                        <select asp-for="LineId"
+                                asp-items="@(new SelectList(Model.Lines, "LineId", "LineName"))">
+
+                            <option value="">-- Select Line --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Project</label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId">
+
+                            <option value="">-- Select Project --</option>
+
+                            @foreach (var item in Model.Projects)
+
+                            {
+                                <option value="@item.ProjectId">
+                                    @item.ProjectName
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Model</label>
+
+                        <select asp-for="ModelId"
+                                id="ModelId">
+
+                            <option value="">-- Select Model --</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Part</label>
+
+                        <select asp-for="PartId"
+                                id="PartId">
+
+                            <option value="">-- Select Part --</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Line Leader</label>
+
+                        <input asp-for="ProdLineLeader" id="ProdLineLeader" />
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Checked By</label>
+
+                        <input asp-for="CheckedBy" id="CheckedBy" />
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>Approved By</label>
+
+                        <input asp-for="ApprovedBy" id="ApprovedBy" />
+
+                    </div>
+
+                    <div class="form-group">
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="note-box">
+            <div><strong>NOTE:-</strong></div>
+            <div>Good Sample indicates good. It must be <b>OK</b>.</div>
+            <div>Good Sample indicates abnormal. It must be <b>NG</b>.</div>
+            <div>Fail Sample indicates good. It must be <b>NG</b>.</div>
+            <div>Fail Sample indicates abnormal. It must be <b>OK</b>.</div>
+        </div>
+
+        <div class="results-table">
+
+            <table class="custom-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>station</th>
+
+                        <th>Inspection</th>
+
+                        <th>Frequency</th>
+
+                        <th>Periods</th>
+
+                        <th>Good Sample</th>
+
+                        <th>Fail Sample</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                @if (Model.dtChecklist != null && Model.dtChecklist.Rows.Count > 0)
+                {
+                    string currentGroup = "";
+
+                    @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                    {
+                        var item = Model.dtChecklist.Rows[i];
+
+                        string groupKey =
+                            item["StationName"].ToString() + "|" +
+                            item["Inspection"].ToString() + "|" +
+                            item["Frequency"].ToString();
+
+                        bool isFirstRow = groupKey != currentGroup;
+
+                        int rowSpan = 0;
+
+                        if (isFirstRow)
+                        {
+                            currentGroup = groupKey;
+
+                            for (int j = i; j < Model.dtChecklist.Rows.Count; j++)
+                            {
+                                string nextGroup =
+                                    Model.dtChecklist.Rows[j]["StationName"].ToString() + "|" +
+                                    Model.dtChecklist.Rows[j]["Inspection"].ToString() + "|" +
+                                    Model.dtChecklist.Rows[j]["Frequency"].ToString();
+
+                                if (nextGroup == groupKey)
+                                {
+                                    rowSpan++;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        <tr>
+
+                            <input type="hidden"
+                                   name="NegativeValidationResults[@i].RiskId"
+                                   value="@item["ValidId"]" />
+
+                            @if (isFirstRow)
+                            {
+                                <td rowspan="@rowSpan" style="vertical-align:top;">
+                                    @item["StationName"]
+                                </td>
+
+                                <td rowspan="@rowSpan" style="vertical-align:top;">
+                                    @item["Inspection"]
+                                </td>
+
+                                <td rowspan="@rowSpan" style="vertical-align:top;">
+                                    @item["Frequency"]
+                                </td>
+                            }
+
+                            <td>
+                                @item["Periods"]
+                            </td>
+
+                                <td>
+                                    <input type="text"
+                                           class="sample-input"
+                                           name="NegativeValidationResults[@i].GoodSample" />
+                                </td>
+
+                                <td>
+                                    <input type="text"
+                                           class="sample-input"
+                                           name="NegativeValidationResults[@i].FailSample" />
+                                </td>
+
+                            <td>
+                                <button type="button"
+                                        class="btn-search"
+                                        onclick="SaveSingleRow(this,@i)">
+                                    Save
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align:center;padding:20px;">
+                            No records found.
+                        </td>
+                    </tr>
+                }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="actions">
+
+            <button type="button"
+                    class="btn-submit"
+                    onclick="Save()">
+                Submit
+            </button>
+
+        </div>
+
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+
+        $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+            $.get('/NegativeValidation/GetModels',
+                { projectId: projectId },
+
+                function (data) {
+
+                    $("#ModelId").empty();
+
+                    $("#ModelId").append(
+                        '<option value="">-- Select Model --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            item.model +
+                            '</option>');
+                    });
+                });
+        });
+
+        $("#ModelId").change(function () {
+
+            var modelId = $(this).val();
+
+            $.get('/NegativeValidation/GetParts',
+                { modelId: modelId },
+
+                function (data) {
+
+                    $("#PartId").empty();
+
+                    $("#PartId").append(
+                        '<option value="">-- Select Part --</option>');
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            item.part +
+                            '</option>');
+                    });
+                });
+        });
+
+        $(document).ready(function () {
+            var postedProjectId = "@Model.ProjectId";
+            var postedModelId = "@Model.ModelId";
+            var postedPartId = "@Model.PartId";
+
+            if (postedProjectId && postedProjectId !== "0") {
+                $.get('/NegativeValidation/GetModels', { projectId: postedProjectId }, function (data) {
+                    $("#ModelId").empty();
+                    $("#ModelId").append('<option value="">-- Select Model --</option>');
+
+                    $.each(data, function (i, item) {
+                        var selected = (item.modelId == postedModelId) ? 'selected="selected"' : '';
+                        $("#ModelId").append(
+                            '<option value="' + item.modelId + '" ' + selected + '>' + item.model + '</option>'
+                        );
+                    });
+
+                    if (postedModelId && postedModelId !== "0") {
+                        $.get('/NegativeValidation/GetParts', { modelId: postedModelId }, function (partData) {
+                            $("#PartId").empty();
+                            $("#PartId").append('<option value="">-- Select Part --</option>');
+
+                            $.each(partData, function (i, item) {
+                                var selected = (item.partId == postedPartId) ? 'selected="selected"' : '';
+                                $("#PartId").append(
+                                    '<option value="' + item.partId + '" ' + selected + '>' + item.part + '</option>'
+                                );
+                            });
+                        });
+                    }
+                });
+            }
+        });
+
+        function validateHeader() {
+            var LineId = $("#LineId").val();
+            var ProjectId = $("#ProjectId").val();
+            var ModelId = $("#ModelId").val();
+            var PartId = $("#PartId").val();
+            var ProdLineLeader = $("#ProdLineLeader").val();
+            var CheckedBy = $("#CheckedBy").val();
+            var ApprovedBy = $("#ApprovedBy").val();
+
+            if (!LineId || LineId == "0" ||
+                !ProjectId || ProjectId == "0" ||
+                !ModelId || ModelId == "0" ||
+                !PartId || PartId == "0" ||
+                !ProdLineLeader || !CheckedBy || !ApprovedBy) {
+                alert("Please fill Line, Project, Model, Part, Line Leader, Checked By and Approved By before saving.");
+                return false;
+            }
+            return true;
+        }
+
+        function Save() {
+
+            if (!validateHeader()) return;
+
+            var formData = new FormData();
+
+            formData.append("LineId", $("#LineId").val());
+            formData.append("ProjectId", $("#ProjectId").val());
+            formData.append("ModelId", $("#ModelId").val());
+            formData.append("PartId", $("#PartId").val());
+            formData.append("ProdLineLeader", $("#ProdLineLeader").val());
+            formData.append("CheckedBy", $("#CheckedBy").val());
+            formData.append("ApprovedBy", $("#ApprovedBy").val());
+
+            var count = 0;
+
+            $("input[name$='.RiskId']").each(function (index) {
+
+                var riskId = $("input[name='NegativeValidationResults[" + index + "].RiskId']").val();
+
+                var goodSample =
+                    $("input[name='NegativeValidationResults[" + index + "].GoodSample']").val();
+
+                var failSample =
+                    $("input[name='NegativeValidationResults[" + index + "].FailSample']").val();
+
+                if (goodSample !== "" || failSample !== "") {
+
+                    formData.append("NegativeValidationResults[" + count + "].RiskId", riskId);
+                    formData.append("NegativeValidationResults[" + count + "].GoodSample", goodSample);
+                    formData.append("NegativeValidationResults[" + count + "].FailSample", failSample);
+
+                    count++;
+                }
+            });
+
+            if (count == 0) {
+                alert("No rows to save.");
+                return;
+            }
+
+            $.ajax({
+
+                url: '/NegativeValidation/SaveBulkNegativeValidation',
+
+                type: 'POST',
+
+                contentType: false,
+
+                processData: false,
+
+                data: formData,
+
+                success: function (res) {
+
+                    alert(res);
+
+                    location.reload();
+
+                },
+
+                error: function (xhr) {
+
+                    console.log(xhr.responseText);
+
+                    alert("Save Failed");
+
+                }
+
+            });
+
+        }
+
+
+        function SaveSingleRow(btn, index) {
+
+            if (!validateHeader()) return;
+
+            var riskId =
+                $("input[name='NegativeValidationResults[" + index + "].RiskId']").val();
+
+            var goodSample =
+                $("input[name='NegativeValidationResults[" + index + "].GoodSample']").val();
+
+            var failSample =
+                $("input[name='NegativeValidationResults[" + index + "].FailSample']").val();
+
+            if (goodSample == "" && failSample == "") {
+
+                alert("Please enter Good Sample or Fail Sample.");
+
+                return;
+            }
+
+            var formData = new FormData();
+
+            formData.append("LineId", $("#LineId").val());
+            formData.append("ProjectId", $("#ProjectId").val());
+            formData.append("ModelId", $("#ModelId").val());
+            formData.append("PartId", $("#PartId").val());
+            formData.append("ProdLineLeader", $("#ProdLineLeader").val());
+            formData.append("CheckedBy", $("#CheckedBy").val());
+            formData.append("ApprovedBy", $("#ApprovedBy").val());
+
+            formData.append("RiskId", riskId);
+            formData.append("GoodSample", goodSample);
+            formData.append("FailSample", failSample);
+
+            $.ajax({
+
+                url: '/NegativeValidation/SaveSingleNegativeValidation',
+
+                type: 'POST',
+
+                contentType: false,
+
+                processData: false,
+
+                data: formData,
+
+                success: function (res) {
+
+                    alert(res);
+
+                    $(btn)
+                        .prop("disabled", true)
+                        .text("Saved")
+                        .css({
+                            "background": "#28a745",
+                            "opacity": "0.7"
+                        });
+
+                },
+
+                error: function (xhr) {
+
+                    console.log(xhr.responseText);
+
+                    alert("Save Failed");
+
+                }
+
+            });
+
+        }
+    </script>
+
+</body>
+</html>
