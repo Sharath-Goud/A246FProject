@@ -718,6 +718,16 @@
             formData.append("GoodSample", goodSample);
             formData.append("FailSample", failSample);
 
+            console.log("RiskId :", riskId);
+console.log("GoodSample :", goodSample);
+console.log("FailSample :", failSample);
+
+        alert(
+            "RiskId = " + riskId +
+            "\nGoodSample = " + goodSample +
+            "\nFailSample = " + failSample
+        );
+
             $.ajax({
 
                 url: '/NegativeValidation/SaveSingleNegativeValidation',

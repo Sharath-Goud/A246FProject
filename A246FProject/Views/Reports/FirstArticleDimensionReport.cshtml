@@ -150,36 +150,37 @@
 
     .custom-table {
         width: 100%;
+        min-width: 1200px;
         border-collapse: collapse;
         table-layout: fixed;
     }
 
-        /* HEADER */
         .custom-table thead th {
             position: sticky;
             top: 0;
             background: #2a2b52;
-            color: #BFC5FF;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid #444870;
+            color: #fff;
+            padding: 12px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #444870;
+            white-space: nowrap;
         }
 
-        /* BODY CELLS */
         .custom-table tbody td {
             background: #232542;
             color: #fff;
-            padding: 12px 10px;
-            font-size: 12px;
-            border-bottom: 1px solid #36395c;
-            /* 🔥 IMPORTANT FIX */
-            text-align: left;
+            padding: 10px 8px;
+            font-size: 13px;
+            border: 1px solid #36395c;
             vertical-align: middle;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-            /* LEFT ALIGN ONLY FOR TEXT COLUMNS */
             .custom-table tbody td:nth-child(2),
             .custom-table tbody td:nth-child(3),
             .custom-table tbody td:nth-child(4) {
@@ -187,14 +188,12 @@
                 padding-left: 14px;
             }
 
-            /* VALUE + RESULT PERFECT ALIGN */
             .custom-table tbody td:nth-child(8),
             .custom-table tbody td:nth-child(9) {
                 font-weight: 600;
                 letter-spacing: 0.3px;
             }
 
-        /* ROWSPAN CELLS CENTER FIX */
         .custom-table td[rowspan] {
             vertical-align: middle !important;
             text-align: left;
@@ -239,7 +238,7 @@
         .custom-table td:nth-child(11),
         .custom-table th:nth-child(12),
         .custom-table td:nth-child(12){
-            width: 80px;
+            width: 140px;
         }
 
 
@@ -568,7 +567,7 @@
 
 
                                         <td>
-                                            @(Convert.ToDecimal(item["Check1"]).ToString("0.00"))
+                                            @(Convert.ToDecimal(item["Check1"]).ToString("0.0000"))
                                         </td>
 
 
@@ -578,7 +577,7 @@
 
 
                                         <td>
-                                            @(Convert.ToDecimal(item["Check2"]).ToString("0.00"))
+                                            @(Convert.ToDecimal(item["Check2"]).ToString("0.0000"))
                                         </td>
 
 
@@ -588,7 +587,7 @@
 
 
                                         <td>
-                                            @(Convert.ToDecimal(item["Check3"]).ToString("0.00"))
+                                            @(Convert.ToDecimal(item["Check3"]).ToString("0.0000"))
                                         </td>
 
 
@@ -598,7 +597,7 @@
 
 
                                         <td>
-                                            @(Convert.ToDecimal(item["Check4"]).ToString("0.00"))
+                                            @(Convert.ToDecimal(item["Check4"]).ToString("0.0000"))
                                         </td>
 
 
@@ -608,7 +607,7 @@
 
 
                                         <td>
-                                            @(Convert.ToDecimal(item["Check5"]).ToString("0.00"))
+                                            @(Convert.ToDecimal(item["Check5"]).ToString("0.0000"))
                                         </td>
 
 

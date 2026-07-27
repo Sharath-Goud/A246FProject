@@ -455,19 +455,25 @@
                             }
                         }
 
-                        <tr>
+                        <tr data-station="@stationId" data-first="@(isFirstRow ? "1" : "0")" data-saved="0">
 
                             @if (isFirstRow)
                             {
-                                <td rowspan="@rowSpan" style="vertical-align:top;">
+                                <td class="station-cell station-no"
+                                    rowspan="@rowSpan"
+                                    style="vertical-align:top;">
                                     @Model.dtChecklist.Rows[i]["StationNo"]
                                 </td>
 
-                                <td rowspan="@rowSpan" style="vertical-align:top;">
+                                <td class="station-cell station-name"
+                                    rowspan="@rowSpan"
+                                    style="vertical-align:top;">
                                     @Model.dtChecklist.Rows[i]["Station"]
                                 </td>
 
-                                <td rowspan="@rowSpan" style="vertical-align:top;">
+                                <td class="station-cell equipment"
+                                    rowspan="@rowSpan"
+                                    style="vertical-align:top;">
                                     @Model.dtChecklist.Rows[i]["EquipmentModel"]
                                 </td>
                             }
@@ -494,36 +500,20 @@
                                        name="A246FCTPParameterResults[@i].LimitId"
                                        value="@Model.dtChecklist.Rows[i]["LimitId"]" />
 
-                                <input type="hidden"
-                                       id="IsSaved_@i"
-                                       value="@Model.dtChecklist.Rows[i]["IsSaved"]" />
-
                                 <input type="text"
                                        class="value-box"
                                        name="A246FCTPParameterResults[@i].Value"
                                        value="@Model.dtChecklist.Rows[i]["Value"]"
-                                       @(Convert.ToInt32(Model.dtChecklist.Rows[i]["IsSaved"]) == 1 ? "disabled" : "") />
+                                        />
 
                             </td>
 
                             <td>
-                                @if (Convert.ToInt32(Model.dtChecklist.Rows[i]["IsSaved"]) == 1)
-                                {
-                                    <button type="button"
-                                            class="btn-search"
-                                            disabled
-                                            style="background:#28a745;cursor:not-allowed;opacity:.7;">
-                                        Saved
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button type="button"
-                                            class="btn-search"
-                                            onclick="SaveSingleRow(this,@i)">
-                                        Save
-                                    </button>
-                                }
+                                <button type="button"
+                                        class="btn-search"
+                                        onclick="SaveSingleRow(this,@i)">
+                                    Save
+                                </button>
                             </td>
 
                         </tr>
@@ -693,88 +683,123 @@
             });
         }
 
-
-                function SaveSingleRow(btn, index)
+        function SaveSingleRow(btn, index)
         {
-            var limitId =
-                $("input[name='A246FCTPParameterResults[" +
-                    index +
-                    "].LimitId']").val();
-
-            var value =
-                $("input[name='A246FCTPParameterResults[" +
-                    index +
-                    "].Value']").val();
-
+            var txt = $("input[name='A246FCTPParameterResults[" + index + "].Value']");
+            var value = txt.val();
             if (value == "")
             {
-                alert("Please enter value");
+                alert("Enter Value");
                 return;
             }
-
             var Results = [];
+            var savedIndexes = [];
 
-            Results.push({
-                LimitId: limitId,
-                Value: value
-            });
-            
-            var obj =
-            {
-                LineId: $("#LineId").val(),
+                for (var i = 0; i <= index; i++) {
 
-                ProjectId: $("#ProjectId").val(),
+                    var valInput = $("input[name='A246FCTPParameterResults[" + i + "].Value']");
 
-                ModelId: $("#ModelId").val(),
+                    if (valInput.length === 0) {
+                        continue;
+                    }
 
-                PartId: $("#PartId").val(),
+                    var value = valInput.val();
+                    var limitId = $("input[name='A246FCTPParameterResults[" + i + "].LimitId']").val();
 
-                MachineId: $("#MachineId").val(),
+                    if (value != null && value.trim() !== "") {
+                        Results.push({
+                            LimitId: limitId,
+                            Value: value
+                        });
+                        savedIndexes.push(i);
+                    }
+                }
 
-                ProdLineLeader:
-                    $("input[name='ProdLineLeader']").val(),
+                if (Results.length === 0) {
+                    alert("Enter Value");
+                    return;
+                }
 
-                CheckedBy:
-                    $("input[name='CheckedBy']").val(),
-
-                ApprovedBy:
-                    $("input[name='ApprovedBy']").val(),
-
-                A246FCTPParameterResults:
-                    Results
-            };
-            console.log('ctp data sending : ',JSON.stringify(obj));
+                var obj =
+                {
+                    LineId: $("#LineId").val(),
+                    ProjectId: $("#ProjectId").val(),
+                    ModelId: $("#ModelId").val(),
+                    PartId: $("#PartId").val(),
+                    MachineId: $("#MachineId").val(),
+                    ProdLineLeader: $("input[name='ProdLineLeader']").val(),
+                    CheckedBy: $("input[name='CheckedBy']").val(),
+                    ApprovedBy: $("input[name='ApprovedBy']").val(),
+                    A246FCTPParameterResults: Results
+                };
+                console.log(JSON.stringify(obj, null, 2));
             $.ajax({
                 url: '/CTPParameter/SaveA246FCTPParameter',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(obj),
+                success: function ()
+                {
+                    $.each(savedIndexes, function (idx, rowIndex) {
 
-                        success: function (response)
-        {
-            alert("Saved Successfully");
+                        var row = $("input[name='A246FCTPParameterResults[" + rowIndex + "].Value']").closest("tr");
 
-            // disable VALUE input
-            $("input[name='A246FCTPParameterResults[" + index + "].Value']")
-                .prop("disabled", true);
+                        if (row.length === 0) {
+                            return true; 
+                        }
 
-            // disable SAVE button
-            $(btn)
-                .prop("disabled", true)
-                .text("Saved")
-                .css({
-                    "background": "#28a745",
-                    "cursor": "not-allowed",
-                    "opacity": "0.7"
-                });
-        },
+                        var stationId = row.data("station");
+                        var isFirst = row.data("first") == 1;
+                        var nextRow = row.next("tr");
 
+                        if (isFirst)
+                        {
+                            if (nextRow.length && nextRow.data("station") == stationId)
+                            {
+                                var stationNo = row.find("td.station-no");
+                                var stationName = row.find("td.station-name");
+                                var equipment = row.find("td.equipment");
+                                var span = parseInt(stationNo.attr("rowspan"));
+                                stationNo.attr("rowspan", span - 1);
+                                stationName.attr("rowspan", span - 1);
+                                equipment.attr("rowspan", span - 1);
+                                nextRow.prepend(equipment);
+                                nextRow.prepend(stationName);
+                                nextRow.prepend(stationNo);
+                                nextRow.attr("data-first", "1");
+                            }
+                        }
+                        else
+                        {
+                            var firstRow = $("tr[data-station='" + stationId + "'][data-first='1']");
+                            if (firstRow.length)
+                            {
+                                firstRow.find("td.station-no").attr(
+                                    "rowspan",
+                                    parseInt(firstRow.find("td.station-no").attr("rowspan")) - 1
+                                );
+                                firstRow.find("td.station-name").attr(
+                                    "rowspan",
+                                    parseInt(firstRow.find("td.station-name").attr("rowspan")) - 1
+                                );
+                                firstRow.find("td.equipment").attr(
+                                    "rowspan",
+                                    parseInt(firstRow.find("td.equipment").attr("rowspan")) - 1
+                                );
+                            }
+                        }
+
+                        row.remove();
+                    });
+
+                    alert("Saved Successfully");
+                },
                 error: function ()
                 {
                     alert("Save Failed");
                 }
             });
-        } 
+        }
 
     </script>
 </body>
