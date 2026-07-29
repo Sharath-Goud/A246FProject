@@ -1,6 +1,5 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
-wwwroot\Images\20260701114409787.PNG
 wwwroot\Images\20260701114651882.jpg
 wwwroot\Images\20260701114818759.PNG
 wwwroot\Images\20260701115125462.PNG
@@ -10,6 +9,7 @@ wwwroot\Images\20260701115218095.jpg
 wwwroot\Images\20260701115218095.PNG
 wwwroot\Images\20260701115218096.jpg
 wwwroot\Images\20260701115218096.PNG
+wwwroot\Images\foxlink_logo.PNG
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map

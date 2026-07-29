@@ -5,10 +5,6 @@
       "PackagePath": "staticwebassets\\A246FProject.6vk95gqy3m.bundle.scp.css"
     },
     {
-      "Id": "E:\\2063907\\my project\\A246FProject\\A246FProject\\wwwroot\\Images\\20260701114409787.PNG",
-      "PackagePath": "staticwebassets\\Images\\20260701114409787.PNG"
-    },
-    {
       "Id": "E:\\2063907\\my project\\A246FProject\\A246FProject\\wwwroot\\Images\\20260701114651882.jpg",
       "PackagePath": "staticwebassets\\Images\\20260701114651882.jpg"
     },
@@ -43,6 +39,10 @@
     {
       "Id": "E:\\2063907\\my project\\A246FProject\\A246FProject\\wwwroot\\Images\\20260701115218096.jpg",
       "PackagePath": "staticwebassets\\Images\\20260701115218096.jpg"
+    },
+    {
+      "Id": "E:\\2063907\\my project\\A246FProject\\A246FProject\\wwwroot\\Images\\foxlink_logo.PNG",
+      "PackagePath": "staticwebassets\\Images\\foxlink_logo.PNG"
     },
     {
       "Id": "E:\\2063907\\my project\\A246FProject\\A246FProject\\wwwroot\\css\\site.css",

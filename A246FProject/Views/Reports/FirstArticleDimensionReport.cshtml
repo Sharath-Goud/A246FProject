@@ -150,7 +150,7 @@
 
     .custom-table {
         width: 100%;
-        min-width: 1200px;
+        min-width: 1300px;
         border-collapse: collapse;
         table-layout: fixed;
     }
@@ -181,65 +181,79 @@
             overflow-wrap: break-word;
         }
 
-            .custom-table tbody td:nth-child(2),
-            .custom-table tbody td:nth-child(3),
-            .custom-table tbody td:nth-child(4) {
-                text-align: left;
-                padding-left: 14px;
-            }
+            /* Alignment */
+.custom-table tbody td:nth-child(2),
+.custom-table tbody td:nth-child(3),
+.custom-table tbody td:nth-child(4) {
+    text-align: left;
+    padding-left: 14px;
+}
 
-            .custom-table tbody td:nth-child(8),
-            .custom-table tbody td:nth-child(9) {
-                font-weight: 600;
-                letter-spacing: 0.3px;
-            }
+.custom-table tbody td:nth-child(8),
+.custom-table tbody td:nth-child(9) {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
 
-        .custom-table td[rowspan] {
-            vertical-align: middle !important;
-            text-align: left;
-        }
 
-        .custom-table tbody tr:hover td {
-            background: #2c2f52;
-        }
+.custom-table td[rowspan] {
+    vertical-align: middle !important;
+    text-align: left;
+}
 
-        .custom-table th:nth-child(1),
-        .custom-table td:nth-child(1) {
-            width: 200px;
-        }
 
-        .custom-table th:nth-child(2),
-        .custom-table td:nth-child(2) {
-            width: 120px;
-        }
+.custom-table tbody tr:hover td {
+    background: #2c2f52;
+}
 
-        .custom-table th:nth-child(3),
-        .custom-table td:nth-child(3),
-        .custom-table th:nth-child(5),
-        .custom-table td:nth-child(5),
-        .custom-table th:nth-child(7),
-        .custom-table td:nth-child(7),
-        .custom-table th:nth-child(9),
-        .custom-table td:nth-child(9),
-        .custom-table th:nth-child(11),
-        .custom-table td:nth-child(11) {
-            width: 100px;
-        }
+.custom-table th:nth-child(1),
+.custom-table td:nth-child(1) {
+    width: 200px;
+}
 
-        .custom-table th:nth-child(4),
-        .custom-table td:nth-child(4),
-        .custom-table th:nth-child(6),
-        .custom-table td:nth-child(6),
-        .custom-table th:nth-child(8),
-        .custom-table td:nth-child(8),
-        .custom-table th:nth-child(10),
-        .custom-table td:nth-child(10),
-        .custom-table th:nth-child(11),
-        .custom-table td:nth-child(11),
-        .custom-table th:nth-child(12),
-        .custom-table td:nth-child(12){
-            width: 140px;
-        }
+
+.custom-table th:nth-child(2),
+.custom-table td:nth-child(2) {
+    width: 160px;
+}
+
+
+.custom-table th:nth-child(3),
+.custom-table td:nth-child(3),
+.custom-table th:nth-child(5),
+.custom-table td:nth-child(5),
+.custom-table th:nth-child(7),
+.custom-table td:nth-child(7),
+.custom-table th:nth-child(9),
+.custom-table td:nth-child(9),
+.custom-table th:nth-child(11),
+.custom-table td:nth-child(11) {
+    width: 90px;
+}
+
+
+.custom-table th:nth-child(4),
+.custom-table td:nth-child(4),
+.custom-table th:nth-child(6),
+.custom-table td:nth-child(6),
+.custom-table th:nth-child(8),
+.custom-table td:nth-child(8),
+.custom-table th:nth-child(10),
+.custom-table td:nth-child(10),
+.custom-table th:nth-child(12),
+.custom-table td:nth-child(12) {
+    width: 130px;
+}
+
+
+.custom-table th:nth-child(13),
+.custom-table td:nth-child(13) {
+    width: 100px !important;
+    min-width: 100px;
+    white-space: nowrap;
+    text-align: center;
+    font-weight: 700;
+}
 
 
     .value-box {

@@ -387,9 +387,11 @@
                                 <label>From Date</label>
 
                                 <input asp-for="FromDate"
+                                       type="text"
                                        id="fromDate"
                                        class="form-control"
-                                       autocomplete="off" />
+                                       autocomplete="off"
+                                       placeholder="Select Date" />
 
                             </div>
 
@@ -398,9 +400,11 @@
                                 <label>To Date</label>
 
                                 <input asp-for="ToDate"
+                                       type="text"
                                        id="toDate"
                                        class="form-control"
-                                       autocomplete="off" />
+                                       autocomplete="off"
+                                       placeholder="Select Date" />
 
                             </div>
 
@@ -534,8 +538,13 @@
 
                     <div class="col-lg-2">
 
-                        <button class="btn-submit">
-                            Export File
+                        <button type="submit"
+                                name="command"
+                                value="ExportPDF"
+                                class="btn-submit">
+
+                            Export PDF
+
                         </button>
 
                     </div>
@@ -554,23 +563,27 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+     $(document).ready(function () {
 
         $("#fromDate").datepicker({
 
-            dateFormat: "mm/dd/yy",
+            dateFormat: "dd/mm/yy",
             changeMonth: true,
-            changeYear: true
+            changeYear: true,
+            showAnim: "fadeIn"
 
         });
+
 
         $("#toDate").datepicker({
 
-            dateFormat: "mm/dd/yy",
+            dateFormat: "dd/mm/yy",
             changeMonth: true,
-            changeYear: true
+            changeYear: true,
+            showAnim: "fadeIn"
 
         });
+
 
     });
 </script>
