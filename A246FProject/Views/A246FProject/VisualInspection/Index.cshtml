@@ -37,7 +37,6 @@
             margin-bottom: 18px;
         }
 
-        /* FORM CARD */
         .form-card {
             background: rgba(255,255,255,.04);
             border: 0.5px solid rgba(255,255,255,.08);
@@ -141,7 +140,6 @@
                 opacity: .85;
             }
 
-        /* NOTE BOX */
         .note-box {
             background: rgba(255,255,255,.03);
             border: 0.5px solid rgba(255,255,255,.08);
@@ -157,7 +155,6 @@
                 line-height: 1.8;
             }
 
-        /* TABLE */
         .results-table {
             background: rgba(255,255,255,.04);
             border: 0.5px solid rgba(255,255,255,.08);
@@ -354,7 +351,9 @@
                     </div>
                     <div class="form-group">
                         <label>Production Line Leader</label>
-                        <input type="text" id="txtLineLeader" placeholder="Production Line Leader" />
+                        <input asp-for="ProdLineLeader"
+                               id="txtLineLeader"
+                               placeholder="Production Line Leader" />
                     </div>
                 
                 </div>
@@ -363,11 +362,15 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Checked By</label>
-                        <input type="text" id="txtCheckedBy" placeholder="Checked By" />
+                        <input asp-for="CheckedBy"
+                               id="txtCheckedBy"
+                               placeholder="Checked By" />
                     </div>
                     <div class="form-group">
                         <label>Approved By</label>
-                        <input type="text" id="txtApprovedBy" placeholder="Approved By" />
+                        <input asp-for="ApprovedBy"
+                               id="txtApprovedBy"
+                               placeholder="Approved By" />
                     </div>
                     <div class="form-group" style="display:flex; justify-content:flex-end;">
                         <label style="visibility:hidden;">Search</label>
@@ -414,11 +417,18 @@
 
                     foreach (DataRow row in Model.dtChecklist.Rows)
                     {
+                        // Hide only for PartId 23 and 26
+                        if ((Model.PartId == 23 || Model.PartId == 26) &&
+                        row["SNo"].ToString() == "430")
+                        {
+                            continue;
+                        }
                         bool isFirstRow = previousStation != row["StationName"].ToString();
 
-                        <tr>
+                        <tr class="inspection-row"
+                                data-sno="@row["SNo"]">
 
-                            <input type="hidden" class="dataid" value="@row["DataId"]" />
+                                <input type="hidden" class="dataid" value="@row["DataId"]" />
                             <td>
                                 @row["SNo"]
                             </td>
@@ -479,9 +489,12 @@
         </table>
     </div>
 
-    <!-- ACTIONS -->
     <div class="actions">
-        <button class="btn-submit" onclick="submitData()">Submit</button>
+        <button type="button"
+                class="btn-submit"
+                onclick="submitData()">
+            Submit
+        </button>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -489,7 +502,6 @@
 
             var projectId = $(this).val();
 
-            // Load Model
             $.ajax({
                 url: '/VisualInspection/GetModelNoByProject',
                 type: 'POST',
@@ -515,7 +527,6 @@
                 }
             });
 
-            // Load Visual Inspection
 
             $.ajax({
 
@@ -599,7 +610,8 @@
                 ProjectId: $("#ProjectId").val(),
                 ModelId: $("#ModelId").val(),
                 PartId: $("#PartId").val(),
-                VisualsId: $("#VisualsId").val(),
+                VisualsId: parseInt($("#VisualsId").val()) || 0,
+                Model: $("#ModelId option:selected").text(),
                 ProdLineLeader: $("#txtLineLeader").val(),
                 CheckedBy: $("#txtCheckedBy").val(),
                 ApprovedBy: $("#txtApprovedBy").val()
@@ -616,7 +628,7 @@
             });
         });
 
-        function submitData() {
+                function submitData() {
 
             var list = [];
 
@@ -631,9 +643,9 @@
                 if (dataId && result !== "") {
 
                     list.push({
-                        DataId: parseInt(dataId),
+                        DataId: parseInt(dataId) || 0,
                         Section1: result,
-                        DefectiveNumber: defective ? parseInt(defective) : 0
+                        DefectiveNumber: defective || "0"
                     });
                 }
             });
@@ -644,12 +656,17 @@
             }
 
             var model = {
+
                 VisualInspectionResults: list,
-                LineId: $("#LineId").val(),
-                ProjectId: $("#ProjectId").val(),
-                ModelId: $("#ModelId").val(),
-                PartId: $("#PartId").val(),
-                VisualsId: $("#VisualsId").val(),
+
+                LineId: parseInt($("#LineId").val()) || 0,
+                ProjectId: parseInt($("#ProjectId").val()) || 0,
+                ModelId: parseInt($("#ModelId").val()) || 0,
+                PartId: parseInt($("#PartId").val()) || 0,
+                VisualsId: parseInt($("#VisualsId").val()) || 0,
+
+                Model: $("#ModelId option:selected").text(),
+
                 ProdLineLeader: $("#txtLineLeader").val(),
                 CheckedBy: $("#txtCheckedBy").val(),
                 ApprovedBy: $("#txtApprovedBy").val()
@@ -663,21 +680,26 @@
                 success: function (res) {
 
                     if (res.success) {
-                        alert("Data Submitted successfully");
+                        alert("Data Submitted Successfully");
 
-                        $(".result").val('');
-                        $(".defective").val('');
+                        $(".result").val("");
+                        $(".defective").val("");
 
-                        $("#txtLineLeader").val('');
-                        $("#txtCheckedBy").val('');
-                        $("#txtApprovedBy").val('');
-
-                    } else {
-                        alert("Save failed");
+                        $("#txtLineLeader").val("");
+                        $("#txtCheckedBy").val("");
+                        $("#txtApprovedBy").val("");
                     }
+                    else {
+                        alert(res.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    alert("Server Error");
                 }
             });
         }
+        
     </script>
 </body>
 </html>

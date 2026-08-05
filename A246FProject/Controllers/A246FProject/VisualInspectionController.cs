@@ -92,7 +92,13 @@ public class VisualInspectionController : Controller
     {
         try
         {
-            string userId = HttpContext.Session.GetString("User");
+            if (model == null)
+                return Json(new { success = false, message = "Model is null." });
+
+            if (model.VisualInspectionResults == null || !model.VisualInspectionResults.Any())
+                return Json(new { success = false, message = "No inspection data found." });
+
+            string userId = HttpContext.Session.GetString("User") ?? "";
 
             DataTable dt = new DataTable();
             dt.Columns.Add("Id");
@@ -102,17 +108,22 @@ public class VisualInspectionController : Controller
 
             var row = model.VisualInspectionResults.First();
 
-            dt.Rows.Add(1, row.DataId, row.Section1, row.DefectiveNumber);
+            dt.Rows.Add(
+                1,
+                row.DataId,
+                row.Section1 ?? "",
+                row.DefectiveNumber ?? "0"
+            );
 
             int result = _bal.InsertBulkVisualInspection(
                 dt,
                 userId,
                 model.LineId,
                 model.ProjectId,
-                model.ModelId.ToString(),
-                model.ProdLineLeader,
-                model.CheckedBy,
-                model.ApprovedBy,
+                model.Model,
+                model.ProdLineLeader ?? "",
+                model.CheckedBy ?? "",
+                model.ApprovedBy ?? "",
                 model.ModelId,
                 model.PartId
             );
@@ -121,7 +132,11 @@ public class VisualInspectionController : Controller
         }
         catch (Exception ex)
         {
-            return Json(new { success = false, message = ex.Message });
+            return Json(new
+            {
+                success = false,
+                message = ex.ToString()
+            });
         }
     }
 
@@ -130,9 +145,16 @@ public class VisualInspectionController : Controller
     {
         try
         {
-            string userId = HttpContext.Session.GetString("User");
+            if (model == null)
+                return Json(new { success = false, message = "Model is null." });
+
+            if (model.VisualInspectionResults == null || model.VisualInspectionResults.Count == 0)
+                return Json(new { success = false, message = "No inspection data." });
+
+            string userId = HttpContext.Session.GetString("User") ?? "";
 
             DataTable dt = new DataTable();
+
             dt.Columns.Add("Id");
             dt.Columns.Add("DataId");
             dt.Columns.Add("Section1");
@@ -145,8 +167,8 @@ public class VisualInspectionController : Controller
                 dt.Rows.Add(
                     i++,
                     row.DataId,
-                    row.Section1,
-                    row.DefectiveNumber
+                    row.Section1 ?? "",
+                    row.DefectiveNumber ?? "0"
                 );
             }
 
@@ -155,10 +177,10 @@ public class VisualInspectionController : Controller
                 userId,
                 model.LineId,
                 model.ProjectId,
-                model.ModelId.ToString(),
-                model.ProdLineLeader,
-                model.CheckedBy,
-                model.ApprovedBy,
+                model.Model,
+                model.ProdLineLeader ?? "",
+                model.CheckedBy ?? "",
+                model.ApprovedBy ?? "",
                 model.ModelId,
                 model.PartId
             );
@@ -167,7 +189,11 @@ public class VisualInspectionController : Controller
         }
         catch (Exception ex)
         {
-            return Json(new { success = false, message = ex.Message });
+            return Json(new
+            {
+                success = false,
+                message = ex.ToString()
+            });
         }
     }
 }

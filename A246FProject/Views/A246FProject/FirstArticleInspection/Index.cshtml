@@ -464,17 +464,27 @@
                                     }
 
                                     html += `
-                                    <div class="data-row">
+                                      <div class="data-row"
+                                            data-contentid="${item.contentId}"
+                                            data-group="${item.stationName}_${item.itemName}">
 
                                         <input type="hidden" class="contentId" value="${item.contentId}" />
 
-                                        <div class="station">${stationHtml}</div>
+                                         <div class="station">
+                                            ${stationHtml}
+                                        </div>
 
-                                        <div class="item">${itemHtml}</div>
+                                        <div class="item">
+                                            ${itemHtml}
+                                        </div>
 
-                                        <div>${item.content}</div>
+                                        <div class="criteria-area">
+                                            <div class="criteria">
+                                                ${item.content}
+                                            </div>
+                                        </div>
 
-                                        <div>
+                                        <div class="control-area">
                                             <select class="status">
                                                 <option value="OK">OK</option>
                                                 <option value="NG">NG</option>
@@ -482,18 +492,18 @@
                                             </select>
                                         </div>
 
-                                        <div>
+                                        <div class="control-area">
                                             <input type="text"
                                                    class="result"
                                                    maxlength="10"
                                                    oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'');" />
                                         </div>
 
-                                        <div>
+                                        <div class="control-area">
                                             <input type="text" class="ngdesc"/>
                                         </div>
 
-                                        <div>
+                                        <div class="action-area">
                                             <button class="btn-search" onclick="saveRow(this)">Save</button>
                                         </div>
 
@@ -506,50 +516,103 @@
             });
         }
 
-         function saveRow(btn) {
+        function saveRow(btn) {
 
-            let row = $(btn).closest(".data-row");
+            let rowsToSave = [];
 
-            let data = {
+            $(".data-row").each(function () {
 
-                ContentId: row.find(".contentId").val(),
-                SRId: row.find(".status").val()=="OK" ? 5 :
-                row.find(".status").val()=="NG" ? 6 : 7,
-                Result: row.find(".result").val(),
-                RejectDescribe: row.find(".ngdesc").val(),
-                Result: row.find(".result").val(),
-                RejectDescribe: row.find(".ngdesc").val(),
+                let row = $(this);
 
+                let result = row.find(".result").val();
+
+                let ngDesc = row.find(".ngdesc").val();
+
+                let status = row.find(".status").val();
+
+                if(result != "" || ngDesc != "")
+                {
+                    rowsToSave.push({
+
+                        ContentId:row.find(".contentId").val(),
+
+                        SRId:
+
+                        status=="OK" ? 5 :
+
+                        status=="NG" ? 6 : 7,
+
+                        Result: result,
+
+                        RejectDescribe: ngDesc
+
+                    });
+                }
+            });
+
+            if(rowsToSave.length == 0)
+            {
+                alert("Please enter data before saving");
+                return;
+            }
+
+            let model = {
                 LineId: $("#ddlLine").val(),
                 ProjectId: $("#ddlProject").val(),
                 ModelId: $("#ddlModel").val(),
                 PartId: $("#ddlPart").val(),
-
-                ProductName: $("#txtProductName").val(),
-                WorkOrder: $("#txtWorkOrder").val(),
-                DrawingVersion: $("#txtDrawingVersion").val(),
-                PackVersion: $("#txtPackVersion").val(),
-                SamplingQty: $("#txtSamplingQty").val(),
-
-                ProdLineLeader: $("#txtLineLeader").val(),
-                CheckedBy: $("#txtCheckedBy").val(),
-                ApprovedBy: $("#txtApprovedBy").val(),
-                CreatedBy: $("#hdnCreatedBy").val()
+                ProductName:
+                $("#txtProductName").val(),
+                WorkOrder:
+                $("#txtWorkOrder").val(),
+                DrawingVersion:
+                $("#txtDrawingVersion").val(),
+                PackVersion:
+                $("#txtPackVersion").val(),
+                SamplingQty:
+                $("#txtSamplingQty").val(),
+                ProdLineLeader:
+                $("#txtLineLeader").val(),
+                CheckedBy:
+                $("#txtCheckedBy").val(),
+                ApprovedBy:
+                $("#txtApprovedBy").val(),
+                CreatedBy:
+                $("#hdnCreatedBy").val(),
+                CheckListFirstArticleInspections:
+                rowsToSave
             };
 
             $.ajax({
-                url: "/FirstArticleInspection/SaveInspection",
-                type: "POST",
-                data: data,
-                success: function (res) {
+
+                url:"/FirstArticleInspection/SubmitInspection",
+                type:"POST",
+                contentType:"application/json",
+                data:JSON.stringify(model),
+                success:function(res){
 
                     if(res.success)
-                        alert("Row Saved Successfully");
-                    else
-                        alert("Save Failed");
+                    {
+
+                        rowsToSave.forEach(function(x){
+
+                            let row =
+                            $(".data-row[data-contentid='"+x.ContentId+"']");
+                            row.find(".criteria-area").fadeOut(500);
+                            row.find(".control-area").fadeOut(500);
+                            row.find(".action-area").fadeOut(500);
+                        });
+                    }
+
+                },
+
+                error:function(xhr){
+                    console.log(xhr.responseText);
+                    alert("Error while saving");
                 }
             });
         }
+
 
         function submitData() {
 

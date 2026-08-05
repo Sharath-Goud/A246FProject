@@ -423,10 +423,6 @@
                         CTP Parameter Report
                     </div>
 
-                    <div class="dd-item" onclick="go('/GlueWeighingReport/Index')">
-                        Glue Weighing Report
-                    </div>
-
                     <div class="dd-item" onclick="go('/SOPPORReport/Index')">
                         SOP/POR Report
                     </div>
@@ -591,20 +587,16 @@
 
         function toggleMenu(menuId, btn) {
 
-            // close other dropdowns
             document.querySelectorAll('.dropdown').forEach(x => {
                 if (x.id !== menuId) x.classList.remove('open');
             });
 
-            // remove active state from other buttons
             document.querySelectorAll('.nav-btn').forEach(x => {
                 if (x !== btn) x.classList.remove('open');
             });
 
-            // toggle selected menu
             document.getElementById(menuId).classList.toggle('open');
 
-            // toggle active button
             btn.classList.toggle('open');
         }
 

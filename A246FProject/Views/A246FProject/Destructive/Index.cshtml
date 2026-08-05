@@ -300,7 +300,7 @@
                 <div class="form-row">
 
                     <div class="form-group">
-                        <label>LINE</label>
+                        <label>Line</label>
                         <select asp-for="LineId"
                                 id="LineId"
                                 asp-items="@(new SelectList(Model.Lines,
@@ -311,7 +311,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>PROJECT</label>
+                        <label>Project</label>
                         <select asp-for="ProjectId"
                                 id="ProjectId"
                                 asp-items="@(new SelectList(Model.Projects,
@@ -322,7 +322,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>MODEL</label>
+                        <label>Model</label>
                         <select asp-for="ModelId"
                                 id="ModelId"
                                 asp-items="@(new SelectList(Model.ModelNos,
@@ -339,7 +339,7 @@
                 <div class="form-row">
 
                     <div class="form-group">
-                        <label>PART</label>
+                        <label>Part</label>
                         <select asp-for="PartId"
                                 id="PartId"
                                 asp-items="@(new SelectList(Model.PartNos,
@@ -350,7 +350,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>MACHINE</label>
+                        <label>Machine</label>
                         <select asp-for="MachineId"
                                 id="MachineId"
                                 asp-items="@(new SelectList(Model.Machines,
@@ -361,7 +361,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>LINE LEADER</label>
+                        <label>Production Line Leader</label>
                         <input asp-for="ProdLineLeader"
                                id="ProdLineLeader"
                                type="text"
@@ -375,14 +375,14 @@
                 <div class="form-row">
 
                     <div class="form-group">
-                        <label>CHECKED BY</label>
+                        <label>Checked By</label>
                         <input asp-for="CheckedBy"
                                id="CheckedBy"
                                type="text" />
                     </div>
 
                     <div class="form-group">
-                        <label>APPROVED BY</label>
+                        <label>Approved By</label>
                         <input asp-for="ApprovedBy"
                                id="ApprovedBy"
                                type="text" />

@@ -103,9 +103,9 @@ namespace A246FProject.Controllers.A246FProject
 
                 dt.Rows.Add(
                     1,
-                    RiskId,
-                    GoodSample,
-                    FailSample,
+                    Convert.ToInt32(RiskId),
+                    GoodSample?.Trim().ToUpper(),
+                    FailSample?.Trim().ToUpper(),
                     DBNull.Value
                 );
 
@@ -145,8 +145,8 @@ namespace A246FProject.Controllers.A246FProject
                     dt.Rows.Add(
                         uid,
                         r.RiskId,
-                        r.GoodSample,
-                        r.FailSample,
+                        r.GoodSample?.Trim().ToUpper(),
+                        r.FailSample?.Trim().ToUpper(),
                         DBNull.Value
                     );
                     uid++;
@@ -165,27 +165,6 @@ namespace A246FProject.Controllers.A246FProject
             {
                 return Json("Error: " + ex.Message);
             }
-        }
-
-        // Private helper — not a separate endpoint, just shared logic used inline
-        private string SaveUploadedFile(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return "";
-
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string fileName = DateTime.Now.ToString("yyyyMMddHHmmssfff") + Path.GetExtension(file.FileName);
-            string filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                file.CopyTo(stream);
-            }
-
-            return "/Images/" + fileName;
         }
     }
 }

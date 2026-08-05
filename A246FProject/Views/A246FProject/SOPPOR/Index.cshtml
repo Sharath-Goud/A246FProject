@@ -257,7 +257,7 @@
         <div class="form-card">
 
             <div class="form-card-header">
-                SOP/POR
+                SOP/POR checklist
             </div>
 
             <div class="form-body">
@@ -700,16 +700,8 @@
         function SaveSingleRow(btn, index) {
             if (!validateHeader()) return;
 
-            var riskId = $("input[name='SOPPORResults[" + index + "].RiskId']").val();
-            var statusId = $("select[name='SOPPORResults[" + index + "].StatusId']").val();
-            var idNumber = $("input[name='SOPPORResults[" + index + "].IdNumber']").val();
-
-            if ((!statusId || statusId === "") && idNumber === "") {
-                alert("Please enter data");
-                return;
-            }
-
             var formData = new FormData();
+
             formData.append("LineId", $("#LineId").val());
             formData.append("ProjectId", $("#ProjectId").val());
             formData.append("ModelId", $("#ModelId").val());
@@ -717,28 +709,96 @@
             formData.append("ProdLineLeader", $("#ProdLineLeader").val());
             formData.append("CheckedBy", $("#CheckedBy").val());
             formData.append("ApprovedBy", $("#ApprovedBy").val());
-            formData.append("RiskId", riskId);
-            formData.append("StatusId", statusId || 0);
-            formData.append("IdNumber", idNumber);
 
-            var fileInput = document.getElementById("FileUpload1-" + index);
-            if (fileInput && fileInput.files.length > 0) {
-                formData.append("ImageFile", fileInput.files[0]);
+            var count = 0;
+            var savedRows = [];
+
+            $("input[name$='.RiskId']").each(function (index) {
+
+                var riskId =
+                    $("input[name='SOPPORResults[" + index + "].RiskId']").val();
+
+                var statusId =
+                    $("select[name='SOPPORResults[" + index + "].StatusId']").val();
+
+                var idNumber =
+                    $("input[name='SOPPORResults[" + index + "].IdNumber']").val();
+
+                var fileInput =
+                    document.getElementById("FileUpload1-" + index);
+
+
+                if ((statusId && statusId !== "") || idNumber !== "") {
+                    savedRows.push(index);
+                    formData.append(
+                        "SOPPORResults[" + count + "].RiskId",
+                        riskId
+                    );
+
+                    formData.append(
+                        "SOPPORResults[" + count + "].StatusId",
+                        statusId
+                    );
+
+                    formData.append(
+                        "SOPPORResults[" + count + "].IdNumber",
+                        idNumber
+                    );
+
+                    if(fileInput && fileInput.files.length > 0)
+                    {
+                        formData.append(
+                            "SOPPORResults[" + count + "].ImageFile",
+                            fileInput.files[0]
+                        );
+                    }
+                    count++;
+                }
+            });
+
+            if(count == 0)
+            {
+                alert("Please enter data before saving");
+                return;
             }
 
             $.ajax({
-                url: '/SOPPOR/SaveSingleSOPPOR',
-                type: 'POST',
-                contentType: false,
-                processData: false,
-                data: formData,
-                success: function (res) {
-                    alert(res);
-                    $(btn).prop("disabled", true)
-                        .text("Saved")
-                        .css({ "background": "#28a745", "opacity": "0.7" });
+
+                url:'/SOPPOR/SaveBulkSOPPOR',
+                type:'POST',
+                contentType:false,
+                processData:false,
+                data:formData,
+                success:function(res){
+
+                    if(res.includes("Saved"))
+                    {
+
+                        $("input[name$='.RiskId']").each(function(){
+
+                            var row = $(this).closest("tr");
+
+                            var status =
+                            row.find("select[name$='.StatusId']").val();
+
+                            var idNumber =
+                            row.find("input[name$='.IdNumber']").val();
+
+                            if(status !== "" || idNumber !== "")
+                            {
+                                row.fadeOut(500,function(){
+                                    $(this).remove();
+                                });
+                            }
+                        });
+                    }
+                    else
+                    {
+                        alert(res);
+                    }
                 },
-                error: function (xhr) {
+
+                error:function(xhr){
                     console.log(xhr.responseText);
                     alert("Save Failed");
                 }
