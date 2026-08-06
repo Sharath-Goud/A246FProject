@@ -577,9 +577,9 @@
                             }
 
                             html += `
-                                <tr>
+                                 <tr data-station="${item.stationName}">
 
-                                    <td>
+                                    <td class="station-cell">
                                         <input type="hidden" class="specId" value="${item.specId}" />
                                         ${station}
                                     </td>
@@ -620,25 +620,121 @@
             });
         }
 
-                 function saveRow(btn) {
+        function refreshStationDisplay() {
 
-            let row = $(btn).closest("tr");
+            let previousStation = "";
 
-            let data = {
+            $("#tableBody tr").each(function () {
 
-                SpecId: row.find(".specId").val(),
+                let row = $(this);
 
-                Check1: row.find(".check1").val(),
-                Check2: row.find(".check2").val(),
-                Check3: row.find(".check3").val(),
-                Check4: row.find(".check4").val(),
-                Check5: row.find(".check5").val(),
+                let stationName = row.attr("data-station");
 
-                SerialNo1: row.find(".serial1").val(),
-                SerialNo2: row.find(".serial2").val(),
-                SerialNo3: row.find(".serial3").val(),
-                SerialNo4: row.find(".serial4").val(),
-                SerialNo5: row.find(".serial5").val(),
+                // First clear the displayed station
+                row.find(".station-cell")
+                   .contents()
+                   .filter(function () {
+                       return this.nodeType === 3;
+                   })
+                   .remove();
+
+                // Show Station Name only for
+                // first remaining row of that station
+                if (stationName != previousStation) {
+
+                    row.find(".station-cell").append(
+                        document.createTextNode(stationName)
+                    );
+
+                    previousStation = stationName;
+                }
+            });
+        }
+
+                function saveRow(btn) {
+
+            let clickedRow = $(btn).closest("tr");
+
+            let rowsToSave = [];
+
+            // Collect all rows ABOVE the clicked row
+            // including the clicked row itself
+            $("#tableBody tr").each(function () {
+
+                let row = $(this);
+
+                rowsToSave.push({
+
+                    SpecId: row.find(".specId").val(),
+
+                    Check1: row.find(".check1").val(),
+                    Check2: row.find(".check2").val(),
+                    Check3: row.find(".check3").val(),
+                    Check4: row.find(".check4").val(),
+                    Check5: row.find(".check5").val(),
+
+                    SerialNo1: row.find(".serial1").val(),
+                    SerialNo2: row.find(".serial2").val(),
+                    SerialNo3: row.find(".serial3").val(),
+                    SerialNo4: row.find(".serial4").val(),
+                    SerialNo5: row.find(".serial5").val(),
+
+                    // Keep reference to HTML row
+                    _htmlRow: row
+                });
+
+                // Stop after clicked Save row
+                if (row[0] === clickedRow[0]) {
+                    return false;
+                }
+            });
+
+            // Remove rows where absolutely nothing was entered
+            rowsToSave = rowsToSave.filter(function (x) {
+
+                return x.Check1 != "" ||
+                       x.Check2 != "" ||
+                       x.Check3 != "" ||
+                       x.Check4 != "" ||
+                       x.Check5 != "" ||
+                       x.SerialNo1 != "" ||
+                       x.SerialNo2 != "" ||
+                       x.SerialNo3 != "" ||
+                       x.SerialNo4 != "" ||
+                       x.SerialNo5 != "";
+            });
+
+
+            if (rowsToSave.length === 0) {
+
+                alert("Please enter data before saving.");
+                return;
+            }
+
+
+            let dimensionList = rowsToSave.map(function (x) {
+
+                return {
+
+                    SpecId: x.SpecId,
+
+                    Check1: x.Check1,
+                    Check2: x.Check2,
+                    Check3: x.Check3,
+                    Check4: x.Check4,
+                    Check5: x.Check5,
+
+                    SerialNo1: x.SerialNo1,
+                    SerialNo2: x.SerialNo2,
+                    SerialNo3: x.SerialNo3,
+                    SerialNo4: x.SerialNo4,
+                    SerialNo5: x.SerialNo5
+                };
+
+            });
+
+
+            let model = {
 
                 LineId: $("#ddlLine").val(),
                 ProjectId: $("#ddlProject").val(),
@@ -654,43 +750,50 @@
                 ProdLineLeader: $("#txtLineLeader").val(),
                 CheckedBy: $("#txtCheckedBy").val(),
                 ApprovedBy: $("#txtApprovedBy").val(),
-                CreatedBy: $("#hdnCreatedBy").val()
+
+                CreatedBy: $("#hdnCreatedBy").val(),
+
+                CheckListFirstArticleDimensions: dimensionList
             };
+
 
             $.ajax({
 
-                url: "/FirstArticleDimension/SaveDimension",
+                url: "/FirstArticleDimension/SubmitDimension",
 
                 type: "POST",
 
-                data: data,
+                contentType: "application/json",
+
+                data: JSON.stringify(model),
 
                 success: function (res) {
 
                     if (res.success) {
 
-                        alert("Row Saved Successfully");
+                        alert("Data Saved Successfully");
+
+                        rowsToSave.forEach(function (x) {
+
+                            x._htmlRow.remove();
+
+                        });
+
+                        refreshStationDisplay();
 
                     }
                     else {
-
                         alert(res.message);
-
                     }
-
                 },
 
-                error: function () {
-
+                error: function (xhr) {
                     alert("Error while saving.");
-
                 }
-
             });
-
         }
 
-                function submitData() {
+         function submitData() {
 
             let list = [];
 
@@ -788,7 +891,7 @@
                     else {
 
                         alert(res.message);
-
+                        
                     }
 
                 },

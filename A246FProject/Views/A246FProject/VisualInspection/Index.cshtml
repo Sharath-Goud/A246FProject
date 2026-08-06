@@ -426,17 +426,17 @@
                         bool isFirstRow = previousStation != row["StationName"].ToString();
 
                         <tr class="inspection-row"
-                                data-sno="@row["SNo"]">
+                            data-sno="@row["SNo"]"
+                            data-station="@row["StationName"]">
 
                                 <input type="hidden" class="dataid" value="@row["DataId"]" />
                             <td>
                                 @row["SNo"]
                             </td>
 
-                            <!-- Station Name -->
                             @if (isFirstRow)
                             {
-                                <td class="station-first">
+                                <td class="station-cell">
                                     @row["StationName"]
                                 </td>
 
@@ -444,7 +444,7 @@
                             }
                             else
                             {
-                                <td class="station-continue"></td>
+                                <td class="station-cell"></td>
                             }
 
                             <td>@row["InpectionProject"]</td>
@@ -596,39 +596,166 @@
 
         });
 
-         $(document).on("click", ".btn-save-row", function () {
+        function refreshStationDisplay() {
 
-            var row = $(this).closest("tr");
+            let previousStation = "";
 
-            var model = {
-                VisualInspectionResults: [{
-                    DataId: row.find(".dataid").val(),
-                    Section1: row.find(".result").val(),
-                    DefectiveNumber: row.find(".defective").val()
-                }],
-                LineId: $("#LineId").val(),
-                ProjectId: $("#ProjectId").val(),
-                ModelId: $("#ModelId").val(),
-                PartId: $("#PartId").val(),
+            $(".inspection-row").each(function () {
+
+                let row = $(this);
+
+                let stationName = row.attr("data-station");
+
+                // Clear existing displayed station
+                row.find(".station-cell").text("");
+
+                // Display station only on first
+                // remaining row of that station
+                if (stationName != previousStation) {
+
+                    row.find(".station-cell").text(stationName);
+
+                    previousStation = stationName;
+                }
+            });
+        }
+
+        $(document).on("click", ".btn-save-row", function () {
+
+            let clickedRow = $(this).closest("tr");
+
+            let rowsToSave = [];
+
+            $(".inspection-row").each(function () {
+
+                let row = $(this);
+
+                let dataId = row.find(".dataid").val();
+                let result = row.find(".result").val();
+                let defective = row.find(".defective").val();
+
+                // Only rows having a Result will be saved
+                if (dataId && result !== "") {
+
+                    rowsToSave.push({
+
+                        DataId: parseInt(dataId) || 0,
+
+                        Section1: result,
+
+                        DefectiveNumber: defective || "0",
+
+                        // Keep HTML row reference
+                        _htmlRow: row
+                    });
+                }
+
+                // Stop only after reaching clicked row
+                if (row[0] === clickedRow[0]) {
+                    return false;
+                }
+
+            });
+
+            if (rowsToSave.length === 0) {
+
+                alert("Please enter inspection result before saving.");
+                return;
+            }
+
+            let inspectionList = rowsToSave.map(function (x) {
+
+                return {
+
+                    DataId: x.DataId,
+
+                    Section1: x.Section1,
+
+                    DefectiveNumber: x.DefectiveNumber
+                };
+
+            });
+
+            let model = {
+
+                VisualInspectionResults: inspectionList,
+
+                LineId: parseInt($("#LineId").val()) || 0,
+
+                ProjectId: parseInt($("#ProjectId").val()) || 0,
+
+                ModelId: parseInt($("#ModelId").val()) || 0,
+
+                PartId: parseInt($("#PartId").val()) || 0,
+
                 VisualsId: parseInt($("#VisualsId").val()) || 0,
+
                 Model: $("#ModelId option:selected").text(),
+
                 ProdLineLeader: $("#txtLineLeader").val(),
+
                 CheckedBy: $("#txtCheckedBy").val(),
+
                 ApprovedBy: $("#txtApprovedBy").val()
             };
 
             $.ajax({
-                url: '/VisualInspection/SaveSingle',
+
+                url: '/VisualInspection/Submit',
+
                 type: 'POST',
+
                 contentType: 'application/json',
+
                 data: JSON.stringify(model),
+
                 success: function (res) {
-                    alert("Row Saved successfully");
+
+                    if (res.success) {
+
+                        alert("Data Saved Successfully");
+
+                        rowsToSave.forEach(function (x) {
+
+                            x._htmlRow.remove();
+
+                        });
+
+                        refreshStationDisplay();
+
+                        if ($(".inspection-row").length === 0) {
+
+                            $(".table-custom tbody").html(`
+                                <tr>
+                                    <td colspan="8" class="empty">
+                                        No records found.
+                                    </td>
+                                </tr>
+                            `);
+                        }
+
+                    }
+                    else {
+
+                        alert(res.message);
+
+                    }
+
+                },
+
+                error: function (xhr) {
+
+                    console.log(xhr.responseText);
+
+                    alert("Server Error while saving.");
+
                 }
+
             });
+
         });
 
-                function submitData() {
+         function submitData() {
 
             var list = [];
 
@@ -694,7 +821,6 @@
                     }
                 },
                 error: function (xhr) {
-                    console.log(xhr.responseText);
                     alert("Server Error");
                 }
             });

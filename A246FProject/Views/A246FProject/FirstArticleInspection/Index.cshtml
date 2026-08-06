@@ -516,6 +516,50 @@
             });
         }
 
+        function refreshStationAndItemDisplay() {
+
+            let previousStation = "";
+            let previousItem = "";
+
+            $(".data-row").each(function () {
+
+                let row = $(this);
+
+                let group = row.attr("data-group");
+
+                if (!group)
+                    return;
+
+                let parts = group.split("_");
+
+                let stationName = parts[0];
+                let itemName = parts.slice(1).join("_");
+
+                // Clear old displayed values first
+                row.find(".station").html("");
+                row.find(".item").html("");
+
+                // Show Station only on first remaining row of station
+                if (stationName != previousStation) {
+
+                    row.find(".station").html(stationName);
+
+                    previousStation = stationName;
+
+                    // New station means item must start again
+                    previousItem = "";
+                }
+
+                // Show Inspection Item only on first remaining row of item
+                if (itemName != previousItem) {
+
+                    row.find(".item").html(itemName);
+
+                    previousItem = itemName;
+                }
+            });
+        }
+
         function saveRow(btn) {
 
             let rowsToSave = [];
@@ -591,18 +635,23 @@
                 data:JSON.stringify(model),
                 success:function(res){
 
-                    if(res.success)
-                    {
+                if(res.success)
+                {
+                    rowsToSave.forEach(function(x){
 
-                        rowsToSave.forEach(function(x){
-
-                            let row =
+                        let row =
                             $(".data-row[data-contentid='"+x.ContentId+"']");
-                            row.find(".criteria-area").fadeOut(500);
-                            row.find(".control-area").fadeOut(500);
-                            row.find(".action-area").fadeOut(500);
+
+                            row.fadeOut(300, function () {
+
+                            $(this).remove();
+
+                            refreshStationAndItemDisplay();
+
                         });
-                    }
+
+                    });
+                }
 
                 },
 
