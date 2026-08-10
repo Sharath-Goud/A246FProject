@@ -65,7 +65,6 @@
         label {
             font-size: 11px;
             color: rgba(255,255,255,.45);
-            text-transform: uppercase;
             margin-bottom: 6px;
         }
 
@@ -543,45 +542,218 @@
             });
         });
     </script>
+    
     <script>
-                $(".btnRowSave").click(function () {
+                $(document).on("click", ".btnRowSave", function () {
 
-            var row = $(this).closest("tr");
+            // Get the row whose Save button was clicked
+            let clickedRow = $(this).closest("tr");
 
-            var data = {
-                LineId: $("#LineId").val(),
-                ProjectId: $("#ProjectId").val(),
-                ModelId: $("#ModelId").val(),
-                PartId: $("#PartId").val(),
-                MachineId: $("#MachineId").val(),
+            let rowsToSave = [];
 
-                ProdLineLeader: $("#ProdLineLeader").val(),
-                CheckedBy: $("#CheckedBy").val(),
-                ApprovedBy: $("#ApprovedBy").val(),
+            // Start from first remaining row
+            // and continue only until clicked row
+            $("#body tr.row").each(function () {
 
-                WireCombMoldingResults: [{
-                    SectionId: row.find(".SectionId").val(),
-                    Value1: row.find(".Value1").val(),
-                    Value2: row.find(".Value2").val(),
-                    Value3: row.find(".Value3").val(),
-                    Value4: row.find(".Value4").val(),
-                    Value5: row.find(".Value5").val(),
-                    CablesSerialNumber: row.find(".CableSerialNo").val()
-                }]
+                let row = $(this);
+
+                let sectionId = row.find(".SectionId").val();
+
+                let value1 = $.trim(row.find(".Value1").val());
+                let value2 = $.trim(row.find(".Value2").val());
+                let value3 = $.trim(row.find(".Value3").val());
+                let value4 = $.trim(row.find(".Value4").val());
+                let value5 = $.trim(row.find(".Value5").val());
+
+                let cableSerialNo =
+                    $.trim(row.find(".CableSerialNo").val());
+
+
+                // Check whether current row contains any entered data
+                let hasValue =
+                    value1 !== "" ||
+                    value2 !== "" ||
+                    value3 !== "" ||
+                    value4 !== "" ||
+                    value5 !== "" ||
+                    cableSerialNo !== "";
+
+
+                // Add ONLY rows having entered data
+                if (sectionId && hasValue) {
+
+                    rowsToSave.push({
+
+                        SectionId: parseInt(sectionId) || 0,
+
+                        Value1: value1 === "" ? null : value1,
+
+                        Value2: value2 === "" ? null : value2,
+
+                        Value3: value3 === "" ? null : value3,
+
+                        Value4: value4 === "" ? null : value4,
+
+                        Value5: value5 === "" ? null : value5,
+
+                        CablesSerialNumber:
+                            cableSerialNo === ""
+                                ? null
+                                : cableSerialNo,
+
+                        // Keep HTML row reference
+                        // so only successfully saved rows are removed
+                        _htmlRow: row
+                    });
+                }
+
+
+                // Stop once we reach the clicked Save row
+                if (row[0] === clickedRow[0]) {
+
+                    return false;
+                }
+
+            });
+
+
+            // Nothing entered
+            if (rowsToSave.length === 0) {
+
+                alert("Please enter at least one value before saving.");
+
+                return;
+            }
+
+
+            // Prepare clean result list
+            // Do not send _htmlRow to controller
+            let resultList = rowsToSave.map(function (x) {
+
+                return {
+
+                    SectionId: x.SectionId,
+
+                    Value1: x.Value1,
+
+                    Value2: x.Value2,
+
+                    Value3: x.Value3,
+
+                    Value4: x.Value4,
+
+                    Value5: x.Value5,
+
+                    CablesSerialNumber: x.CablesSerialNumber
+
+                };
+
+            });
+
+
+            // Prepare complete ViewModel
+            let data = {
+
+                LineId:
+                    parseInt($("#LineId").val()) || 0,
+
+                ProjectId:
+                    parseInt($("#ProjectId").val()) || 0,
+
+                ModelId:
+                    parseInt($("#ModelId").val()) || 0,
+
+                PartId:
+                    parseInt($("#PartId").val()) || 0,
+
+                MachineId:
+                    parseInt($("#MachineId").val()) || 0,
+
+
+                ProdLineLeader:
+                    $("#ProdLineLeader").val(),
+
+                CheckedBy:
+                    $("#CheckedBy").val(),
+
+                ApprovedBy:
+                    $("#ApprovedBy").val(),
+
+
+                WireCombMoldingResults: resultList
             };
 
+
+            console.log(data);
+
+
             $.ajax({
+
                 url: '/WireCombMolding/SaveA246FWCMMCCheckList',
+
                 type: 'POST',
-                contentType: "application/json; charset=utf-8",
+
+                contentType: 'application/json; charset=utf-8',
+
                 data: JSON.stringify(data),
-                success: function () {
-                    alert("Saved Successfully");
+
+
+                success: function (response) {
+
+                    // In case controller returns success = false
+                    if (response &&
+                        response.success !== undefined &&
+                        response.success === false) {
+
+                        alert(
+                            response.message ||
+                            "Error while saving."
+                        );
+
+                        return;
+                    }
+
+
+                    alert("Data Saved Successfully");
+
+
+                    // Remove ONLY successfully saved rows
+                    rowsToSave.forEach(function (x) {
+
+                        x._htmlRow.remove();
+
+                    });
+
+
+                    // If all rows have now been saved/removed
+                    if ($("#body tr.row").length === 0) {
+
+                        $("#body").html(`
+                            <tr>
+                                <td colspan="12"
+                                    class="empty-row">
+                                    No records found.
+                                </td>
+                            </tr>
+                        `);
+
+                    }
+
+                },
+
+
+                error: function (xhr) {
+
+                    console.log(xhr.responseText);
+
+                    alert("Server Error while saving.");
+
                 }
+
             });
+
         });
-    </script>
-    <script>
+
         $(document).on("click", ".btn-submit", function (e) {
 
             e.preventDefault();

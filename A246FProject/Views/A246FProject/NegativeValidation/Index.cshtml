@@ -673,8 +673,6 @@
 
                 error: function (xhr) {
 
-                    console.log(xhr.responseText);
-
                     alert("Save Failed");
 
                 }
@@ -718,10 +716,6 @@
             formData.append("GoodSample", goodSample);
             formData.append("FailSample", failSample);
 
-            console.log("RiskId :", riskId);
-console.log("GoodSample :", goodSample);
-console.log("FailSample :", failSample);
-
         alert(
             "RiskId = " + riskId +
             "\nGoodSample = " + goodSample +
@@ -755,8 +749,6 @@ console.log("FailSample :", failSample);
                 },
 
                 error: function (xhr) {
-
-                    console.log(xhr.responseText);
 
                     alert("Save Failed");
 

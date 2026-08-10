@@ -575,51 +575,148 @@
 
     </script>
     <script>
-                $(document).on("click", ".btnRowSave", function () {
+        $(document).on("click", ".btnRowSave", function () {
 
-            var row = $(this).closest("tr");
+            // Save button clicked row
+            let clickedRow = $(this).closest("tr");
 
-            var data = {
-                lineId: $("#LineId").val(),
-                projectId: $("#ProjectId").val(),
-                modelId: $("#ModelId").val(),
-                partId: $("#PartId").val(),
-                machineId: $("#MachineId").val(),
+            let rowsToSave = [];
+
+            // Read rows from top until clicked row
+            $("tbody tr").each(function () {
+
+                let row = $(this);
+
+                let sectionId = row.find(".SectionId").val();
+
+                let value1 = $.trim(row.find(".value1").val());
+
+                // Save only rows having a value
+                if (sectionId && value1 !== "") {
+
+                    rowsToSave.push({
+
+                        sectionId: parseInt(sectionId) || 0,
+
+                        value1: parseFloat(value1) || 0,
+
+                        inspectionResults: "",
+
+                        // Keep HTML row reference
+                        _htmlRow: row
+
+                    });
+
+                }
+
+                // Stop at clicked row
+                if (row[0] === clickedRow[0]) {
+                    return false;
+                }
+
+            });
+
+            if (rowsToSave.length === 0) {
+
+                alert("Please enter at least one value before saving.");
+
+                return;
+            }
+
+            // Remove _htmlRow before sending
+            let resultList = rowsToSave.map(function (x) {
+
+                return {
+
+                    sectionId: x.sectionId,
+
+                    value1: x.value1,
+
+                    inspectionResults: x.inspectionResults
+
+                };
+
+            });
+
+            let data = {
+
+                lineId: parseInt($("#LineId").val()) || 0,
+
+                projectId: parseInt($("#ProjectId").val()) || 0,
+
+                modelId: parseInt($("#ModelId").val()) || 0,
+
+                partId: parseInt($("#PartId").val()) || 0,
+
+                machineId: parseInt($("#MachineId").val()) || 0,
 
                 prodLineLeader: $("#ProdLineLeader").val(),
+
                 checkedBy: $("#CheckedBy").val(),
+
                 approvedBy: $("#ApprovedBy").val(),
 
-                a246FMHB2CheckListResults: [
-                    {
-                        sectionId: parseInt(row.find(".SectionId").val()),
-                        value1: row.find(".value1").val() || 0,
-                        inspectionResults: ""
-                    }
-                ]
+                a246FMHB2CheckListResults: resultList
+
             };
 
             $.ajax({
+
                 url: '/Destructive/SaveA246FMHB2CheckList',
+
                 type: 'POST',
+
                 contentType: 'application/json',
+
                 data: JSON.stringify(data),
 
                 success: function (response) {
-                    if (response > 0) {
-                        alert("✔ Row inserted successfully!");
-                    } else {
-                        alert("❌ Row insert failed!");
+
+                    if (response > 0 || response.success === true) {
+
+                        alert("Data Saved Successfully");
+
+                        // Remove only saved rows
+                        rowsToSave.forEach(function (x) {
+
+                            x._htmlRow.remove();
+
+                        });
+
+                        // If all rows removed
+                        if ($("tbody tr").length === 0) {
+
+                            $("tbody").html(`
+                                <tr>
+                                    <td colspan="7" class="empty-row">
+                                        No records found.
+                                    </td>
+                                </tr>
+                            `);
+
+                        }
+
                     }
+                    else {
+
+                        alert("Save failed.");
+
+                    }
+
                 },
 
                 error: function () {
-                    alert("⚠ Error while saving row!");
+
+                    alert("Error while saving.");
+
                 }
+
             });
+
         });
 
-                        $("#btnSubmit").click(function () {
+
+        $("#btnSubmit").click(function () {
 
             var results = [];
 

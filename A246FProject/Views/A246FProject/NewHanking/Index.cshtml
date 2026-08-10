@@ -66,7 +66,6 @@
         label {
             font-size: 11px;
             color: #8d95c7;
-            text-transform: uppercase;
             letter-spacing: .5px;
             font-weight: 500;
             margin-bottom: 8px;
@@ -516,24 +515,112 @@
         });
     }
 
-    $(document).on("click", ".row-save-btn", function () {
-        var btn = $(this);
-    btn.prop("disabled", true);
-        var $row = $(this).closest("tr");
-        var item = buildItemFromRow($row);
+            $(document).on("click", ".row-save-btn", function () {
 
-        submitItems([item])
-            .done(function (res) {
-                if (res.success) {
-                    alert("Row saved.");
-                } else {
-                    alert("Save failed: " + res.message);
+            let clickedRow = $(this).closest("tr");
+
+            let rowsToSave = [];
+
+            $(".custom-table tbody tr[data-section-id]").each(function () {
+
+                let row = $(this);
+
+                let value1 = $.trim(row.find(".val-input[data-slot='1']").val());
+                let value2 = $.trim(row.find(".val-input[data-slot='2']").val());
+                let value3 = $.trim(row.find(".val-input[data-slot='3']").val());
+                let value4 = $.trim(row.find(".val-input[data-slot='4']").val());
+                let value5 = $.trim(row.find(".val-input[data-slot='5']").val());
+
+                let hasValue =
+                    value1 !== "" ||
+                    value2 !== "" ||
+                    value3 !== "" ||
+                    value4 !== "" ||
+                    value5 !== "";
+
+                if (hasValue) {
+
+                    let item = buildItemFromRow(row);
+
+                    item._htmlRow = row;
+
+                    rowsToSave.push(item);
+
                 }
-            })
-            .fail(function (xhr) {
-                alert("Save error.");
+
+                // Stop after clicked row
+                if (row[0] === clickedRow[0]) {
+                    return false;
+                }
+
             });
-    });
+
+            if (rowsToSave.length === 0) {
+
+                alert("Please enter at least one value before saving.");
+
+                return;
+
+            }
+
+            let items = rowsToSave.map(function (x) {
+
+                return {
+
+                    sectionId: x.sectionId,
+
+                    value1: x.value1,
+                    value2: x.value2,
+                    value3: x.value3,
+                    value4: x.value4,
+                    value5: x.value5
+
+                };
+
+            });
+
+            submitItems(items)
+
+                .done(function (res) {
+
+                    if (res.success) {
+
+                        alert("Rows Saved Successfully");
+
+                        rowsToSave.forEach(function (x) {
+
+                            x._htmlRow.remove();
+
+                        });
+
+                        if ($(".custom-table tbody tr[data-section-id]").length === 0) {
+
+                            $(".custom-table tbody").html(`
+                                <tr>
+                                    <td colspan="11" class="empty-row">
+                                        No records found.
+                                    </td>
+                                </tr>
+                            `);
+
+                        }
+
+                    }
+                    else {
+
+                        alert(res.message);
+
+                    }
+
+                })
+
+                .fail(function () {
+
+                    alert("Save Error");
+
+                });
+
+        });
 
     $(".btn-submit").on("click", function (e) {
         e.preventDefault();
