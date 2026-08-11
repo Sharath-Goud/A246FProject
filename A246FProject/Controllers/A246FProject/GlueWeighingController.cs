@@ -56,9 +56,12 @@ namespace A246FProject.Controllers.A246FProject
         }
 
         [HttpPost]
-        public IActionResult GetGlueWeighingData(GlueWeighingViewModel model)
+        public IActionResult GetGlueWeighingData(
+            GlueWeighingViewModel model)
         {
+
             model.Lines = _master.GetLine();
+
             model.Projects = _master.GetProject();
 
             model.ModelNos = model.ProjectId > 0
@@ -72,6 +75,27 @@ namespace A246FProject.Controllers.A246FProject
             model.Adhesives = model.ProjectId > 0
                 ? _master.GetAdhesive(model.ProjectId)
                 : new List<Adhesive>();
+
+            if (model.LineId <= 0 ||
+               model.ProjectId <= 0 ||
+               model.ModelId <= 0 ||
+               model.PartId <= 0 ||
+               model.AdhesiveId <= 0 ||
+               string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+               string.IsNullOrWhiteSpace(model.CheckedBy) ||
+               string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
+
+                ViewBag.Message =
+                "Please enter Production Line Leader, Checked By and Approved By";
+
+                model.dtChecklist = null;
+
+                return View(
+                "~/Views/A246FProject/GlueWeighing/Index.cshtml",
+                model);
+
+            }
 
             model.dtChecklist =
                 _master.GetFormByA246FAdhesive(

@@ -28,19 +28,48 @@ namespace A246FProject.Controllers.A246FProject
         [HttpPost]
         public IActionResult Index(ShellCrimpViewModel model)
         {
+
             model.Lines = _bal.GetLine();
+
             model.Projects = _bal.GetProject();
+
             model.ModelNos = _bal.GetModelNo();
+
             model.Machines = _bal.GetMachines();
 
             model.PartNos = model.ModelId > 0
                 ? _bal.GetPartNoByModel(model.ModelId)
                 : new List<PartNo>();
 
-            model.dtChecklist =
-                _bal.GetShellCrimpData(model.ProjectId, model.LineId, model.MachineId);
+            if (model.LineId <= 0 ||
+                model.ProjectId <= 0 ||
+                model.ModelId <= 0 ||
+                model.PartId <= 0 ||
+                model.MachineId <= 0 ||
+                string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+                string.IsNullOrWhiteSpace(model.CheckedBy) ||
+                string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
 
-            return View("~/Views/A246FProject/ShellCrimp/Index.cshtml", model);
+                ViewBag.Message =
+                "Please enter Production Line Leader, Checked By and Approved By before Search.";
+
+                model.dtChecklist = new DataTable();
+
+                return View(
+                    "~/Views/A246FProject/ShellCrimp/Index.cshtml",
+                    model);
+            }
+
+            model.dtChecklist =
+                _bal.GetShellCrimpData(
+                    model.ProjectId,
+                    model.LineId,
+                    model.MachineId);
+
+            return View(
+                "~/Views/A246FProject/ShellCrimp/Index.cshtml",
+                model);
         }
 
         [HttpPost]

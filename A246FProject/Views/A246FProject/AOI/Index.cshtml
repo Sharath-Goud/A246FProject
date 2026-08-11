@@ -373,6 +373,23 @@
 
     </form>
 
+    @if (ViewBag.Message != null)
+    {
+        <div id="validationMessage"
+             style="
+         background:#dc3545;
+         color:white;
+         padding:10px 15px;
+         border-radius:8px;
+         margin:10px 0;
+         font-size:13px;
+         font-weight:500;">
+
+            @ViewBag.Message
+
+        </div>
+    }
+
     <div class="results-table">
 
         <div class="table-scroll">
@@ -671,8 +688,6 @@
 
                 error: function (xhr) {
 
-                    console.log(xhr.responseText);
-
                     alert("Server Error while saving.");
 
                 }
@@ -744,11 +759,7 @@
 
                 success: function (response) {
 
-                    console.log(response);
-
                     if (response.success === true) {
-
-                        alert(response.message);
 
                         $(".Value1").val("");
                         $(".Value2").val("");
@@ -766,8 +777,6 @@
                 },
 
                 error: function (xhr) {
-
-                    console.log(xhr);
 
                     alert("Save Failed");
 

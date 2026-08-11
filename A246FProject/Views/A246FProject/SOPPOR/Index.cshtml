@@ -377,6 +377,20 @@
 
         </div>
 
+        @if (ViewBag.Message != null)
+        {
+            <div style="
+                background:#dc3545;
+                color:white;
+                padding:10px;
+                border-radius:8px;
+                margin:10px 0;">
+
+                @ViewBag.Message
+
+            </div>
+        }
+
         <div class="results-table">
 
             <table class="custom-table">
@@ -690,7 +704,6 @@
                     location.reload();
                 },
                 error: function (xhr) {
-                    console.log(xhr.responseText);
                     alert("Save Failed");
                 }
             });
@@ -799,7 +812,6 @@
                 },
 
                 error:function(xhr){
-                    console.log(xhr.responseText);
                     alert("Save Failed");
                 }
             });

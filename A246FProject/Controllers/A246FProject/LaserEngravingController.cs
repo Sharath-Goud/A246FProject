@@ -34,19 +34,54 @@ namespace A246FProject.Controllers.A246FProject
         [HttpPost]
         public IActionResult Index(LaserEngravingViewModel model)
         {
+
             model.Lines = _bal.GetLine();
+
             model.Projects = _bal.GetProject();
+
             model.ModelNos = _bal.GetModelNo();
+
             model.Machines = _bal.GetMachines();
 
             if (model.ModelId > 0)
-                model.PartNos = _bal.GetPartNoByModel(model.ModelId);
+            {
+                model.PartNos =
+                    _bal.GetPartNoByModel(model.ModelId);
+            }
             else
-                model.PartNos = new List<PartNo>();
+            {
+                model.PartNos =
+                    new List<PartNo>();
+            }
 
-            model.dtChecklist = _bal.GetChecklist(model.LineId, model.ProjectId);
+            if (model.LineId <= 0 ||
+                model.ProjectId <= 0 ||
+                model.ModelId <= 0 ||
+                model.PartId <= 0 ||
+                model.MachineId <= 0 ||
+                string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+                string.IsNullOrWhiteSpace(model.CheckedBy) ||
+                string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
 
-            return View("~/Views/A246FProject/LaserEngraving/Index.cshtml", model);
+                ViewBag.Message =
+                "Please enter Production Line Leader, Checked By and Approved By before Search.";
+
+                model.dtChecklist = new DataTable();
+
+                return View(
+                "~/Views/A246FProject/LaserEngraving/Index.cshtml",
+                model);
+            }
+
+            model.dtChecklist =
+                _bal.GetChecklist(
+                    model.LineId,
+                    model.ProjectId);
+
+            return View(
+            "~/Views/A246FProject/LaserEngraving/Index.cshtml",
+            model);
         }
 
         [HttpPost]

@@ -45,7 +45,17 @@ namespace A246FProject.Controllers.A246FProject
         [HttpPost]
         public JsonResult GetInspectionData(int lineId, int projectId)
         {
-            var data = _bal.GetInspectionData(lineId, projectId);
+
+            if (lineId <= 0 || projectId <= 0)
+            {
+                return Json(new List<object>());
+            }
+
+            var data =
+                _bal.GetInspectionData(
+                    lineId,
+                    projectId);
+
             return Json(data);
         }
 

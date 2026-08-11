@@ -431,6 +431,20 @@
 
             </div>
 
+            @if (ViewBag.Message != null)
+            {
+                <div style="
+                    background:#dc3545;
+                    color:white;
+                    padding:10px;
+                    border-radius:8px;
+                    margin-bottom:10px;">
+
+                    @ViewBag.Message
+
+                </div>
+            }
+
             @if (Model.dtChecklist != null &&
             Model.dtChecklist.Rows.Count > 0)
             {

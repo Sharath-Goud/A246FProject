@@ -31,11 +31,15 @@ namespace A246FProject.Controllers.A246FProject
 
         [HttpPost]
         public IActionResult Index(
-            HotBarViewModel model)
+    HotBarViewModel model)
         {
+ 
             model.Lines = _bal.GetLine();
+
             model.Projects = _bal.GetProject();
+
             model.ModelNos = _bal.GetModelNo();
+
             model.Machines = _bal.GetMachines();
 
             if (model.ModelId > 0)
@@ -49,10 +53,29 @@ namespace A246FProject.Controllers.A246FProject
                     new List<PartNo>();
             }
 
+            if (model.LineId <= 0 ||
+                model.ProjectId <= 0 ||
+                model.ModelId <= 0 ||
+                model.PartId <= 0 ||
+                string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+                string.IsNullOrWhiteSpace(model.CheckedBy) ||
+                string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
+                ViewBag.Message =
+                    "Please enter Production Line Leader, Checked By and Approved By before Search.";
+
+                model.dtChecklist = new DataTable();
+
+                return View(
+                    "~/Views/A246FProject/HotBar/Index.cshtml",
+                    model);
+            }
+
             model.dtChecklist =
                 _bal.GetHotBarData(
                     model.ProjectId,
                     model.LineId);
+
 
             return View(
                 "~/Views/A246FProject/HotBar/Index.cshtml",

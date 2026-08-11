@@ -435,6 +435,16 @@
         <span>, X - NG</span>
     </div>
 
+    <div id="validationMessage"
+         style="
+     display:none;
+     background:#dc3545;
+     color:white;
+     padding:10px;
+     border-radius:8px;
+     margin:10px 0;">
+    </div>
+
     <div class="results-table" style="overflow:auto">
 
         <table class="table table-bordered table-sm" id="tblDimension" style="width:100%;white-space:nowrap;">
@@ -539,85 +549,232 @@
             });
         });
 
-         
 
-        function loadData() {
+
+                function loadData() {
+
+
+            var errors = "";
+
+
+            if ($("#ddlLine").val() == "")
+            {
+                errors += "Line<br>";
+            }
+
+
+            if ($("#ddlProject").val() == "")
+            {
+                errors += "Project<br>";
+            }
+
+
+            if ($("#ddlModel").val() == "")
+            {
+                errors += "Model<br>";
+            }
+
+
+            if ($("#ddlPart").val() == "")
+            {
+                errors += "Part<br>";
+            }
+
+
+            if ($("#txtLineLeader").val().trim() == "")
+            {
+                errors += "Production Line Leader<br>";
+            }
+
+
+            if ($("#txtCheckedBy").val().trim() == "")
+            {
+                errors += "Checked By<br>";
+            }
+
+
+            if ($("#txtApprovedBy").val().trim() == "")
+            {
+                errors += "Approved By<br>";
+            }
+
+
+            if ($("#txtWorkOrder").val().trim() == "")
+            {
+                errors += "Work Order<br>";
+            }
+
+
+            if ($("#txtDrawingVersion").val().trim() == "")
+            {
+                errors += "Drawing Version<br>";
+            }
+
+
+            if ($("#txtPackVersion").val().trim() == "")
+            {
+                errors += "Pack Version<br>";
+            }
+
+
+            if ($("#txtSamplingQty").val().trim() == "")
+            {
+                errors += "Sampling Quantity<br>";
+            }
+
+
+
+            // Validation failed
+
+            if(errors != "")
+            {
+
+                $("#validationMessage")
+                .html(
+                "<b>Please enter all details before Search.</b><br><br>"
+                + errors
+                )
+                .show();
+
+
+                $("#tableBody").html("");
+
+                return;
+            }
+
+
+
+            // Hide validation message
+
+            $("#validationMessage")
+            .hide();
+
+
+
+            // Existing AJAX call
 
             $.ajax({
+
                 url: '/FirstArticleDimension/GetDimensionData',
-                type: 'POST',
-                data: {
+
+                type:'POST',
+
+                data:
+                {
                     lineId: $("#ddlLine").val(),
+
                     projectId: $("#ddlProject").val()
                 },
-                        success: function (data) {
 
-                    let html = "";
 
-                    if (data.length === 0) {
-                        html = `
-                            <tr>
-                                <td colspan="13" style="text-align:center;">
-                                    No records found
-                                </td>
-                            </tr>`;
+                success:function(data)
+                {
+
+
+                    let html="";
+
+
+                    if(data.length==0)
+                    {
+
+                        html =
+                        `
+                        <tr>
+                        <td colspan="13"
+                        style="text-align:center;">
+                        No records found
+                        </td>
+                        </tr>
+                        `;
+
                     }
-                    else { 
 
-                        let previousStation = "";
+                    else
+                    {
 
-                        $.each(data, function (i, item) {
+                        let previousStation="";
 
-                            let station = "";
 
-                            if (previousStation != item.stationName) {
+                        $.each(data,function(i,item)
+                        {
 
-                                station = item.stationName;
-                                previousStation = item.stationName;
+                            let station="";
+
+
+                            if(previousStation != item.stationName)
+                            {
+                                station=item.stationName;
+                                previousStation=item.stationName;
                             }
 
-                            html += `
-                                 <tr data-station="${item.stationName}">
 
-                                    <td class="station-cell">
-                                        <input type="hidden" class="specId" value="${item.specId}" />
-                                        ${station}
-                                    </td>
+                            html +=
+                            `
+                            <tr data-station="${item.stationName}">
 
-                                    <td>${item.specification}</td>
+                            <td class="station-cell">
 
-                                    <td><input type="text" class="check1" /></td>
-                                    <td><input type="text" class="serial1" /></td>
+                            <input type="hidden"
+                            class="specId"
+                            value="${item.specId}" />
 
-                                    <td><input type="text" class="check2" /></td>
-                                    <td><input type="text" class="serial2" /></td>
+                            ${station}
 
-                                    <td><input type="text" class="check3" /></td>
-                                    <td><input type="text" class="serial3" /></td>
+                            </td>
 
-                                    <td><input type="text" class="check4" /></td>
-                                    <td><input type="text" class="serial4" /></td>
 
-                                    <td><input type="text" class="check5" /></td>
-                                    <td><input type="text" class="serial5" /></td>
+                            <td>${item.specification}</td>
 
-                                    <td>
-                                        <button type="button"
-                                                class="btn-search"
-                                                onclick="saveRow(this)">
-                                            Save
-                                        </button>
-                                    </td>
 
-                                </tr>
-                             `;
+                            <td><input class="check1"/></td>
+                            <td><input class="serial1"/></td>
 
-                    });
+
+                            <td><input class="check2"/></td>
+                            <td><input class="serial2"/></td>
+
+
+                            <td><input class="check3"/></td>
+                            <td><input class="serial3"/></td>
+
+
+                            <td><input class="check4"/></td>
+                            <td><input class="serial4"/></td>
+
+
+                            <td><input class="check5"/></td>
+                            <td><input class="serial5"/></td>
+
+
+                            <td>
+
+                            <button type="button"
+                            class="btn-search"
+                            onclick="saveRow(this)">
+                            Save
+                            </button>
+
+                            </td>
+
+
+                            </tr>
+                            `;
+
+
+                        });
+
+                    }
+
 
                     $("#tableBody").html(html);
-                    }
+
+
                 }
+
+
             });
+
+
         }
 
         function refreshStationDisplay() {

@@ -9,6 +9,10 @@ wwwroot\Images\20260701115218095.jpg
 wwwroot\Images\20260701115218095.PNG
 wwwroot\Images\20260701115218096.jpg
 wwwroot\Images\20260701115218096.PNG
+wwwroot\Images\20260805150219471.jpg
+wwwroot\Images\20260805151301376.jpg
+wwwroot\Images\20260805151812722.jpg
+wwwroot\Images\20260805151812729.PNG
 wwwroot\Images\foxlink_logo.PNG
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css

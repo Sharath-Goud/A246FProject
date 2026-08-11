@@ -368,7 +368,21 @@
 
     </form>
 
-    <!-- TABLE -->
+    @if (ViewBag.Message != null)
+    {
+        <div id="validationMessage" style="
+        background:#dc3545;
+        color:white;
+        padding:10px 15px;
+        border-radius:8px;
+        margin:10px 0;
+        font-size:13px;
+        font-weight:500;">
+
+            @ViewBag.Message
+
+        </div>
+    }
 
     <div class="results-table">
 
@@ -681,8 +695,6 @@
 
                 error: function (xhr) {
 
-                    console.log(xhr.responseText);
-
                     alert("Server Error while saving.");
 
                 }
@@ -724,8 +736,6 @@
                 HotBarResult: results
             };
 
-            console.log(model);
-
             $.ajax({
                 url: '/HotBar/SaveA246FMHB1CheckList',
                 type: 'POST',
@@ -733,8 +743,6 @@
                 data: JSON.stringify(model),
 
                         success: function (response) {
-
-            console.log("Response:", response);
 
             if (response.success === true) {
 

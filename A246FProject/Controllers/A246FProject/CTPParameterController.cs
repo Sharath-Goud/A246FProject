@@ -32,14 +32,16 @@ namespace A246FProject.Controllers.A246FProject
 
         [HttpPost]
         public IActionResult Index(
-            A246FCTPParameterViewModel model)
+    A246FCTPParameterViewModel model)
         {
             ViewBag.Role =
-       HttpContext.Session.GetString("Role");
+                HttpContext.Session.GetString("Role");
+
             model.Lines = _bal.GetLine();
             model.Projects = _bal.GetProject();
             model.Machines = _bal.GetMachines();
             model.ModelNos = _bal.GetModelNo();
+
             if (model.ModelId > 0)
             {
                 model.PartNos =
@@ -49,6 +51,26 @@ namespace A246FProject.Controllers.A246FProject
             {
                 model.PartNos =
                     new List<PartNo>();
+            }
+
+            if (model.LineId <= 0 ||
+                model.ProjectId <= 0 ||
+                model.ModelId <= 0 ||
+                model.PartId <= 0 ||
+                model.MachineId <= 0 ||
+                string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+                string.IsNullOrWhiteSpace(model.CheckedBy) ||
+                string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
+
+                ViewBag.Message =
+                "Please enter Production Line Leader, Checked By and Approved By";
+
+                model.dtChecklist = null;
+
+                return View(
+                    "~/Views/A246FProject/A246FCTPParameter/Index.cshtml",
+                    model);
             }
 
             model.dtChecklist =

@@ -350,6 +350,22 @@
 
         </div>
 
+        @if (ViewBag.Message != null)
+        {
+            <div style="
+        background:#dc3545;
+        color:white;
+        padding:12px 20px;
+        margin-bottom:15px;
+        border-radius:8px;
+        font-size:13px;
+        font-weight:500;">
+
+                @ViewBag.Message
+
+            </div>
+        }
+
         <div class="note-box">
             <div><strong>NOTE:-</strong></div>
             <div>Good Sample indicates good. It must be <b>OK</b>.</div>

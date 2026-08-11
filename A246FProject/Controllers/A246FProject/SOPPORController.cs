@@ -67,31 +67,65 @@ namespace A246FProject.Controllers.A246FProject
         {
             model.Lines = _commonBAL.GetLine();
             model.Projects = _commonBAL.GetProject();
-
             model.ModelNos = new List<ModelNo>();
             model.PartNos = new List<PartNo>();
-
             model.Statuses = _bal.GetResult();
 
-            model.dtChecklist =
-                _bal.GetSOPPORData(model.LineId, model.ProjectId);
+            if (model.ProjectId > 0)
+            {
+                model.ModelNos =
+                    _commonBAL.GetModelNoByProject(model.ProjectId);
+            }
 
-            return View("~/Views/A246FProject/SOPPOR/Index.cshtml", model);
+            if (model.ModelId > 0)
+            {
+                model.PartNos =
+                    _commonBAL.GetPartNoByModel(model.ModelId);
+            }
+
+            if (model.LineId <= 0 ||
+               model.ProjectId <= 0 ||
+               model.ModelId <= 0 ||
+               model.PartId <= 0 ||
+               string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+               string.IsNullOrWhiteSpace(model.CheckedBy) ||
+               string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
+
+                ViewBag.Message =
+                "Please enter Production Line Leader, Checked By and Approved By";
+
+                model.dtChecklist = new DataTable();
+
+                return View(
+                "~/Views/A246FProject/SOPPOR/Index.cshtml",
+                model);
+
+            }
+
+            model.dtChecklist =
+                _bal.GetSOPPORData(
+                    model.LineId,
+                    model.ProjectId);
+
+            return View(
+                "~/Views/A246FProject/SOPPOR/Index.cshtml",
+                model);
         }
 
         [HttpPost]
         public JsonResult SaveSingleSOPPOR(
-    [FromForm] int LineId,
-    [FromForm] int ProjectId,
-    [FromForm] int ModelId,
-    [FromForm] int PartId,
-    [FromForm] string ProdLineLeader,
-    [FromForm] string CheckedBy,
-    [FromForm] string ApprovedBy,
-    [FromForm] int RiskId,
-    [FromForm] int StatusId,
-    [FromForm] string IdNumber,
-    IFormFile ImageFile)
+            [FromForm] int LineId,
+            [FromForm] int ProjectId,
+            [FromForm] int ModelId,
+            [FromForm] int PartId,
+            [FromForm] string ProdLineLeader,
+            [FromForm] string CheckedBy,
+            [FromForm] string ApprovedBy,
+            [FromForm] int RiskId,
+            [FromForm] int StatusId,
+            [FromForm] string IdNumber,
+            IFormFile ImageFile)
         {
             try
             {

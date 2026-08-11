@@ -34,8 +34,9 @@ namespace A246FProject.Controllers.A246FProject
 
         [HttpPost]
         public IActionResult Index(
-            CCMCHI4SCViewModel model)
+    CCMCHI4SCViewModel model)
         {
+
             model.Lines = _bal.GetLine();
 
             model.Projects = _bal.GetProject();
@@ -43,6 +44,7 @@ namespace A246FProject.Controllers.A246FProject
             model.ModelNos = _bal.GetModelNo();
 
             model.Machines = _bal.GetMachines();
+
 
             if (model.ModelId > 0)
             {
@@ -55,11 +57,36 @@ namespace A246FProject.Controllers.A246FProject
                     new List<PartNo>();
             }
 
+            if (model.LineId <= 0 ||
+               model.ProjectId <= 0 ||
+               model.ModelId <= 0 ||
+               model.PartId <= 0 ||
+               model.MachineId <= 0 ||
+               string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+               string.IsNullOrWhiteSpace(model.CheckedBy) ||
+               string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
+
+                ViewBag.Message =
+                "Please enter Production Line Leader, Checked By and Approved By before Search";
+
+
+                model.dtChecklist = new DataTable();
+
+
+                return View(
+                "~/Views/A246FProject/CCMCHI4SC/Index.cshtml",
+                model);
+
+            }
+
             model.dtChecklist =
                 _bal.GetCCMCHI4SCData(
                     model.LineId,
                     model.ProjectId,
                     model.MachineId);
+
+
 
             return View(
                 "~/Views/A246FProject/CCMCHI4SC/Index.cshtml",

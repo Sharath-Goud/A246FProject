@@ -65,18 +65,54 @@ namespace A246FProject.Controllers.A246FProject
         [HttpPost]
         public IActionResult Index(NegativeValidationViewModel model)
         {
+
             model.Lines = _commonBAL.GetLine();
+
             model.Projects = _commonBAL.GetProject();
 
+
             model.ModelNos = new List<ModelNo>();
+
             model.PartNos = new List<PartNo>();
 
             model.Statuses = _bal.GetResult();
 
-            model.dtChecklist =
-                _bal.GetNegativeValidationData(model.LineId, model.ProjectId);
+            if (model.LineId == 0 ||
 
-            return View("~/Views/A246FProject/NegativeValidation/Index.cshtml", model);
+                model.ProjectId == 0 ||
+
+                model.ModelId == 0 ||
+
+                model.PartId == 0 ||
+
+                string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+
+                string.IsNullOrWhiteSpace(model.CheckedBy) ||
+
+                string.IsNullOrWhiteSpace(model.ApprovedBy))
+            {
+
+
+                ViewBag.Message =
+                "Please fill Production Line Leader, Checked By and Approved By before Search.";
+
+                model.dtChecklist = new DataTable();
+
+                return View(
+                "~/Views/A246FProject/NegativeValidation/Index.cshtml",
+                model);
+
+            }
+
+            model.dtChecklist =
+                _bal.GetNegativeValidationData(
+                    model.LineId,
+                    model.ProjectId);
+
+            return View(
+            "~/Views/A246FProject/NegativeValidation/Index.cshtml",
+            model);
+
         }
 
         [HttpPost]

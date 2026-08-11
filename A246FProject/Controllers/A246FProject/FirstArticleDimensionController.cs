@@ -26,8 +26,6 @@ namespace A246FProject.Controllers.A246FProject
 
             var user = HttpContext.Session.GetString("User");
 
-            Console.WriteLine("Logged In User : " + user);
-
             ViewBag.CreatedBy = user;
 
             return View(

@@ -59,7 +59,9 @@ public class VisualInspectionController : Controller
             HttpContext.Session.GetString("Role");
 
         model.Lines = _bal.GetLine();
+
         model.Shifts = _bal.GetShift();
+
         model.Projects = _bal.GetProject();
 
         model.ModelNos =
@@ -77,14 +79,36 @@ public class VisualInspectionController : Controller
             ? _bal.GetVisuals(model.ProjectId)
             : new List<Visuals>();
 
-        model.dtChecklist = _bal.GetVisualInspectionData(
+        if (model.LineId <= 0 ||
+           model.ProjectId <= 0 ||
+           model.ModelId <= 0 ||
+           model.VisualsId <= 0 ||
+           model.PartId <= 0 ||
+           string.IsNullOrWhiteSpace(model.ProdLineLeader) ||
+           string.IsNullOrWhiteSpace(model.CheckedBy) ||
+           string.IsNullOrWhiteSpace(model.ApprovedBy))
+        {
+
+            ViewBag.Message =
+            "Please enter Production Line Leader, Checked By and Approved By before Search";
+
+            model.dtChecklist = new DataTable();
+
+            return View(
+            "~/Views/A246FProject/VisualInspection/Index.cshtml",
+            model);
+
+        }
+
+        model.dtChecklist =
+            _bal.GetVisualInspectionData(
                 model.LineId,
                 model.ProjectId,
                 model.VisualsId);
 
         return View(
-            "~/Views/A246FProject/VisualInspection/Index.cshtml",
-            model);
+        "~/Views/A246FProject/VisualInspection/Index.cshtml",
+        model);
     }
 
     [HttpPost]

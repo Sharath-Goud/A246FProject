@@ -348,6 +348,16 @@
         <span>, X - NG</span>
     </div>
 
+    <div id="validationMessage"
+         style="
+     display:none;
+     background:#dc3545;
+     color:white;
+     padding:10px;
+     border-radius:8px;
+     margin:10px 0;">
+    </div>
+
     <!-- RESULTS TABLE -->
     <div class="results-table">
         <div class="header-row">
@@ -425,95 +435,210 @@
 
         function loadData() {
 
+            var lineId = $("#ddlLine").val();
+            var projectId = $("#ddlProject").val();
+            var modelId = $("#ddlModel").val();
+            var partId = $("#ddlPart").val();
+
+            var lineLeader = $("#txtLineLeader").val();
+            var checkedBy = $("#txtCheckedBy").val();
+            var approvedBy = $("#txtApprovedBy").val();
+
+            var workOrder = $("#txtWorkOrder").val();
+            var drawingVersion = $("#txtDrawingVersion").val();
+            var packVersion = $("#txtPackVersion").val();
+            var samplingQty = $("#txtSamplingQty").val();
+
+            if(lineId == "" ||
+               projectId == "" ||
+               modelId == "" ||
+               partId == "" ||
+               lineLeader.trim() == "" ||
+               checkedBy.trim() == "" ||
+               approvedBy.trim() == "" ||
+               workOrder.trim() == "" ||
+               drawingVersion.trim() == "" ||
+               packVersion.trim() == "" ||
+               samplingQty.trim() == "")
+            {
+
+
+            $("#validationMessage")
+            .html(
+            "Please enter all details before Search.<br><br>" +
+            "Production Line Leader<br>" +
+            "Checked By<br>" +
+            "Approved By<br>" +
+            "Work Order<br>" +
+            "Drawing Version<br>" +
+            "Pack Version<br>" +
+            "Sampling Quantity"
+            )
+            .show();
+
+
+                $("#tableBody").html(
+                "<div class='empty'>No records found. Use Search to load data.</div>"
+                );
+
+
+                return;
+
+            }
+
+            $("#validationMessage").hide();
+
             $.ajax({
-                url: '/FirstArticleInspection/GetInspectionData',
-                type: 'POST',
-                data: {
-                    lineId: $("#ddlLine").val(),
-                    projectId: $("#ddlProject").val()
+
+                url:'/FirstArticleInspection/GetInspectionData',
+
+                type:'POST',
+
+                data:
+                {
+                    lineId:lineId,
+                    projectId:projectId
                 },
-                        success: function (data) {
 
-                    let html = "";
 
-                    if (data.length === 0) {
-                        html = "<div class='empty'>No records found</div>";
+                success:function(data)
+                {
+
+
+                    let html="";
+
+
+                    if(data.length===0)
+                    {
+
+                        html=
+                        "<div class='empty'>No records found</div>";
+
                     }
-                    else {
+                    else
+                    {
 
-                                let previousStation = "";
-                                let previousItem = "";
+                        let previousStation="";
+                        let previousItem="";
 
-                                $.each(data, function (i, item) {
 
-                                    let stationHtml = "";
-                                    let itemHtml = "";
+                        $.each(data,function(i,item)
+                        {
 
-                                    if (item.stationName != previousStation) {
 
-                                        stationHtml = item.stationName;
-                                        previousStation = item.stationName;
+                            let stationHtml="";
+                            let itemHtml="";
 
-                                        previousItem = "";
-                                    }
 
-                                    if (item.itemName != previousItem) {
+                            if(item.stationName != previousStation)
+                            {
+                                stationHtml=item.stationName;
+                                previousStation=item.stationName;
+                                previousItem="";
+                            }
 
-                                        itemHtml = item.itemName;
-                                        previousItem = item.itemName;
-                                    }
 
-                                    html += `
-                                      <div class="data-row"
-                                            data-contentid="${item.contentId}"
-                                            data-group="${item.stationName}_${item.itemName}">
+                            if(item.itemName != previousItem)
+                            {
+                                itemHtml=item.itemName;
+                                previousItem=item.itemName;
+                            }
 
-                                        <input type="hidden" class="contentId" value="${item.contentId}" />
 
-                                         <div class="station">
-                                            ${stationHtml}
-                                        </div>
 
-                                        <div class="item">
-                                            ${itemHtml}
-                                        </div>
+                            html += `
 
-                                        <div class="criteria-area">
-                                            <div class="criteria">
-                                                ${item.content}
-                                            </div>
-                                        </div>
+                            <div class="data-row"
+                            data-contentid="${item.contentId}"
+                            data-group="${item.stationName}_${item.itemName}">
 
-                                        <div class="control-area">
-                                            <select class="status">
-                                                <option value="OK">OK</option>
-                                                <option value="NG">NG</option>
-                                                <option value="NA">NA</option>
-                                            </select>
-                                        </div>
 
-                                        <div class="control-area">
-                                            <input type="text"
-                                                   class="result"
-                                                   maxlength="10"
-                                                   oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'');" />
-                                        </div>
+                            <input type="hidden"
+                            class="contentId"
+                            value="${item.contentId}" />
 
-                                        <div class="control-area">
-                                            <input type="text" class="ngdesc"/>
-                                        </div>
 
-                                        <div class="action-area">
-                                            <button class="btn-search" onclick="saveRow(this)">Save</button>
-                                        </div>
+                            <div class="station">
+                            ${stationHtml}
+                            </div>
 
-                                    </div>`;
-                                });
+
+                            <div class="item">
+                            ${itemHtml}
+                            </div>
+
+
+                            <div class="criteria-area">
+                            ${item.content}
+                            </div>
+
+
+                            <div class="control-area">
+
+                            <select class="status">
+
+                            <option value="OK">OK</option>
+
+                            <option value="NG">NG</option>
+
+                            <option value="NA">NA</option>
+
+                            </select>
+
+                            </div>
+
+
+                            <div class="control-area">
+
+                            <input type="text"
+                            class="result"/>
+
+                            </div>
+
+
+                            <div class="control-area">
+
+                            <input type="text"
+                            class="ngdesc"/>
+
+                            </div>
+
+
+                            <div class="action-area">
+
+                            <button class="btn-search"
+                            onclick="saveRow(this)">
+                            Save
+                            </button>
+
+                            </div>
+
+
+                            </div>
+
+                            `;
+
+
+                        });
+
                     }
+
 
                     $("#tableBody").html(html);
+
+
+                },
+
+
+                error:function()
+                {
+                    alert("Error while loading data");
                 }
+
+
             });
+
+
         }
 
         function refreshStationAndItemDisplay() {
@@ -656,7 +781,6 @@
                 },
 
                 error:function(xhr){
-                    console.log(xhr.responseText);
                     alert("Error while saving");
                 }
             });
