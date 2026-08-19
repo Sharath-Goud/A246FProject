@@ -1,0 +1,1641 @@
+﻿@model A246FProject.Models.TrapTestViewModel
+@using System.Data
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Trap Test</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0d1a, #0a0a2e, #0d1b2a);
+            min-height: 100vh;
+            color: #e2e8f0;
+            padding: 16px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .sub {
+            color: rgba(255,255,255,.45);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .form-card {
+            width: 100%;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .form-card-header {
+            background: rgba(167,139,250,.12);
+            border-bottom: 1px solid rgba(167,139,250,.18);
+            padding: 13px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .form-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 11px;
+            color: rgba(255,255,255,.55);
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 38px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 7px;
+            padding: 8px 11px;
+            font-size: 13px;
+            color: #ffffff;
+            outline: none;
+        }
+
+            select option {
+                background: #1a1040;
+                color: #ffffff;
+            }
+
+            input:focus,
+            select:focus {
+                border-color: rgba(167,139,250,.55);
+                background: rgba(167,139,250,.08);
+            }
+
+        .results-table {
+            width: 100%;
+            background: rgba(255,255,255,.035);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .trap-test-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 12px;
+        }
+
+        .trap-test-table {
+            width: 100%;
+            min-width: 1250px;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #12132b;
+            color: #ffffff;
+        }
+
+            .trap-test-table thead th {
+                height: 52px;
+                padding: 9px 7px;
+                background: #202044;
+                color: #ffffff;
+                text-align: center;
+                vertical-align: middle;
+                font-size: 13px;
+                font-weight: 700;
+                line-height: 1.25;
+                border-right: 1px solid #303252;
+                border-bottom: 1px solid #303252;
+                white-space: normal;
+                word-break: normal;
+            }
+
+                .trap-test-table thead th:first-child {
+                    border-top-left-radius: 10px;
+                }
+
+                .trap-test-table thead th:last-child {
+                    border-top-right-radius: 10px;
+                    border-right: none;
+                }
+
+            .trap-test-table tbody tr {
+                height: 54px;
+            }
+
+            .trap-test-table tbody td {
+                height: 54px;
+                padding: 6px 7px;
+                text-align: center;
+                vertical-align: middle;
+                font-size: 13px;
+                font-weight: 500;
+                color: #ffffff;
+                background: #12132b;
+                border-right: 1px solid #2b2d4a;
+                border-bottom: 1px solid #2b2d4a;
+            }
+
+                .trap-test-table tbody td:last-child {
+                    border-right: none;
+                }
+
+            .trap-test-table th:nth-child(1),
+            .trap-test-table td:nth-child(1) {
+                width: 45px;
+                min-width: 45px;
+                max-width: 45px;
+                text-align: center;
+            }
+
+            .trap-test-table th:nth-child(2),
+            .trap-test-table td:nth-child(2) {
+                width: 180px;
+                min-width: 180px;
+                max-width: 180px;
+                text-align: left;
+                padding-left: 10px;
+                padding-right: 10px;
+                white-space: normal;
+                overflow-wrap: break-word;
+                word-break: normal;
+            }
+
+            .trap-test-table th:nth-child(3),
+            .trap-test-table td:nth-child(3) {
+                width: 155px;
+                min-width: 155px;
+                max-width: 155px;
+            }
+
+            .trap-test-table th:nth-child(4),
+            .trap-test-table td:nth-child(4) {
+                width: 145px;
+                min-width: 145px;
+                max-width: 145px;
+            }
+
+            .trap-test-table th:nth-child(5),
+            .trap-test-table td:nth-child(5) {
+                width: 155px;
+                min-width: 155px;
+                max-width: 155px;
+            }
+
+            .trap-test-table th:nth-child(6),
+            .trap-test-table td:nth-child(6) {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+            }
+
+            .trap-test-table th:nth-child(7),
+            .trap-test-table td:nth-child(7) {
+                width: 155px;
+                min-width: 155px;
+                max-width: 155px;
+            }
+
+            .trap-test-table th:nth-child(8),
+            .trap-test-table td:nth-child(8) {
+                width: 155px;
+                min-width: 155px;
+                max-width: 155px;
+            }
+
+            .trap-test-table th:nth-child(9),
+            .trap-test-table td:nth-child(9) {
+                width: 65px;
+                min-width: 65px;
+                max-width: 65px;
+                text-align: center;
+            }
+
+            .trap-test-table th:nth-child(10),
+            .trap-test-table td:nth-child(10) {
+                width: 75px;
+                min-width: 75px;
+                max-width: 75px;
+                text-align: center;
+            }
+
+            .trap-test-table .module-name {
+                display: block;
+                width: 100%;
+                line-height: 1.35;
+                text-align: left;
+                white-space: normal;
+                overflow-wrap: break-word;
+                word-break: normal;
+            }
+
+            .trap-test-table input[type="text"],
+            .trap-test-table input[type="number"] {
+                width: 100%;
+                height: 38px;
+                padding: 7px 9px;
+                border: 1px solid #45476b;
+                border-radius: 6px;
+                background: #20213f;
+                color: #ffffff;
+                font-size: 13px;
+                font-weight: 500;
+                outline: none;
+            }
+
+                .trap-test-table input[type="text"]:focus,
+                .trap-test-table input[type="number"]:focus {
+                    border-color: #6c70a8;
+                    box-shadow: 0 0 0 2px rgba(108,112,168,.18);
+                }
+
+            .trap-test-table input::placeholder {
+                color: #9b9db7;
+            }
+
+            .trap-test-table select {
+                width: 100%;
+                height: 38px;
+                padding: 7px 28px 7px 9px;
+                border: 1px solid #45476b;
+                border-radius: 6px;
+                background-color: #20213f;
+                color: #ffffff;
+                font-size: 13px;
+                outline: none;
+                cursor: pointer;
+            }
+
+                .trap-test-table select:focus {
+                    border-color: #6c70a8;
+                    box-shadow: 0 0 0 2px rgba(108,112,168,.18);
+                }
+
+                .trap-test-table select option {
+                    background: #20213f;
+                    color: #ffffff;
+                }
+
+            .trap-test-table input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                margin: 0;
+                cursor: pointer;
+                vertical-align: middle;
+            }
+
+            .trap-test-table .btn-save {
+                width: 60px;
+                min-width: 60px;
+                height: 34px;
+                padding: 5px 9px;
+                border: none;
+                border-radius: 5px;
+                background: #ffffff;
+                color: #111222;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all .2s ease;
+            }
+
+                .trap-test-table .btn-save:hover {
+                    background: #e7e7e7;
+                    transform: translateY(-1px);
+                }
+
+                .trap-test-table .btn-save:active {
+                    transform: translateY(0);
+                }
+
+            .trap-test-table tbody tr:hover td {
+                background: #181a35;
+            }
+
+            .trap-test-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .trap-test-table thead th:nth-child(1) {
+                text-align: center;
+            }
+
+            .trap-test-table thead th:nth-child(2) {
+                text-align: left;
+            }
+
+            .trap-test-table thead th:nth-child(n+3) {
+                text-align: center;
+            }
+
+            .trap-test-table .action-cell {
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .trap-test-table .status-cell {
+                text-align: center;
+                vertical-align: middle;
+            }
+
+        .trap-test-table-wrapper::-webkit-scrollbar {
+            height: 7px;
+        }
+
+        .trap-test-table-wrapper::-webkit-scrollbar-track {
+            background: #101126;
+            border-radius: 10px;
+        }
+
+        .trap-test-table-wrapper::-webkit-scrollbar-thumb {
+            background: #45476b;
+            border-radius: 10px;
+        }
+
+            .trap-test-table-wrapper::-webkit-scrollbar-thumb:hover {
+                background: #5b5e86;
+            }
+
+        .btn-search {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border: none;
+            border-radius: 7px;
+            padding: 9px 19px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+            .btn-search:hover {
+                opacity: .9;
+            }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            border: none;
+            border-radius: 7px;
+            padding: 9px 22px;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+            .btn-submit:hover {
+                opacity: .9;
+            }
+
+        .message {
+            background: #dc3545;
+            color: #ffffff;
+            padding: 9px 12px;
+            border-radius: 7px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        @@media (max-width: 1300px) {
+
+            .trap-test-table {
+                min-width: 1250px;
+            }
+
+                .trap-test-table thead th {
+                    font-size: 12px;
+                }
+
+                .trap-test-table tbody td {
+                    font-size: 12px;
+                }
+        }
+
+        @@media (max-width: 900px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .form-body {
+                padding: 14px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .trap-test-table {
+                min-width: 1250px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <form id="trapTestForm"
+          asp-action="Index"
+          asp-controller="TrapTest"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div class="form-card">
+
+            <div class="form-card-header">
+
+                Trap Test Checklist
+
+            </div>
+
+
+            <div class="form-body">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>
+                            Line
+                        </label>
+
+                        <select asp-for="LineId"
+                                id="LineId"
+                                asp-items="@(new SelectList(Model.Lines, "LineId", "LineName"))">
+
+                            <option value="">
+                                -- Select Line --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Project
+                        </label>
+
+                        <select asp-for="ProjectId"
+                                id="ProjectId">
+
+                            <option value="">
+                                -- Select Project --
+                            </option>
+
+                            @if (Model.Projects != null)
+                            {
+                                foreach (var item in Model.Projects)
+                                {
+                                    <option value="@item.ProjectId"
+                                            selected="@(Model.ProjectId == item.ProjectId)">
+                                        @item.ProjectName
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Model
+                        </label>
+
+                        <select asp-for="ModelId"
+                                id="ModelId">
+
+                            <option value="">
+                                -- Select Model --
+                            </option>
+
+                            @if (Model.ModelNos != null)
+                            {
+                                foreach (var item in Model.ModelNos)
+                                {
+                                    <option value="@item.ModelId"
+                                            selected="@(Model.ModelId == item.ModelId)">
+                                        @item.Model
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>
+                            Part
+                        </label>
+
+                        <select asp-for="PartId"
+                                id="PartId">
+
+                            <option value="">
+                                -- Select Part --
+                            </option>
+
+                            @if (Model.PartNos != null)
+                            {
+                                foreach (var item in Model.PartNos)
+                                {
+                                    <option value="@item.PartId"
+                                            selected="@(Model.PartId == item.PartId)">
+                                        @item.Part
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Line Leader
+                        </label>
+
+                        <input asp-for="ProdLineLeader"
+                               id="ProdLineLeader"
+                               placeholder="Enter Line Leader" />
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Checked By
+                        </label>
+
+                        <input asp-for="CheckedBy"
+                               id="CheckedBy"
+                               placeholder="Enter Checked By" />
+
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label>
+                            Approved By
+                        </label>
+
+                        <input asp-for="ApprovedBy"
+                               id="ApprovedBy"
+                               placeholder="Enter Approved By" />
+
+                    </div>
+
+
+                    <div class="form-group">
+                    </div>
+
+                    <div class="form-group"
+                         style="justify-content:flex-end;">
+
+                        <button type="submit"
+                                class="btn-search">
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="message">
+
+                @ViewBag.Message
+
+            </div>
+        }
+
+        <div class="trap-test-table-wrapper">
+
+            <table class="trap-test-table">
+
+                <thead>
+                    <tr>
+
+                        <th>S.No</th>
+
+                        <th>Module</th>
+
+                        <th>
+                            Inspector<br />
+                            Category
+                        </th>
+
+                        <th>
+                            Inspector Id
+                        </th>
+
+                        <th>
+                            Inspector Name
+                        </th>
+
+                        <th>
+                            No Of Samples
+                        </th>
+
+                        <th>
+                            No Of checked qty
+                        </th>
+
+                        <th>
+                            No Of skipped qty
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model.dtChecklist != null &&
+                                        Model.dtChecklist.Rows.Count > 0)
+                    {
+                        int sno = 1;
+
+                        foreach (DataRow row in Model.dtChecklist.Rows)
+                        {
+                            <tr data-inspect-id="@row["InspectId"]">
+                                <td>
+                                    @sno
+                                </td>
+
+                                <td>
+                                    <div class="module-name">
+                                        @row["Parts"]
+                                    </div>
+                                </td>
+
+                                <td>
+
+                                    <select class="inspector-category"
+                                            name="InspectorId_@row["InspectId"]">
+
+                                        <option value="">
+                                            --Select Inspector Category--
+                                        </option>
+
+                                        @if (Model.InspectorSS != null)
+                                        {
+                                            foreach (var inspector in Model.InspectorSS)
+                                            {
+                                                <option value="@inspector.InspecId">
+                                                    @inspector.InspectorName
+                                                </option>
+                                            }
+                                        }
+
+                                    </select>
+
+                                </td>
+
+                                <td>
+
+                                    <input type="text"
+                                           class="inspector-id"
+                                           name="InspectorIdText_@row["InspectId"]"
+                                           autocomplete="off" />
+
+                                </td>
+
+                                <td>
+
+                                    <input type="text"
+                                           class="inspector-name"
+                                           name="InspectorName_@row["InspectId"]"
+                                           autocomplete="off" />
+
+                                </td>
+
+                                <td>
+
+                                    <input type="number"
+                                           class="no-of-samples"
+                                           name="NoOfCables_@row["InspectId"]"
+                                           min="0" />
+
+                                </td>
+
+                                <td>
+
+                                    <input type="number"
+                                           class="checked-qty"
+                                           name="CheckedQty_@row["InspectId"]"
+                                           min="0" />
+
+                                </td>
+
+                                <td>
+
+                                    <input type="number"
+                                           class="skipped-qty"
+                                           name="SkippedQty_@row["InspectId"]"
+                                           min="0" />
+
+                                </td>
+
+                                <td>
+
+                                    <input type="checkbox"
+                                           class="check-status"
+                                           name="CheckStatus_@row["InspectId"]"
+                                           value="1" />
+
+                                </td>
+
+                                <td>
+
+                                    <button type="button"
+                                            class="btn-search"
+                                            onclick="saveTrapTestRow(this)">
+                                        Save
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            sno++;
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        @if (Model.dtChecklist != null &&
+                Model.dtChecklist.Rows.Count > 0)
+        {
+
+            <div class="actions">
+
+                <button type="button"
+                        class="btn-submit"
+                        id="btnSaveTrapTest">
+
+                    Submit
+
+                </button>
+
+            </div>
+
+        }
+
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+    <script>
+
+        $("#ProjectId").change(function () {
+
+            var projectId = $(this).val();
+
+
+            $("#ModelId").empty();
+
+            $("#PartId").empty();
+
+
+            $("#ModelId").append(
+                '<option value="">-- Select Model --</option>'
+            );
+
+
+            $("#PartId").append(
+                '<option value="">-- Select Part --</option>'
+            );
+
+
+            if (!projectId)
+                return;
+
+
+            $.get(
+                '@Url.Action("GetModels", "TrapTest")',
+                {
+                    projectId: projectId
+                },
+                function (data) {
+
+
+                    $.each(data, function (i, item) {
+
+                        $("#ModelId").append(
+
+                            '<option value="' +
+                            item.modelId +
+                            '">' +
+                            (item.modelNo || item.model || '') +
+                            '</option>'
+
+                        );
+
+                    });
+
+                }
+            );
+
+        });
+
+        $("#ModelId").change(function () {
+
+            var modelId = $(this).val();
+
+
+            $("#PartId").empty();
+
+
+            $("#PartId").append(
+                '<option value="">-- Select Part --</option>'
+            );
+
+
+            if (!modelId)
+                return;
+
+
+            $.get(
+                '@Url.Action("GetParts", "TrapTest")',
+                {
+                    modelId: modelId
+                },
+                function (data) {
+
+
+                    $.each(data, function (i, item) {
+
+                        $("#PartId").append(
+
+                            '<option value="' +
+                            item.partId +
+                            '">' +
+                            (item.partNo || item.part || '') +
+                            '</option>'
+
+                        );
+
+                    });
+
+                }
+            );
+
+        });
+
+        function validateHeader() {
+
+
+            var LineId =
+                $("#LineId").val();
+
+
+            var ProjectId =
+                $("#ProjectId").val();
+
+
+            var ModelId =
+                $("#ModelId").val();
+
+
+            var PartId =
+                $("#PartId").val();
+
+
+            var ProdLineLeader =
+                $("#ProdLineLeader").val();
+
+
+            var CheckedBy =
+                $("#CheckedBy").val();
+
+
+            var ApprovedBy =
+                $("#ApprovedBy").val();
+
+
+            if (!LineId ||
+                LineId == "0" ||
+
+                !ProjectId ||
+                ProjectId == "0" ||
+
+                !ModelId ||
+                ModelId == "0" ||
+
+                !PartId ||
+                PartId == "0" ||
+
+                !ProdLineLeader ||
+
+                !CheckedBy ||
+
+                !ApprovedBy) {
+
+
+                alert(
+                    "Please fill Line, Project, Model, Part, Line Leader, Checked By and Approved By before saving."
+                );
+
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+
+    </script>
+
+    <script>
+
+    function saveTrapTestRow(button) {
+
+            var row = $(button).closest("tr");
+
+            var inspectId = row.attr("data-inspect-id");
+
+            var inspecId = row.find(".inspector-category").val();
+            var inspectorName = row.find(".inspector-name").val();
+            var inspectorId = row.find(".inspector-id").val();
+
+            var noOfCables = row.find(".no-of-samples").val();
+            var checkedQty = row.find(".checked-qty").val();
+            var skippedQty = row.find(".skipped-qty").val();
+
+            var checkResult = row.find(".check-status").is(":checked");
+
+            if (!inspectId) {
+                alert("Inspector Id is missing.");
+                return;
+            }
+
+            if (!inspecId) {
+                alert("Please select Inspector Category.");
+                return;
+            }
+
+            if (!inspectorId) {
+                alert("Please enter Inspector Id.");
+                return;
+            }
+
+            if (!inspectorName) {
+                alert("Please enter Inspector Name.");
+                return;
+            }
+
+            if (!noOfCables) {
+                alert("Please enter No Of Samples.");
+                return;
+            }
+
+            if (!checkedQty) {
+                alert("Please enter No Of checked qty.");
+                return;
+            }
+
+            if (!skippedQty) {
+                alert("Please enter No Of skipped qty.");
+                return;
+            }
+
+            var lineId = $("#LineId").val();
+            var projectId = $("#ProjectId").val();
+            var modelId = $("#ModelId").val();
+            var partId = $("#PartId").val();
+
+            var prodLineLeader = $("#ProdLineLeader").val();
+            var checkedBy = $("#CheckedBy").val();
+            var approvedBy = $("#ApprovedBy").val();
+
+            if (!lineId || lineId == "0") {
+                alert("Please select Line.");
+                return;
+            }
+
+            if (!projectId || projectId == "0") {
+                alert("Please select Project.");
+                return;
+            }
+
+            if (!modelId || modelId == "0") {
+                alert("Please select Model.");
+                return;
+            }
+
+            if (!partId || partId == "0") {
+                alert("Please select Part.");
+                return;
+            }
+
+            if (!prodLineLeader) {
+                alert("Please enter Production Line Leader.");
+                return;
+            }
+
+            if (!checkedBy) {
+                alert("Please enter Checked By.");
+                return;
+            }
+
+            if (!approvedBy) {
+                alert("Please enter Approved By.");
+                return;
+            }
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            var formData = new FormData();
+
+            formData.append("__RequestVerificationToken", token);
+
+            formData.append("LineId", lineId);
+            formData.append("ProjectId", projectId);
+            formData.append("ModelId", modelId);
+            formData.append("PartId", partId);
+
+            formData.append(
+                "ProdLineLeader",
+                prodLineLeader
+            );
+
+            formData.append(
+                "CheckedBy",
+                checkedBy
+            );
+
+            formData.append(
+                "ApprovedBy",
+                approvedBy
+            );
+
+            formData.append(
+                "TrapTestResults[0].Id",
+                "1"
+            );
+
+            formData.append(
+                "TrapTestResults[0].InspectId",
+                inspectId
+            );
+
+            formData.append(
+                "TrapTestResults[0].InspecId",
+                inspecId
+            );
+
+            formData.append(
+                "TrapTestResults[0].InspectorName",
+                inspectorName
+            );
+
+            formData.append(
+                "TrapTestResults[0].InspectorId",
+                inspectorId
+            );
+
+            formData.append(
+                "TrapTestResults[0].NoOfCables",
+                noOfCables
+            );
+
+            formData.append(
+                "TrapTestResults[0].CheckResult",
+                checkResult ? "true" : "false"
+            );
+
+            formData.append(
+                "TrapTestResults[0].SkippedQty",
+                skippedQty
+            );
+
+            formData.append(
+                "TrapTestResults[0].CheckedQty",
+                checkedQty
+            );
+
+            var saveButton = $(button);
+
+            saveButton.prop("disabled", true);
+            saveButton.text("Saving...");
+
+
+            $.ajax({
+
+                url: '@Url.Action("SaveBulkTrapTest", "TrapTest")',
+
+                type: 'POST',
+
+                data: formData,
+
+                processData: false,
+
+                contentType: false,
+
+
+                success: function (response) {
+
+                    if (response.success) {
+
+                        alert(response.message);
+
+                        saveButton.text("Saved");
+
+                        saveButton.prop("disabled", true);
+
+                    }
+                    else {
+
+                        alert(response.message);
+
+                        saveButton.prop("disabled", false);
+
+                        saveButton.text("Save");
+                    }
+
+                },
+
+
+                error: function (xhr) {
+
+                    alert(
+                        "Error while saving Trap Test.\n\n" +
+                        xhr.responseText
+                    );
+
+                    saveButton.prop("disabled", false);
+
+                    saveButton.text("Save");
+                }
+
+            });
+        }
+
+
+        $("#btnSaveTrapTest").click(function () {
+
+            if (!validateHeader()) {
+                return;
+            }
+
+            var lineId = $("#LineId").val();
+            var projectId = $("#ProjectId").val();
+            var modelId = $("#ModelId").val();
+            var partId = $("#PartId").val();
+
+            var prodLineLeader = $("#ProdLineLeader").val();
+            var checkedBy = $("#CheckedBy").val();
+            var approvedBy = $("#ApprovedBy").val();
+
+            var token =
+                $('input[name="__RequestVerificationToken"]').val();
+
+            var formData = new FormData();
+
+            formData.append(
+                "__RequestVerificationToken",
+                token
+            );
+
+            formData.append(
+                "LineId",
+                lineId
+            );
+
+            formData.append(
+                "ProjectId",
+                projectId
+            );
+
+            formData.append(
+                "ModelId",
+                modelId
+            );
+
+            formData.append(
+                "PartId",
+                partId
+            );
+
+            formData.append(
+                "ProdLineLeader",
+                prodLineLeader
+            );
+
+            formData.append(
+                "CheckedBy",
+                checkedBy
+            );
+
+            formData.append(
+                "ApprovedBy",
+                approvedBy
+            );
+
+            var rowIndex = 0;
+            var hasRows = false;
+            var validationFailed = false;
+
+
+            $(".trap-test-table tbody tr").each(function () {
+
+                if (validationFailed) {
+                    return false;
+                }
+
+
+                var row = $(this);
+
+                var inspectId =
+                    row.attr("data-inspect-id");
+
+
+                if (!inspectId) {
+
+                    alert(
+                        "Inspect Id is missing in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                var inspecId =
+                    row.find(".inspector-category").val();
+
+                var inspectorId =
+                    row.find(".inspector-id").val();
+
+                var inspectorName =
+                    row.find(".inspector-name").val();
+
+                var noOfCables =
+                    row.find(".no-of-samples").val();
+
+                var checkedQty =
+                    row.find(".checked-qty").val();
+
+                var skippedQty =
+                    row.find(".skipped-qty").val();
+
+                var checkResult =
+                    row.find(".check-status").is(":checked");
+
+                if (!inspecId) {
+
+                    alert(
+                        "Please select Inspector Category in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                if (!inspectorId) {
+
+                    alert(
+                        "Please enter Inspector Id in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                if (!inspectorName) {
+
+                    alert(
+                        "Please enter Inspector Name in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                if (!noOfCables) {
+
+                    alert(
+                        "Please enter No Of Samples in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                if (!checkedQty) {
+
+                    alert(
+                        "Please enter No Of checked qty in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                if (!skippedQty) {
+
+                    alert(
+                        "Please enter No Of skipped qty in row " +
+                        (rowIndex + 1)
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].Id",
+                    (rowIndex + 1).toString()
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].InspectId",
+                    inspectId
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].InspecId",
+                    inspecId
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].InspectorName",
+                    inspectorName
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].InspectorId",
+                    inspectorId
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].NoOfCables",
+                    noOfCables
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].CheckResult",
+                    checkResult ? "true" : "false"
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].SkippedQty",
+                    skippedQty
+                );
+
+                formData.append(
+                    "TrapTestResults[" + rowIndex + "].CheckedQty",
+                    checkedQty
+                );
+
+
+                rowIndex++;
+
+                hasRows = true;
+
+            });
+
+            if (validationFailed) {
+                return;
+            }
+
+            if (!hasRows) {
+
+                alert(
+                    "No Trap Test checklist rows found."
+                );
+
+                return;
+            }
+
+            var submitButton =
+                $("#btnSaveTrapTest");
+
+            submitButton.prop(
+                "disabled",
+                true
+            );
+
+            submitButton.text(
+                "Submitting..."
+            );
+
+            $.ajax({
+
+                url:
+                    '@Url.Action("SaveBulkTrapTest", "TrapTest")',
+
+                type: "POST",
+
+                data: formData,
+
+                processData: false,
+
+                contentType: false,
+
+                success: function (response) {
+
+                    console.log(
+                        "Bulk Save Response:",
+                        response
+                    );
+
+
+                    if (response.success) {
+
+                        alert(
+                            response.message ||
+                            "All Trap Test rows saved successfully."
+                        );
+
+                        submitButton.text(
+                            "Submitted"
+                        );
+
+                        submitButton.prop(
+                            "disabled",
+                            true
+                        );
+
+                    }
+                    else {
+
+                        alert(
+                            response.message ||
+                            "Bulk Trap Test save failed."
+                        );
+
+                        submitButton.text(
+                            "Submit"
+                        );
+
+                        submitButton.prop(
+                            "disabled",
+                            false
+                        );
+
+                    }
+
+                },
+
+                error: function (xhr) {
+
+                    console.error(
+                        "Bulk Save Error:",
+                        xhr.responseText
+                    );
+
+                    alert(
+                        "Error while submitting Trap Test.\n\n" +
+                        xhr.responseText
+                    );
+
+                    submitButton.text(
+                        "Submit"
+                    );
+
+                    submitButton.prop(
+                        "disabled",
+                        false
+                    );
+
+                }
+
+            });
+
+        });
+
+
+        function clearTrapTestForm() {
+
+            // Clear header fields
+            $("#LineId").val("");
+            $("#ProjectId").val("");
+            $("#ModelId").empty()
+                .append('<option value="">-- Select Model --</option>');
+
+            $("#PartId").empty()
+                .append('<option value="">-- Select Part --</option>');
+
+            $("#ProdLineLeader").val("");
+            $("#CheckedBy").val("");
+            $("#ApprovedBy").val("");
+
+            // Clear all row-level fields
+            $(".inspector-category").val("");
+            $(".inspector-id").val("");
+            $(".inspector-name").val("");
+            $(".no-of-samples").val("");
+            $(".checked-qty").val("");
+            $(".skipped-qty").val("");
+            $(".check-status").prop("checked", false);
+        }
+
+    </script>
+
+</body>
+
+</html>

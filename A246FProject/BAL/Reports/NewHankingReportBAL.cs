@@ -13,7 +13,7 @@ namespace A246FProject.BAL.Reports
         }
 
         public DataTable GetNewHankingReport(
-            string fromDate,
+            DateTime? fromDate,
             int lineId,
             int shiftId,
             int projectId,

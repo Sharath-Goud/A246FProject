@@ -234,28 +234,28 @@ namespace A246FProject.DAL
         }
 
         public int InsertBulkGlueWeighingData(
-    DataTable dtChecklist,
-    string createdBy,
-    int lineId,
-    int projectId,
-    string prodLineLeader,
-    string checkedBy,
-    string approvedBy,
-    int modelId,
-    int partId)
+            DataTable dtChecklist,
+            string createdBy,
+            int lineId,
+            int projectId,
+            string prodLineLeader,
+            string checkedBy,
+            string approvedBy,
+            int modelId,
+            int partId)
         {
             SqlParameter[] parms =
             {
-        new SqlParameter("@LaserChecklist", dtChecklist),
-        new SqlParameter("@CreatedBy", createdBy),
-        new SqlParameter("@LineId", lineId),
-        new SqlParameter("@ProjectId", projectId),
-        new SqlParameter("@ProdLineLeader", prodLineLeader),
-        new SqlParameter("@CheckedBy", checkedBy),
-        new SqlParameter("@ApprovedBy", approvedBy),
-        new SqlParameter("@ModelId", modelId),
-        new SqlParameter("@PartId", partId)
-    };
+                new SqlParameter("@LaserChecklist", dtChecklist),
+                new SqlParameter("@CreatedBy", createdBy),
+                new SqlParameter("@LineId", lineId),
+                new SqlParameter("@ProjectId", projectId),
+                new SqlParameter("@ProdLineLeader", prodLineLeader),
+                new SqlParameter("@CheckedBy", checkedBy),
+                new SqlParameter("@ApprovedBy", approvedBy),
+                new SqlParameter("@ModelId", modelId),
+                new SqlParameter("@PartId", partId)
+            };
 
             return _db.ExecuteNonQueryWithParameter(
                 "ipqc.InsertBulkGlueWeighingData",

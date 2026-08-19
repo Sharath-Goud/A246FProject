@@ -585,25 +585,10 @@
 
                         <tbody>
 
-                            @{
-
-                                int row = 1;
-
-                                int totalCount = 0;
-
-                            }
-
                             @if (Model.dtReports != null && Model.dtReports.Rows.Count > 0)
                             {
-                                @foreach (System.Data.DataRow item in Model.dtReports.Rows)
+                                foreach (System.Data.DataRow item in Model.dtReports.Rows)
                                 {
-                                    totalCount = Convert.ToInt32(item["TotalCount"]);
-
-                                    if (row > totalCount)
-                                    {
-                                        row = 1;
-                                    }
-
                                     <tr>
 
                                         <td>
@@ -647,22 +632,25 @@
                                         </td>
 
                                         <td>
-                                            <span style="color:@(item["InspectionResults"].ToString() == "NG" ? "red" : "green")">
-                                                @item["InspectionResults"]
-                                            </span>
-                                        </td>
+                                            <span style="color:@(
+                                                  item["InspectionResults"]?.ToString() == "NG"
+                                                  ? "red"
+                                                  : "green"
+                                )">
+                                    @item["InspectionResults"]
+                                </span>
+                            </td>
 
                                     </tr>
-
-                                    if (row == totalCount)
-                                    {
-                                        row = 1;
-                                    }
-                                    else
-                                    {
-                                        row++;
-                                    }
-                                }
+                                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="11" class="empty">
+                                        No data found for the selected filters.
+                                    </td>
+                                </tr>
                             }
 
                         </tbody>
@@ -724,7 +712,7 @@
     $(document).ready(function () {
 
         $("#datepicker").datepicker({
-            dateFormat: "dd/mm/yy",
+            dateFormat: "mm/dd/yy",
             changeMonth: true,
             changeYear: true,
             showAnim: "fadeIn"
@@ -776,7 +764,7 @@
 
     });
 
-        $("#ModelId").change(function () {
+    $("#ModelId").change(function () {
 
         var modelId = $(this).val();
 

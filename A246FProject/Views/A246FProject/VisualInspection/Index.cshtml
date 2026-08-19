@@ -634,7 +634,7 @@
             });
         }
 
-        $(document).on("click", ".btn-save-row", function () {
+                $(document).on("click", ".btn-save-row", function () {
 
             let clickedRow = $(this).closest("tr");
 
@@ -652,19 +652,14 @@
                 if (dataId && result !== "") {
 
                     rowsToSave.push({
-
                         DataId: parseInt(dataId) || 0,
-
                         Section1: result,
-
                         DefectiveNumber: defective || "0",
-
-                        // Keep HTML row reference
                         _htmlRow: row
                     });
                 }
 
-                // Stop only after reaching clicked row
+                // Stop after clicked row
                 if (row[0] === clickedRow[0]) {
                     return false;
                 }
@@ -680,11 +675,8 @@
             let inspectionList = rowsToSave.map(function (x) {
 
                 return {
-
                     DataId: x.DataId,
-
                     Section1: x.Section1,
-
                     DefectiveNumber: x.DefectiveNumber
                 };
 
@@ -706,12 +698,13 @@
 
                 Model: $("#ModelId option:selected").text(),
 
-                ProdLineLeader: $("#txtLineLeader").val(),
+                ProdLineLeader: $("#txtLineLeader").val() || "",
 
-                CheckedBy: $("#txtCheckedBy").val(),
+                CheckedBy: $("#txtCheckedBy").val() || "",
 
-                ApprovedBy: $("#txtApprovedBy").val()
+                ApprovedBy: $("#txtApprovedBy").val() || ""
             };
+
 
             $.ajax({
 
@@ -719,15 +712,19 @@
 
                 type: 'POST',
 
-                contentType: 'application/json',
+                contentType: 'application/json; charset=utf-8',
+
+                dataType: 'json',
 
                 data: JSON.stringify(model),
 
                 success: function (res) {
 
-                    if (res.success) {
+                    console.log("Save response:", res);
 
-                        alert("Data Saved Successfully");
+                    if (res && res.success === true) {
+
+                        alert(res.message || "Data Saved Successfully");
 
                         rowsToSave.forEach(function (x) {
 
@@ -751,15 +748,40 @@
                     }
                     else {
 
-                        alert(res.message);
+                        alert(
+                            (res && res.message)
+                                ? res.message
+                                : "Save failed. No error message was returned by the server."
+                        );
 
                     }
 
                 },
 
-                error: function (xhr) {
+                error: function (xhr, status, error) {
 
-                    alert("Server Error while saving.");
+                    console.log("AJAX Error:", xhr.responseText);
+
+                    let message = "Server Error while saving.";
+
+                    try {
+
+                        let response = JSON.parse(xhr.responseText);
+
+                        if (response.message) {
+                            message = response.message;
+                        }
+
+                    }
+                    catch (e) {
+
+                        if (xhr.responseText) {
+                            message = xhr.responseText;
+                        }
+
+                    }
+
+                    alert(message);
 
                 }
 

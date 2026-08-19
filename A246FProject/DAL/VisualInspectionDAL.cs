@@ -166,45 +166,37 @@ public class VisualInspectionDAL
     }
 
     public int InsertBulkVisualInspection(
-        DataTable dtChecklist,
-        string userId,
-        int LineId,
-        int ProjectId,
-        string Model,
-        string ProdLineLeader,
-        string CheckedBy,
-        string ApprovedBy,
-        int ModelId,
-        int PartId)
+    DataTable dtChecklist,
+    string userId,
+    int LineId,
+    int ProjectId,
+    string Model,
+    string ProdLineLeader,
+    string CheckedBy,
+    string ApprovedBy,
+    int ModelId,
+    int PartId)
     {
-        int result = 0;
-
-        try
+        SqlParameter[] parameters =
         {
-            SqlParameter[] parameters =
-            {
-                new SqlParameter("@Checklist", dtChecklist),
-                new SqlParameter("@CreatedBy", userId),
-                new SqlParameter("@LineId", LineId),
-                new SqlParameter("@ProjectId", ProjectId),
-                new SqlParameter("@Model", Model),
-                new SqlParameter("@ProdLineLeader", ProdLineLeader),
-                new SqlParameter("@CheckedBy", CheckedBy),
-                new SqlParameter("@ApprovedBy", ApprovedBy),
-                new SqlParameter("@ModelId", ModelId),
-                new SqlParameter("@PartId", PartId)
-            };
+        new SqlParameter("@Checklist", dtChecklist),
+        new SqlParameter("@CreatedBy", userId ?? ""),
+        new SqlParameter("@LineId", LineId),
+        new SqlParameter("@ProjectId", ProjectId),
+        new SqlParameter("@Model", Model ?? ""),
+        new SqlParameter("@ProdLineLeader", ProdLineLeader ?? ""),
+        new SqlParameter("@CheckedBy", CheckedBy ?? ""),
+        new SqlParameter("@ApprovedBy", ApprovedBy ?? ""),
+        new SqlParameter("@ModelId", ModelId),
+        new SqlParameter("@PartId", PartId)
+    };
 
-            result = _db.ExecuteNonQueryWithParameter(
-                "ipqc.InsertBulkVisualInspection",
-                parameters
-            );
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        _db.ExecuteNonQueryWithParameter(
+            "ipqc.InsertBulkVisualInspection",
+            parameters
+        );
 
-        return result;
+        // If no exception occurred, SQL execution completed successfully.
+        return 1;
     }
 }

@@ -13,7 +13,7 @@ namespace A246FProject.DAL.Reports
         }
 
         public DataTable GetNewHankingReport(
-            string fromDate,
+            DateTime? fromDate,
             int lineId,
             int shiftId,
             int projectId,
@@ -22,12 +22,37 @@ namespace A246FProject.DAL.Reports
         {
             SqlParameter[] parms =
             {
-                new SqlParameter("@Date", fromDate ?? (object)DBNull.Value),
-                new SqlParameter("@LineId", lineId),
-                new SqlParameter("@ShiftId", shiftId),
-                new SqlParameter("@ProjectId", projectId),
-                new SqlParameter("@MachineId", machineId),
-                new SqlParameter("@PartId", partId)
+                new SqlParameter("@Date", SqlDbType.Date)
+                {
+                    Value = fromDate.HasValue
+                        ? fromDate.Value.Date
+                        : DBNull.Value
+                },
+
+                new SqlParameter("@LineId", SqlDbType.Int)
+                {
+                    Value = lineId
+                },
+
+                new SqlParameter("@ShiftId", SqlDbType.Int)
+                {
+                    Value = shiftId
+                },
+
+                new SqlParameter("@ProjectId", SqlDbType.Int)
+                {
+                    Value = projectId
+                },
+
+                new SqlParameter("@MachineId", SqlDbType.Int)
+                {
+                    Value = machineId
+                },
+
+                new SqlParameter("@PartId", SqlDbType.Int)
+                {
+                    Value = partId
+                }
             };
 
             return _db.ExecuteProcedureWithParameterForDataTable(

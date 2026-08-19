@@ -117,18 +117,33 @@ public class VisualInspectionController : Controller
         try
         {
             if (model == null)
-                return Json(new { success = false, message = "Model is null." });
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid request data."
+                });
+            }
 
-            if (model.VisualInspectionResults == null || !model.VisualInspectionResults.Any())
-                return Json(new { success = false, message = "No inspection data found." });
+            if (model.VisualInspectionResults == null ||
+                !model.VisualInspectionResults.Any())
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No inspection data found."
+                });
+            }
 
-            string userId = HttpContext.Session.GetString("User") ?? "";
+            string userId =
+                HttpContext.Session.GetString("User") ?? "";
 
             DataTable dt = new DataTable();
-            dt.Columns.Add("Id");
-            dt.Columns.Add("DataId");
-            dt.Columns.Add("Section1");
-            dt.Columns.Add("DefectiveNumber");
+
+            dt.Columns.Add("Id", typeof(int));
+            dt.Columns.Add("DataId", typeof(int));
+            dt.Columns.Add("Section1", typeof(string));
+            dt.Columns.Add("DefectiveNumber", typeof(string));
 
             var row = model.VisualInspectionResults.First();
 
@@ -139,7 +154,7 @@ public class VisualInspectionController : Controller
                 row.DefectiveNumber ?? "0"
             );
 
-            int result = _bal.InsertBulkVisualInspection(
+            _bal.InsertBulkVisualInspection(
                 dt,
                 userId,
                 model.LineId,
@@ -152,14 +167,18 @@ public class VisualInspectionController : Controller
                 model.PartId
             );
 
-            return Json(new { success = result > 0 });
+            return Json(new
+            {
+                success = true,
+                message = "Inspection data saved successfully."
+            });
         }
         catch (Exception ex)
         {
             return Json(new
             {
                 success = false,
-                message = ex.ToString()
+                message = ex.Message
             });
         }
     }
@@ -170,19 +189,33 @@ public class VisualInspectionController : Controller
         try
         {
             if (model == null)
-                return Json(new { success = false, message = "Model is null." });
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid request data."
+                });
+            }
 
-            if (model.VisualInspectionResults == null || model.VisualInspectionResults.Count == 0)
-                return Json(new { success = false, message = "No inspection data." });
+            if (model.VisualInspectionResults == null ||
+                model.VisualInspectionResults.Count == 0)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No inspection data found."
+                });
+            }
 
-            string userId = HttpContext.Session.GetString("User") ?? "";
+            string userId =
+                HttpContext.Session.GetString("User") ?? "";
 
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("Id");
-            dt.Columns.Add("DataId");
-            dt.Columns.Add("Section1");
-            dt.Columns.Add("DefectiveNumber");
+            dt.Columns.Add("Id", typeof(int));
+            dt.Columns.Add("DataId", typeof(int));
+            dt.Columns.Add("Section1", typeof(string));
+            dt.Columns.Add("DefectiveNumber", typeof(string));
 
             int i = 1;
 
@@ -196,7 +229,7 @@ public class VisualInspectionController : Controller
                 );
             }
 
-            int result = _bal.InsertBulkVisualInspection(
+            _bal.InsertBulkVisualInspection(
                 dt,
                 userId,
                 model.LineId,
@@ -209,14 +242,18 @@ public class VisualInspectionController : Controller
                 model.PartId
             );
 
-            return Json(new { success = result > 0 });
+            return Json(new
+            {
+                success = true,
+                message = "All inspection data saved successfully."
+            });
         }
         catch (Exception ex)
         {
             return Json(new
             {
                 success = false,
-                message = ex.ToString()
+                message = ex.Message
             });
         }
     }
