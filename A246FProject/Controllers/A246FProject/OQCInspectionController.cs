@@ -29,7 +29,10 @@ namespace A246FProject.Controllers.A246FProject
         {
             model.Projects = _bal.GetProject();
 
-            if (model.ProjectId.HasValue)
+            if (model.ProjectId.HasValue &&
+                model.ProjectId.Value > 0 &&
+                !string.IsNullOrWhiteSpace(model.CheckedBy) &&
+                !string.IsNullOrWhiteSpace(model.ApprovedBy))
             {
                 model.dtChecklist =
                     _bal.GetInspectionData(model.ProjectId.Value);

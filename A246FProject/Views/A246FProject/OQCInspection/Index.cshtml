@@ -308,6 +308,14 @@
     </style>
 </head>
 
+@{
+        bool canShowInspection =
+                Model.ProjectId.HasValue &&
+                Model.ProjectId.Value > 0 &&
+                !string.IsNullOrWhiteSpace(Model.CheckedBy) &&
+                !string.IsNullOrWhiteSpace(Model.ApprovedBy);
+}
+
 <body>
 
     <div class="form-card">
@@ -348,166 +356,179 @@
                 </div>
             </div>
 
-            <div class="customer-section">
+                <div class="customer-section">
 
-                <h4>Customer : APPLE</h4>
+                    <h4>Customer : APPLE</h4>
 
-                <!-- Row 1 -->
+                    <!-- Row 1 -->
 
-                <div class="customer-row">
+                    <div class="customer-row">
 
-                    <div class="customer-item">
-                        <label>Customer P/N</label>
-                        <input asp-for="CustomerPN" />
+                        <div class="customer-item">
+                            <label>Customer P/N</label>
+                            <input asp-for="CustomerPN" />
+                        </div>
+
+                        <div class="customer-item">
+                            <label>Lot Size</label>
+                            <input asp-for="LotSize" />
+                        </div>
+
+                        <div class="customer-item">
+                            <label>Date</label>
+                            <input type="text"
+                                   value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss")"
+                                   readonly />
+                        </div>
+
                     </div>
 
-                    <div class="customer-item">
-                        <label>Lot Size</label>
-                        <input asp-for="LotSize" />
+                    <!-- Row 2 -->
+
+                    <div class="customer-row">
+
+                        <div class="customer-item">
+                            <label>Finished Product No</label>
+                            <input asp-for="FinishedProductNo" />
+                        </div>
+
+                        <div class="customer-item">
+                            <label>Rev</label>
+                            <input asp-for="Rev" />
+                        </div>
+
+                        <div class="customer-item">
+                            <label>Packing List No</label>
+                            <input asp-for="PackingListNo" />
+                        </div>
+
                     </div>
 
-                    <div class="customer-item">
-                        <label>Date</label>
-                        <input type="text"
-                               value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss")"
-                               readonly />
+                    <!-- Row 3 -->
+
+                    <div class="customer-row">
+
+                        <div class="customer-item">
+                            <label>Sim Tool Part Number</label>
+                            <input asp-for="SimToolPartNumber" />
+                        </div>
+
                     </div>
 
                 </div>
 
-                <!-- Row 2 -->
+                <div class="inspection-method">
 
-                <div class="customer-row">
+                    <span>Inspection Method</span>
 
-                    <div class="customer-item">
-                        <label>Finished Product No</label>
-                        <input asp-for="FinishedProductNo" />
-                    </div>
+                    <label>
+                        <input asp-for="SamplingInspection" type="checkbox" />
+                        Sampling Inspection
+                    </label>
 
-                    <div class="customer-item">
-                        <label>Rev</label>
-                        <input asp-for="Rev" />
-                    </div>
+                    <label>
+                        <input asp-for="HundredPercentInspection" type="checkbox" />
+                        100% Inspection
+                    </label>
 
-                    <div class="customer-item">
-                        <label>Packing List No</label>
-                        <input asp-for="PackingListNo" />
-                    </div>
-
-                </div>
-
-                <!-- Row 3 -->
-
-                <div class="customer-row">
-
-                    <div class="customer-item">
-                        <label>Sim Tool Part Number</label>
-                        <input asp-for="SimToolPartNumber" />
-                    </div>
+                    <label>
+                        <input asp-for="OtherInspection" type="checkbox" />
+                        Others
+                    </label>
 
                 </div>
 
-            </div>
+            @if (canShowInspection)
+            {
+                <div class="results-table">
 
-            <div class="inspection-method">
+                    @if (Model.dtChecklist != null &&
+                                    Model.dtChecklist.Rows.Count > 0)
+                    {
+                        <table class="custom-table">
 
-                <span>Inspection Method</span>
-
-                <label>
-                    <input asp-for="SamplingInspection" type="checkbox" />
-                    Sampling Inspection
-                </label>
-
-
-                <label>
-                    <input asp-for="HundredPercentInspection" type="checkbox" />
-                    100% Inspection
-                </label>
-
-
-                <label>
-                    <input asp-for="OtherInspection" type="checkbox" />
-                    Others
-                </label>
-
-            </div>
-            <div class="results-table">
-
-                @if (Model.dtChecklist != null &&
-                Model.dtChecklist.Rows.Count > 0)
-                {
-                    <table class="custom-table">
-                        <thead>
-
-                            <tr>
-
-                                <th>Inspection Items</th>
-
-                                <th>Inspection Spec</th>
-
-                                <th>Inspection Contents</th>
-
-                                <th>Value</th>
-
-                            </tr>
-
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
-                            {
-                                var row = Model.dtChecklist.Rows[i];
-
+                            <thead>
                                 <tr>
-                                    <td>@row["Item"]</td>
-
-                                    <td>@row["Inspecs"]</td>
-
-                                    <td>@row["Contents"]</td>
-
-                                    <td>
-
-                                        <input type="hidden"
-                                               name="Checklist[@i].Id"
-                                               value="@(i + 1)" />
-
-                                        <input type="hidden"
-                                               name="Checklist[@i].ItemId"
-                                               value="@row["ItemId"]" />
-
-                                        <input type="hidden"
-                                               name="Checklist[@i].SpecId"
-                                               value="@row["SpecId"]" />
-
-                                        <input type="hidden"
-                                               name="Checklist[@i].ContentId"
-                                               value="@row["ContentId"]" />
-
-                                        <input class="value-box"
-                                               type="text"
-                                               name="Checklist[@i].Result" />
-
-                                    </td>
+                                    <th>Inspection Items</th>
+                                    <th>Inspection Spec</th>
+                                    <th>Inspection Contents</th>
+                                    <th>Value</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div class="empty">
-                        No records found. Use search to load data.
-                    </div>
-                }
-            </div>
-            <div class="actions">
-                <button type="button"
-                        id="btnSave"
-                        onclick="SaveInspection()"
-                        class="btn-submit">
-                    Submit
-                </button>
+                            </thead>
 
-            </div>
+                            <tbody>
+
+                                @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
+                                {
+                                    var row = Model.dtChecklist.Rows[i];
+
+                                    <tr>
+
+                                        <td>
+                                            @row["Item"]
+                                        </td>
+
+                                        <td>
+                                            @row["Inspecs"]
+                                        </td>
+
+                                        <td>
+                                            @row["Contents"]
+                                        </td>
+
+                                        <td>
+
+                                            <input type="hidden"
+                                                   name="Checklist[@i].Id"
+                                                   value="@(i + 1)" />
+
+                                            <input type="hidden"
+                                                   name="Checklist[@i].ItemId"
+                                                   value="@row["ItemId"]" />
+
+                                            <input type="hidden"
+                                                   name="Checklist[@i].SpecId"
+                                                   value="@row["SpecId"]" />
+
+                                            <input type="hidden"
+                                                   name="Checklist[@i].ContentId"
+                                                   value="@row["ContentId"]" />
+
+                                            <input class="value-box"
+                                                   type="text"
+                                                   name="Checklist[@i].Result" />
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty">
+                            No records found. Use search to load data.
+                        </div>
+                    }
+
+                </div>
+            }
+            @if (canShowInspection)
+            {
+                <div class="actions">
+
+                    <button type="button"
+                            id="btnSave"
+                            onclick="SaveInspection()"
+                            class="btn-submit">
+                        Submit
+                    </button>
+
+                </div>
+            }
         </form>
     </div>
     <script>
@@ -551,7 +572,7 @@
 
         });
 
-        function SaveInspection()
+                function SaveInspection()
         {
             var checklist = [];
 

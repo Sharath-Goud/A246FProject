@@ -247,6 +247,24 @@
                 gap: 10px;
             }
         }
+
+        /* NG ROW */
+        .ng-row {
+            background: rgba(220, 53, 69, 0.18) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.18) !important;
+                color: #ff6b6b !important;
+            }
+
+            .ng-row select,
+            .ng-row input {
+                border: 1px solid #dc3545 !important;
+                background: rgba(220, 53, 69, 0.12) !important;
+                color: #ff6b6b !important;
+            }
     </style>
 </head>
 
@@ -656,166 +674,561 @@
             return true;
         }
 
-        function Save() {
-            if (!validateHeader()) return;
+                function ValidateAllSOPPORRows()
+        {
+            var ngRecords = [];
+            var hasEnteredRows = false;
 
-            var formData = new FormData();
-            formData.append("LineId", $("#LineId").val());
-            formData.append("ProjectId", $("#ProjectId").val());
-            formData.append("ModelId", $("#ModelId").val());
-            formData.append("PartId", $("#PartId").val());
-            formData.append("ProdLineLeader", $("#ProdLineLeader").val());
-            formData.append("CheckedBy", $("#CheckedBy").val());
-            formData.append("ApprovedBy", $("#ApprovedBy").val());
 
-            var count = 0;
+            $("input[name$='.RiskId']").each(function(index)
+            {
+                var row = $(this).closest("tr");
 
-            $("input[name$='.RiskId']").each(function (index) {
-                var riskId = $("input[name='SOPPORResults[" + index + "].RiskId']").val();
-                var statusId = $("select[name='SOPPORResults[" + index + "].StatusId']").val();
-                var idNumber = $("input[name='SOPPORResults[" + index + "].IdNumber']").val();
 
-                if (statusId !== "" || idNumber !== "") {
-                    formData.append("SOPPORResults[" + count + "].RiskId", riskId);
-                    formData.append("SOPPORResults[" + count + "].StatusId", statusId);
-                    formData.append("SOPPORResults[" + count + "].IdNumber", idNumber);
+                var statusId =
+                    row.find(
+                        "select[name='SOPPORResults[" +
+                        index +
+                        "].StatusId']"
+                    ).val();
 
-                    var fileInput = document.getElementById("FileUpload1-" + index);
-                    if (fileInput && fileInput.files.length > 0) {
-                        formData.append("SOPPORResults[" + count + "].ImageFile", fileInput.files[0]);
-                    }
-                    count++;
+
+                var statusText =
+                    row.find(
+                        "select[name='SOPPORResults[" +
+                        index +
+                        "].StatusId'] option:selected"
+                    ).text().trim();
+
+
+                var idNumber =
+                    row.find(
+                        "input[name='SOPPORResults[" +
+                        index +
+                        "].IdNumber']"
+                    ).val();
+
+                if ((!statusId || statusId === "") &&
+                    (!idNumber || idNumber.trim() === ""))
+                {
+                    return;
+                }
+
+
+                hasEnteredRows = true;
+
+
+                if (statusText.toUpperCase() === "NG")
+                {
+                    row.addClass("ng-row");
+
+
+                    ngRecords.push({
+                        index: index + 1,
+                        status: statusText,
+                        idNumber: idNumber,
+                        row: row
+                    });
+                }
+                else
+                {
+                    row.removeClass("ng-row");
                 }
             });
 
-            if (count === 0) {
-                alert("No rows to save");
+
+            if (!hasEnteredRows)
+            {
+                alert("No rows to save.");
+                return false;
+            }
+
+
+            if (ngRecords.length === 0)
+            {
+                return true;
+            }
+
+
+            var message =
+                ngRecords.length +
+                " record(s) are marked as NG.\n\n";
+
+
+            $.each(
+                ngRecords,
+                function(i, item)
+                {
+                    message +=
+                        "Record " +
+                        item.index +
+                        " → " +
+                        item.status;
+
+
+                    if (item.idNumber &&
+                        item.idNumber.trim() !== "")
+                    {
+                        message +=
+                            " → ID: " +
+                            item.idNumber;
+                    }
+
+
+                    message += "\n";
+                }
+            );
+
+
+            message +=
+                "\nDo you want to save these NG records?";
+
+
+            var result =
+                confirm(message);
+
+
+            if (!result)
+            {
+                $.each(
+                    ngRecords,
+                    function(i, item)
+                    {
+                        item.row.addClass("ng-row");
+                    }
+                );
+
+
+                return false;
+            }
+
+            $.each(
+                ngRecords,
+                function(i, item)
+                {
+                    item.row.removeClass("ng-row");
+                }
+            );
+
+
+            return true;
+        }
+
+        function Save()
+        {
+
+            if (!validateHeader())
+            {
                 return;
             }
 
-            $.ajax({
-                url: '/SOPPOR/SaveBulkSOPPOR',
-                type: 'POST',
-                contentType: false,
-                processData: false,
-                data: formData,
-                success: function (res) {
-                    alert(res);
-                    location.reload();
-                },
-                error: function (xhr) {
-                    alert("Save Failed");
-                }
-            });
-        }
+            if (!ValidateAllSOPPORRows())
+            {
+                return;
+            }
 
 
-        function SaveSingleRow(btn, index) {
-            if (!validateHeader()) return;
+            var formData =
+                new FormData();
 
-            var formData = new FormData();
 
-            formData.append("LineId", $("#LineId").val());
-            formData.append("ProjectId", $("#ProjectId").val());
-            formData.append("ModelId", $("#ModelId").val());
-            formData.append("PartId", $("#PartId").val());
-            formData.append("ProdLineLeader", $("#ProdLineLeader").val());
-            formData.append("CheckedBy", $("#CheckedBy").val());
-            formData.append("ApprovedBy", $("#ApprovedBy").val());
+            formData.append(
+                "LineId",
+                $("#LineId").val()
+            );
+
+            formData.append(
+                "ProjectId",
+                $("#ProjectId").val()
+            );
+
+            formData.append(
+                "ModelId",
+                $("#ModelId").val()
+            );
+
+            formData.append(
+                "PartId",
+                $("#PartId").val()
+            );
+
+            formData.append(
+                "ProdLineLeader",
+                $("#ProdLineLeader").val()
+            );
+
+            formData.append(
+                "CheckedBy",
+                $("#CheckedBy").val()
+            );
+
+            formData.append(
+                "ApprovedBy",
+                $("#ApprovedBy").val()
+            );
 
             var count = 0;
-            var savedRows = [];
 
-            $("input[name$='.RiskId']").each(function (index) {
-
+            $("input[name$='.RiskId']").each(function(index)
+            {
                 var riskId =
-                    $("input[name='SOPPORResults[" + index + "].RiskId']").val();
+                    $("input[name='SOPPORResults[" +
+                        index +
+                        "].RiskId']").val();
+
 
                 var statusId =
-                    $("select[name='SOPPORResults[" + index + "].StatusId']").val();
+                    $("select[name='SOPPORResults[" +
+                        index +
+                        "].StatusId']").val();
+
 
                 var idNumber =
-                    $("input[name='SOPPORResults[" + index + "].IdNumber']").val();
+                    $("input[name='SOPPORResults[" +
+                        index +
+                        "].IdNumber']").val();
 
-                var fileInput =
-                    document.getElementById("FileUpload1-" + index);
 
-
-                if ((statusId && statusId !== "") || idNumber !== "") {
-                    savedRows.push(index);
+                if ((statusId && statusId !== "") ||
+                    (idNumber && idNumber.trim() !== ""))
+                {
                     formData.append(
-                        "SOPPORResults[" + count + "].RiskId",
+                        "SOPPORResults[" +
+                        count +
+                        "].RiskId",
                         riskId
                     );
 
+
                     formData.append(
-                        "SOPPORResults[" + count + "].StatusId",
+                        "SOPPORResults[" +
+                        count +
+                        "].StatusId",
                         statusId
                     );
 
+
                     formData.append(
-                        "SOPPORResults[" + count + "].IdNumber",
+                        "SOPPORResults[" +
+                        count +
+                        "].IdNumber",
                         idNumber
                     );
 
-                    if(fileInput && fileInput.files.length > 0)
+
+                    var fileInput =
+                        document.getElementById(
+                            "FileUpload1-" + index
+                        );
+
+
+                    if (fileInput &&
+                        fileInput.files.length > 0)
                     {
                         formData.append(
-                            "SOPPORResults[" + count + "].ImageFile",
+                            "SOPPORResults[" +
+                            count +
+                            "].ImageFile",
                             fileInput.files[0]
                         );
                     }
+
+
                     count++;
                 }
             });
 
-            if(count == 0)
+
+            if (count === 0)
             {
-                alert("Please enter data before saving");
+                alert("No rows to save.");
+
                 return;
             }
 
             $.ajax({
 
-                url:'/SOPPOR/SaveBulkSOPPOR',
-                type:'POST',
-                contentType:false,
-                processData:false,
-                data:formData,
-                success:function(res){
+                url:
+                    '/SOPPOR/SaveBulkSOPPOR',
 
-                    if(res.includes("Saved"))
-                    {
+                type:
+                    'POST',
 
-                        $("input[name$='.RiskId']").each(function(){
+                contentType:
+                    false,
 
-                            var row = $(this).closest("tr");
+                processData:
+                    false,
 
-                            var status =
-                            row.find("select[name$='.StatusId']").val();
+                data:
+                    formData,
 
-                            var idNumber =
-                            row.find("input[name$='.IdNumber']").val();
-
-                            if(status !== "" || idNumber !== "")
-                            {
-                                row.fadeOut(500,function(){
-                                    $(this).remove();
-                                });
-                            }
-                        });
-                    }
-                    else
+                success:
+                    function(res)
                     {
                         alert(res);
-                    }
-                },
 
-                error:function(xhr){
-                    alert("Save Failed");
-                }
+                        location.reload();
+                    },
+
+                error:
+                    function(xhr)
+                    {
+                        alert("Save Failed");
+                    }
             });
         }
+
+
+        function SaveSingleRow(btn, index)
+        {
+
+            if (!validateHeader())
+            {
+                return;
+            }
+
+            var clickedRow = $(btn).closest("tr");
+
+            if (clickedRow.length === 0)
+            {
+                alert("Record not found.");
+                return;
+            }
+
+            var ngRecords = [];
+            var enteredRows = [];
+
+            $("input[name$='.RiskId']").each(function(i)
+            {
+                var currentRow = $(this).closest("tr");
+
+                var riskId = $(this).val();
+
+                var statusId = currentRow.find(
+                    "select[name='SOPPORResults[" + i + "].StatusId']"
+                ).val();
+
+                var idNumber = currentRow.find(
+                    "input[name='SOPPORResults[" + i + "].IdNumber']"
+                ).val();
+
+                if (i > index)
+                {
+                    return;
+                }
+
+                if ((!statusId || statusId === "") &&
+                    (!idNumber || idNumber.trim() === ""))
+                {
+                    return;
+                }
+
+                var statusText = currentRow.find(
+                    "select[name='SOPPORResults[" + i + "].StatusId'] option:selected"
+                ).text().trim();
+
+                if (statusText.toUpperCase() === "NG")
+                {
+                    currentRow.addClass("ng-row");
+
+                    ngRecords.push({
+                        index: i + 1,
+                        status: statusText,
+                        idNumber: idNumber,
+                        row: currentRow
+                    });
+                }
+                else
+                {
+                    currentRow.removeClass("ng-row");
+                }
+
+                enteredRows.push({
+                    originalIndex: i,
+                    riskId: riskId,
+                    statusId: statusId,
+                    idNumber: idNumber,
+                    row: currentRow
+                });
+            });
+
+            if (enteredRows.length === 0)
+            {
+                alert("No entered records to save.");
+                return;
+            }
+
+            if (ngRecords.length > 0)
+            {
+                var message =
+                    ngRecords.length +
+                    " record(s) are marked as NG.\n\n";
+
+                $.each(
+                    ngRecords,
+                    function(i, item)
+                    {
+                        message +=
+                            "Record " +
+                            item.index +
+                            " → " +
+                            item.status;
+
+                        if (item.idNumber &&
+                            item.idNumber.trim() !== "")
+                        {
+                            message +=
+                                " → ID: " +
+                                item.idNumber;
+                        }
+
+                        message += "\n";
+                    }
+                );
+
+                message +=
+                    "\nDo you want to save these records?";
+
+
+                if (!confirm(message))
+                {
+
+                    $.each(
+                        ngRecords,
+                        function(i, item)
+                        {
+                            item.row.addClass("ng-row");
+                        }
+                    );
+
+                    return;
+                }
+
+                $.each(
+                    ngRecords,
+                    function(i, item)
+                    {
+                        item.row.removeClass("ng-row");
+                    }
+                );
+            }
+
+            var formData = new FormData();
+
+            formData.append(
+                "LineId",
+                $("#LineId").val()
+            );
+
+            formData.append(
+                "ProjectId",
+                $("#ProjectId").val()
+            );
+
+            formData.append(
+                "ModelId",
+                $("#ModelId").val()
+            );
+
+            formData.append(
+                "PartId",
+                $("#PartId").val()
+            );
+
+            formData.append(
+                "ProdLineLeader",
+                $("#ProdLineLeader").val()
+            );
+
+            formData.append(
+                "CheckedBy",
+                $("#CheckedBy").val()
+            );
+
+            formData.append(
+                "ApprovedBy",
+                $("#ApprovedBy").val()
+            );
+
+            $.each(
+                enteredRows,
+                function(saveIndex, item)
+                {
+
+                    formData.append(
+                        "SOPPORResults[" +
+                        saveIndex +
+                        "].RiskId",
+                        item.riskId
+                    );
+
+                    formData.append(
+                        "SOPPORResults[" +
+                        saveIndex +
+                        "].StatusId",
+                        item.statusId
+                    );
+
+                    formData.append(
+                        "SOPPORResults[" +
+                        saveIndex +
+                        "].IdNumber",
+                        item.idNumber
+                    );
+
+                    var fileInput =
+                        document.getElementById(
+                            "FileUpload1-" +
+                            item.originalIndex
+                        );
+
+
+                    if (fileInput &&
+                        fileInput.files &&
+                        fileInput.files.length > 0)
+                    {
+                        formData.append(
+                            "SOPPORResults[" +
+                            saveIndex +
+                            "].ImageFile",
+                            fileInput.files[0]
+                        );
+                    }
+                }
+            );
+
+        $.ajax(
+        {
+            url: '/SOPPOR/SaveBulkSOPPOR',
+
+            type: 'POST',
+
+            contentType: false,
+
+            processData: false,
+
+            data: formData,
+
+            success: function(res)
+            {
+
+                location.reload();
+            },
+
+            error: function(xhr)
+            {
+                console.log(xhr.responseText);
+
+                alert(
+                    "Save Failed.\n\n" +
+                    xhr.responseText
+                );
+            }
+        });
+
+        }
+
     </script>
 
 </body>

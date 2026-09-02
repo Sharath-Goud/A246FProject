@@ -43,7 +43,7 @@ namespace A246FProject.Services
                                         .Border(1)
                                         .Height(45)
                                         .Padding(5)
-                                        .Image("wwwroot/Images/foxlink_logo.PNG")
+                                        .Image("wwwroot/Images/foxlink-logo.png")
                                         .FitArea();
 
                                     table.Cell()
@@ -209,22 +209,15 @@ namespace A246FProject.Services
                                     table.Header(header =>
                                     {
 
-
                                         HeaderCell(header, "Item");
-
 
                                         HeaderCell(header, "Inspection Items");
 
-
                                         HeaderCell(header, "Inspection Spec");
-
 
                                         HeaderCell(header, "Inspection Contents");
 
-
                                         HeaderCell(header, "Judgement Result");
-
-
 
                                     });
 
@@ -330,11 +323,10 @@ namespace A246FProject.Services
                                         {
 
                                             text.Line("Approved By")
-                                                .Bold()
-                                                .FontSize(8);
+                                            .Bold()
+                                            .FontSize(8);
 
-
-                                            text.Line("2063821")
+                                            text.Line(dt.Rows[0]["ApprovedBy"].ToString())
                                                 .FontSize(8);
 
 
@@ -349,11 +341,10 @@ namespace A246FProject.Services
                                         {
 
                                             text.Line("Inspector:")
-                                                .Bold()
-                                                .FontSize(8);
+                                            .Bold()
+                                            .FontSize(8);
 
-
-                                            text.Line("2063222")
+                                            text.Line(dt.Rows[0]["CheckedBy"].ToString())
                                                 .FontSize(8);
 
 

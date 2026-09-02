@@ -185,6 +185,29 @@
                 gap: 10px;
             }
         }
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.18) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row > div {
+                background: rgba(220, 53, 69, 0.18) !important;
+                color: #ff6b6b !important;
+            }
+
+            .ng-row .actual-input {
+                border: 1px solid #dc3545 !important;
+                background: rgba(220, 53, 69, 0.12) !important;
+                color: #ff6b6b !important;
+            }
+
+        .ng-message {
+            color: #ff6b6b;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
     </style>
 </head>
 
@@ -378,7 +401,9 @@
 
     </form>
 
-    <form asp-action="SaveGlueWeighing" method="post">
+    <form asp-action="SaveGlueWeighing"
+          method="post"
+          id="glueWeighingForm">
 
         <input type="hidden" asp-for="LineId" />
 
@@ -452,7 +477,10 @@
                 int index = 0;
                 foreach (DataRow row in Model.dtChecklist.Rows)
                 {
-                    <div class="table-row">
+                    <div class="table-row"
+                         data-index="@index"
+                         data-lsl="@row["LowerLimit"]"
+                         data-usl="@row["UpperLimit"]">
 
                         <div>
                             @row["Adhesive"]
@@ -588,6 +616,303 @@
                     });
                 }
             });
+        });
+
+
+        function ValidateAllGlueWeighingValues()
+        {
+            var ngRecords = [];
+
+            var hasInvalidNumber = false;
+
+            $(".table-row").each(function (index)
+            {
+                var row = $(this);
+
+                var txt = row.find(".actual-input");
+
+                var valueText = txt.val();
+
+                if (valueText == null ||
+                    valueText.trim() === "")
+                {
+                    return;
+                }
+
+                var enteredValue =
+                    parseFloat(valueText);
+
+                if (isNaN(enteredValue))
+                {
+                    txt.focus();
+
+                    alert(
+                        "Please enter a valid numeric value."
+                    );
+
+                    hasInvalidNumber = true;
+
+                    return false;
+                }
+
+                var lsl =
+                    parseFloat(
+                        row.attr("data-lsl")
+                    );
+
+                var usl =
+                    parseFloat(
+                        row.attr("data-usl")
+                    );
+
+                if (isNaN(lsl) ||
+                    isNaN(usl))
+                {
+                    row.removeClass("ng-row");
+
+                    return;
+                }
+
+                if (enteredValue < lsl ||
+                    enteredValue > usl)
+                {
+                    var adhesive =
+                        row.find("div").eq(0).text().trim();
+
+                    row.addClass("ng-row");
+
+                    ngRecords.push({
+
+                        index:
+                            parseInt(
+                                row.attr("data-index")
+                            ) + 1,
+
+                        adhesive:
+                            adhesive,
+
+                        value:
+                            enteredValue,
+
+                        lsl:
+                            lsl,
+
+                        usl:
+                            usl,
+
+                        row:
+                            row
+                    });
+                }
+                else
+                {
+                    row.removeClass("ng-row");
+                }
+
+            });
+
+            if (hasInvalidNumber)
+            {
+                return false;
+            }
+
+            if (ngRecords.length === 0)
+            {
+                return true;
+            }
+
+            var message =
+                ngRecords.length +
+                " value(s) are outside the allowed range.\n\n";
+
+
+            $.each(
+                ngRecords,
+                function (i, item)
+                {
+                    message +=
+                        "Record " +
+                        item.index +
+                        " → " +
+                        item.adhesive +
+                        " → " +
+                        item.value +
+                        " [" +
+                        item.lsl +
+                        " - " +
+                        item.usl +
+                        "]\n";
+                }
+            );
+
+
+            message +=
+                "\nDo you want to save these NG values?";
+
+            var result =
+                confirm(message);
+
+            if (!result)
+            {
+
+                $.each(
+                    ngRecords,
+                    function (i, item)
+                    {
+                        item.row.addClass("ng-row");
+                    }
+                );
+
+                return false;
+            }
+
+            $.each(
+                ngRecords,
+                function (i, item)
+                {
+                    item.row.removeClass("ng-row");
+                }
+            );
+
+
+            return true;
+        }
+
+
+        $("#glueWeighingForm").on("submit", function (e)
+        {
+            var submitButton = $(document.activeElement);
+
+            if (submitButton.attr("name") === "saveRow")
+            {
+                var rowIndex =
+                    submitButton.val();
+
+                var row =
+                    $(".table-row[data-index='" +
+                        rowIndex +
+                        "']");
+
+                var txt =
+                    row.find(".actual-input");
+
+                var value =
+                    txt.val();
+
+
+                if (value == null ||
+                    value.trim() === "")
+                {
+                    e.preventDefault();
+
+                    alert("Please enter a value.");
+
+                    txt.focus();
+
+                    return false;
+                }
+
+
+                var enteredValue =
+                    parseFloat(value);
+
+
+                if (isNaN(enteredValue))
+                {
+                    e.preventDefault();
+
+                    alert(
+                        "Please enter a valid numeric value."
+                    );
+
+                    txt.focus();
+
+                    return false;
+                }
+
+
+                var lsl =
+                    parseFloat(
+                        row.attr("data-lsl")
+                    );
+
+                var usl =
+                    parseFloat(
+                        row.attr("data-usl")
+                    );
+
+
+                if (!isNaN(lsl) &&
+                    !isNaN(usl))
+                {
+                    if (enteredValue < lsl ||
+                        enteredValue > usl)
+                    {
+                        var adhesive =
+                            row.find("div").eq(0).text().trim();
+
+                        row.addClass("ng-row");
+
+                        var message =
+                            "VALUE OUT OF RANGE\n\n" +
+
+                            "Record : " +
+                            (parseInt(rowIndex) + 1) +
+                            "\n" +
+
+                            "Parameter : " +
+                            adhesive +
+                            "\n" +
+
+                            "LSL : " +
+                            lsl +
+                            "\n" +
+
+                            "USL : " +
+                            usl +
+                            "\n" +
+
+                            "Entered Value : " +
+                            enteredValue +
+                            "\n\n" +
+
+                            "Do you want to save this value?";
+
+                        var result =
+                            confirm(message);
+
+                        if (!result)
+                        {
+                            e.preventDefault();
+
+                            row.addClass("ng-row");
+
+                            return false;
+                        }
+
+                        row.removeClass("ng-row");
+                    }
+                    else
+                    {
+                        row.removeClass("ng-row");
+                    }
+                }
+
+                return true;
+            }
+
+            var validationResult =
+                ValidateAllGlueWeighingValues();
+
+
+            if (!validationResult)
+            {
+                e.preventDefault();
+
+                return false;
+            }
+
+            return true;
         });
     </script>
 </body>
