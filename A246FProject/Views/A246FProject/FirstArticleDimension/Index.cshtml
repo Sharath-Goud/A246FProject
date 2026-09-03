@@ -333,6 +333,21 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.18) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.12) !important;
+            }
+
+            .ng-row input {
+                border: 1px solid #dc3545 !important;
+                background: rgba(220, 53, 69, 0.12) !important;
+                color: #ff6b6b !important;
+            }
     </style>
 </head>
 <body>
@@ -551,11 +566,9 @@
 
 
 
-                function loadData() {
-
+        function loadData() {
 
             var errors = "";
-
 
             if ($("#ddlLine").val() == "")
             {
@@ -623,9 +636,6 @@
             }
 
 
-
-            // Validation failed
-
             if(errors != "")
             {
 
@@ -642,16 +652,8 @@
                 return;
             }
 
-
-
-            // Hide validation message
-
             $("#validationMessage")
             .hide();
-
-
-
-            // Existing AJAX call
 
             $.ajax({
 
@@ -670,9 +672,7 @@
                 success:function(data)
                 {
 
-
                     let html="";
-
 
                     if(data.length==0)
                     {
@@ -710,7 +710,8 @@
 
                             html +=
                             `
-                            <tr data-station="${item.stationName}">
+                            <tr data-station="${item.stationName}"
+                                data-specification="${item.specification}">
 
                             <td class="station-cell">
 
@@ -760,21 +761,364 @@
                             </tr>
                             `;
 
-
                         });
 
                     }
 
-
                     $("#tableBody").html(html);
-
 
                 }
 
+            });
+
+        }
+
+        function getSpecRange(specification) {
+
+            if (!specification) {
+                return null;
+            }
+
+            let spec = specification
+                .toString()
+                .trim()
+                .replace(/\s+/g, "");
+
+            if (spec.includes("±")) {
+
+                let parts = spec.split("±");
+
+                if (parts.length === 2) {
+
+                    let center = parseFloat(parts[0]);
+                    let tolerance = parseFloat(parts[1]);
+
+                    if (!isNaN(center) && !isNaN(tolerance)) {
+
+                        return {
+                            min: center - tolerance,
+                            max: center + tolerance
+                        };
+                    }
+                }
+            }
+
+            if (spec.includes("~")) {
+
+                let parts = spec.split("~");
+
+                if (parts.length === 2) {
+
+                    let min = parseFloat(parts[0]);
+                    let max = parseFloat(parts[1]);
+
+                    if (!isNaN(min) && !isNaN(max)) {
+
+                        return {
+                            min: Math.min(min, max),
+                            max: Math.max(min, max)
+                        };
+                    }
+                }
+            }
+
+
+            let toleranceMatch =
+                spec.match(
+                    /^(-?\d+(?:\.\d+)?)\+(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/
+                );
+
+            if (toleranceMatch) {
+
+                let base = parseFloat(toleranceMatch[1]);
+                let plusTolerance = parseFloat(toleranceMatch[2]);
+                let minusTolerance = parseFloat(toleranceMatch[3]);
+
+                return {
+                    min: base - minusTolerance,
+                    max: base + plusTolerance
+                };
+            }
+
+
+            return null;
+        }
+
+        function isNGValue(value, specification) {
+
+            if (value == null || value.toString().trim() === "") {
+                return false;
+            }
+
+            let numericValue = parseFloat(value);
+
+            if (isNaN(numericValue)) {
+                return false;
+            }
+
+            let range = getSpecRange(specification);
+
+            if (!range) {
+                return false;
+            }
+
+            return (
+                numericValue < range.min ||
+                numericValue > range.max
+            );
+        }
+
+        function updateDimensionNGRow(row) {
+
+            let specification =
+                row.attr("data-specification");
+
+            let hasNG = false;
+
+
+            if (
+                isNGValue(
+                    row.find(".check1").val(),
+                    specification
+                )
+            ) {
+                hasNG = true;
+            }
+
+
+            if (
+                isNGValue(
+                    row.find(".check2").val(),
+                    specification
+                )
+            ) {
+                hasNG = true;
+            }
+
+
+            if (
+                isNGValue(
+                    row.find(".check3").val(),
+                    specification
+                )
+            ) {
+                hasNG = true;
+            }
+
+
+            if (
+                isNGValue(
+                    row.find(".check4").val(),
+                    specification
+                )
+            ) {
+                hasNG = true;
+            }
+
+
+            if (
+                isNGValue(
+                    row.find(".check5").val(),
+                    specification
+                )
+            ) {
+                hasNG = true;
+            }
+
+
+            if (hasNG) {
+
+                row.addClass("ng-row");
+
+            }
+            else {
+
+                row.removeClass("ng-row");
+
+            }
+        }
+
+        $(document).on(
+            "input",
+            ".check1, .check2, .check3, .check4, .check5",
+            function () {
+
+                let row = $(this).closest("tr");
+
+                updateDimensionNGRow(row);
+            }
+        );
+
+        function ValidateDimensionNGRecords(rows) {
+
+            let ngRecords = [];
+
+            rows.forEach(function (x, index) {
+
+                let ngChecks = [];
+
+                let specification =
+                    x._htmlRow.attr("data-specification");
+
+                if (
+                    isNGValue(
+                        x.Check1,
+                        specification
+                    )
+                ) {
+                    ngChecks.push("Check1");
+                }
+
+
+                if (
+                    isNGValue(
+                        x.Check2,
+                        specification
+                    )
+                ) {
+                    ngChecks.push("Check2");
+                }
+
+
+                if (
+                    isNGValue(
+                        x.Check3,
+                        specification
+                    )
+                ) {
+                    ngChecks.push("Check3");
+                }
+
+
+                if (
+                    isNGValue(
+                        x.Check4,
+                        specification
+                    )
+                ) {
+                    ngChecks.push("Check4");
+                }
+
+
+                if (
+                    isNGValue(
+                        x.Check5,
+                        specification
+                    )
+                ) {
+                    ngChecks.push("Check5");
+                }
+
+                if (ngChecks.length > 0) {
+
+                    x._htmlRow.addClass("ng-row");
+
+
+                    let stationName =
+                        x._htmlRow.attr("data-station") || "-";
+
+
+                    let range =
+                        getSpecRange(specification);
+
+
+                    ngRecords.push({
+
+                        index: index,
+
+                        stationName: stationName,
+
+                        specification: specification,
+
+                        allowedRange:
+                            range
+                                ? range.min + " to " + range.max
+                                : "-",
+
+                        checks: ngChecks,
+
+                        row: x._htmlRow
+
+                    });
+
+                }
+                else {
+
+                    x._htmlRow.removeClass("ng-row");
+
+                }
 
             });
 
 
+            if (ngRecords.length === 0) {
+
+                return true;
+
+            }
+
+            let message =
+                ngRecords.length +
+                " NG record(s) found.\n\n";
+
+
+            ngRecords.forEach(function (item) {
+
+                message +=
+                    "Record " +
+                    (item.index + 1) +
+                    "\n";
+
+
+                message +=
+                    "Station: " +
+                    item.stationName +
+                    "\n";
+
+
+                message +=
+                    "Specification: " +
+                    item.specification +
+                    "\n";
+
+
+                message +=
+                    "Allowed Range: " +
+                    item.allowedRange +
+                    "\n";
+
+
+                message +=
+                    "NG Found In: " +
+                    item.checks.join(", ") +
+                    "\n\n";
+
+            });
+
+
+            message +=
+                "The above values are outside the specification.\n\n" +
+                "Do you want to save these NG records?";
+
+
+            let result =
+                confirm(message);
+
+
+            if (!result) {
+
+                ngRecords.forEach(function (item) {
+
+                    item.row.addClass("ng-row");
+
+                });
+
+                return false;
+
+            }
+
+
+            return true;
         }
 
         function refreshStationDisplay() {
@@ -808,14 +1152,12 @@
             });
         }
 
-                function saveRow(btn) {
+        function saveRow(btn) {
 
             let clickedRow = $(btn).closest("tr");
 
             let rowsToSave = [];
 
-            // Collect all rows ABOVE the clicked row
-            // including the clicked row itself
             $("#tableBody tr").each(function () {
 
                 let row = $(this);
@@ -836,146 +1178,284 @@
                     SerialNo4: row.find(".serial4").val(),
                     SerialNo5: row.find(".serial5").val(),
 
-                    // Keep reference to HTML row
                     _htmlRow: row
                 });
 
-                // Stop after clicked Save row
                 if (row[0] === clickedRow[0]) {
                     return false;
                 }
+
             });
 
-            // Remove rows where absolutely nothing was entered
             rowsToSave = rowsToSave.filter(function (x) {
 
-                return x.Check1 != "" ||
-                       x.Check2 != "" ||
-                       x.Check3 != "" ||
-                       x.Check4 != "" ||
-                       x.Check5 != "" ||
-                       x.SerialNo1 != "" ||
-                       x.SerialNo2 != "" ||
-                       x.SerialNo3 != "" ||
-                       x.SerialNo4 != "" ||
-                       x.SerialNo5 != "";
+                return (
+                    (x.Check1 || "").trim() !== "" ||
+                    (x.Check2 || "").trim() !== "" ||
+                    (x.Check3 || "").trim() !== "" ||
+                    (x.Check4 || "").trim() !== "" ||
+                    (x.Check5 || "").trim() !== "" ||
+
+                    (x.SerialNo1 || "").trim() !== "" ||
+                    (x.SerialNo2 || "").trim() !== "" ||
+                    (x.SerialNo3 || "").trim() !== "" ||
+                    (x.SerialNo4 || "").trim() !== "" ||
+                    (x.SerialNo5 || "").trim() !== ""
+                );
+
             });
 
 
             if (rowsToSave.length === 0) {
 
                 alert("Please enter data before saving.");
+
                 return;
             }
 
+            let validationResult =
+                ValidateDimensionNGRecords(rowsToSave);
 
-            let dimensionList = rowsToSave.map(function (x) {
 
-                return {
+            if (!validationResult) {
 
-                    SpecId: x.SpecId,
+                return;
 
-                    Check1: x.Check1,
-                    Check2: x.Check2,
-                    Check3: x.Check3,
-                    Check4: x.Check4,
-                    Check5: x.Check5,
+            }
 
-                    SerialNo1: x.SerialNo1,
-                    SerialNo2: x.SerialNo2,
-                    SerialNo3: x.SerialNo3,
-                    SerialNo4: x.SerialNo4,
-                    SerialNo5: x.SerialNo5
-                };
+            let dimensionList =
+                rowsToSave.map(function (x) {
 
-            });
+                    return {
+
+                        SpecId: x.SpecId,
+
+                        Check1: x.Check1,
+                        Check2: x.Check2,
+                        Check3: x.Check3,
+                        Check4: x.Check4,
+                        Check5: x.Check5,
+
+                        SerialNo1: x.SerialNo1,
+                        SerialNo2: x.SerialNo2,
+                        SerialNo3: x.SerialNo3,
+                        SerialNo4: x.SerialNo4,
+                        SerialNo5: x.SerialNo5
+                    };
+
+                });
 
 
             let model = {
 
                 LineId: $("#ddlLine").val(),
+
                 ProjectId: $("#ddlProject").val(),
+
                 ModelId: $("#ddlModel").val(),
+
                 PartId: $("#ddlPart").val(),
 
                 ProductName: $("#txtProductName").val(),
+
                 WorkOrder: $("#txtWorkOrder").val(),
+
                 DrawingVersion: $("#txtDrawingVersion").val(),
+
                 PackVersion: $("#txtPackVersion").val(),
+
                 SamplingQty: $("#txtSamplingQty").val(),
 
                 ProdLineLeader: $("#txtLineLeader").val(),
+
                 CheckedBy: $("#txtCheckedBy").val(),
+
                 ApprovedBy: $("#txtApprovedBy").val(),
 
                 CreatedBy: $("#hdnCreatedBy").val(),
 
-                CheckListFirstArticleDimensions: dimensionList
+                CheckListFirstArticleDimensions:
+                    dimensionList
             };
 
 
             $.ajax({
 
-                url: "/FirstArticleDimension/SubmitDimension",
+                url:
+                    "/FirstArticleDimension/SubmitDimension",
 
-                type: "POST",
+                type:
+                    "POST",
 
-                contentType: "application/json",
+                contentType:
+                    "application/json",
 
-                data: JSON.stringify(model),
+                data:
+                    JSON.stringify(model),
 
-                success: function (res) {
 
-                    if (res.success) {
+                success:
+                    function (res) {
 
-                        alert("Data Saved Successfully");
+                        if (res.success) {
 
-                        rowsToSave.forEach(function (x) {
+                            alert(
+                                "Data Saved Successfully"
+                            );
 
-                            x._htmlRow.remove();
+                            rowsToSave.forEach(function (x) {
 
-                        });
+                                x._htmlRow.fadeOut(
+                                    300,
+                                    function () {
 
-                        refreshStationDisplay();
+                                        $(this).remove();
+
+                                        refreshStationDisplay();
+
+                                    }
+                                );
+
+                            });
+
+                        }
+                        else {
+
+                            alert(
+                                res.message ||
+                                "Save Failed"
+                            );
+
+                        }
+
+                    },
+
+
+                error:
+                    function () {
+
+                        alert(
+                            "Error while saving."
+                        );
 
                     }
-                    else {
-                        alert(res.message);
-                    }
-                },
 
-                error: function (xhr) {
-                    alert("Error while saving.");
-                }
             });
+
         }
 
-         function submitData() {
+                function submitData() {
 
-            let list = [];
+            let rowsToSubmit = [];
 
+
+            /*
+               Collect all remaining rows
+            */
             $("#tableBody tr").each(function () {
 
-                list.push({
+                let row = $(this);
 
-                    SpecId: $(this).find(".specId").val(),
 
-                    Check1: $(this).find(".check1").val(),
-                    Check2: $(this).find(".check2").val(),
-                    Check3: $(this).find(".check3").val(),
-                    Check4: $(this).find(".check4").val(),
-                    Check5: $(this).find(".check5").val(),
+                rowsToSubmit.push({
 
-                    SerialNo1: $(this).find(".serial1").val(),
-                    SerialNo2: $(this).find(".serial2").val(),
-                    SerialNo3: $(this).find(".serial3").val(),
-                    SerialNo4: $(this).find(".serial4").val(),
-                    SerialNo5: $(this).find(".serial5").val()
+                    SpecId: row.find(".specId").val(),
+
+                    Check1: row.find(".check1").val(),
+                    Check2: row.find(".check2").val(),
+                    Check3: row.find(".check3").val(),
+                    Check4: row.find(".check4").val(),
+                    Check5: row.find(".check5").val(),
+
+                    SerialNo1: row.find(".serial1").val(),
+                    SerialNo2: row.find(".serial2").val(),
+                    SerialNo3: row.find(".serial3").val(),
+                    SerialNo4: row.find(".serial4").val(),
+                    SerialNo5: row.find(".serial5").val(),
+
+                    _htmlRow: row
 
                 });
 
             });
 
+
+            /*
+               Remove empty rows
+            */
+            rowsToSubmit =
+                rowsToSubmit.filter(function (x) {
+
+                    return (
+                        (x.Check1 || "").trim() !== "" ||
+                        (x.Check2 || "").trim() !== "" ||
+                        (x.Check3 || "").trim() !== "" ||
+                        (x.Check4 || "").trim() !== "" ||
+                        (x.Check5 || "").trim() !== "" ||
+
+                        (x.SerialNo1 || "").trim() !== "" ||
+                        (x.SerialNo2 || "").trim() !== "" ||
+                        (x.SerialNo3 || "").trim() !== "" ||
+                        (x.SerialNo4 || "").trim() !== "" ||
+                        (x.SerialNo5 || "").trim() !== ""
+                    );
+
+                });
+
+
+            if (rowsToSubmit.length === 0) {
+
+                alert("No data available to submit.");
+
+                return;
+
+            }
+
+
+            /*
+               Validate NG records
+            */
+            let validationResult =
+                ValidateDimensionNGRecords(
+                    rowsToSubmit
+                );
+
+
+            if (!validationResult) {
+
+                return;
+
+            }
+
+
+            /*
+               Remove HTML reference
+               before sending data
+            */
+            let dimensionList =
+                rowsToSubmit.map(function (x) {
+
+                    return {
+
+                        SpecId: x.SpecId,
+
+                        Check1: x.Check1,
+                        Check2: x.Check2,
+                        Check3: x.Check3,
+                        Check4: x.Check4,
+                        Check5: x.Check5,
+
+                        SerialNo1: x.SerialNo1,
+                        SerialNo2: x.SerialNo2,
+                        SerialNo3: x.SerialNo3,
+                        SerialNo4: x.SerialNo4,
+                        SerialNo5: x.SerialNo5
+
+                    };
+
+                });
+
+
             let model = {
 
                 LineId: $("#ddlLine").val(),
@@ -1004,60 +1484,95 @@
 
                 CreatedBy: $("#hdnCreatedBy").val(),
 
-                CheckListFirstArticleDimensions: list
+                CheckListFirstArticleDimensions:
+                    dimensionList
 
             };
 
+
             $.ajax({
 
-                url: "/FirstArticleDimension/SubmitDimension",
+                url:
+                    "/FirstArticleDimension/SubmitDimension",
 
-                type: "POST",
+                type:
+                    "POST",
 
-                contentType: "application/json",
+                contentType:
+                    "application/json",
 
-                data: JSON.stringify(model),
+                data:
+                    JSON.stringify(model),
 
-                success: function (res) {
 
-                    if (res.success) {
+                success:
+                    function (res) {
 
-                        alert("Bulk Data Submitted Successfully");
+                        if (res.success) {
 
-                        $("#ddlLine").val("");
-                        $("#ddlProject").val("");
+                            alert(
+                                "Bulk Data Submitted Successfully"
+                            );
 
-                        $("#ddlModel").empty()
-                            .append("<option value=''>-- Select Model --</option>");
 
-                        $("#ddlPart").empty()
-                            .append("<option value=''>-- Select Part --</option>");
+                            /*
+                               Clear form
+                            */
+                            $("#ddlLine").val("");
 
-                        $("#txtLineLeader").val("");
-                        $("#txtCheckedBy").val("");
-                        $("#txtApprovedBy").val("");
-                        $("#txtProductName").val("");
-                        $("#txtWorkOrder").val("");
-                        $("#txtDrawingVersion").val("");
-                        $("#txtPackVersion").val("");
-                        $("#txtSamplingQty").val("");
+                            $("#ddlProject").val("");
 
-                        $("#tableBody").html("");
+                            $("#ddlModel")
+                                .empty()
+                                .append(
+                                    "<option value=''>-- Select Model --</option>"
+                                );
+
+                            $("#ddlPart")
+                                .empty()
+                                .append(
+                                    "<option value=''>-- Select Part --</option>"
+                                );
+
+                            $("#txtLineLeader").val("");
+
+                            $("#txtCheckedBy").val("");
+
+                            $("#txtApprovedBy").val("");
+
+                            $("#txtProductName").val("");
+
+                            $("#txtWorkOrder").val("");
+
+                            $("#txtDrawingVersion").val("");
+
+                            $("#txtPackVersion").val("");
+
+                            $("#txtSamplingQty").val("");
+
+                            $("#tableBody").html("");
+
+                        }
+                        else {
+
+                            alert(
+                                res.message ||
+                                "Submit Failed"
+                            );
+
+                        }
+
+                    },
+
+
+                error:
+                    function () {
+
+                        alert(
+                            "Error while submitting."
+                        );
 
                     }
-                    else {
-
-                        alert(res.message);
-                        
-                    }
-
-                },
-
-                error: function () {
-
-                    alert("Error while submitting.");
-
-                }
 
             });
 

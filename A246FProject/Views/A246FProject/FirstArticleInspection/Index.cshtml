@@ -246,6 +246,26 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.18) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row .station,
+            .ng-row .item,
+            .ng-row .criteria-area,
+            .ng-row .control-area,
+            .ng-row .action-area {
+                color: #ff6b6b !important;
+            }
+
+            .ng-row input,
+            .ng-row select {
+                border: 1px solid #dc3545 !important;
+                background: rgba(220, 53, 69, 0.12) !important;
+                color: #ff6b6b !important;
+            }
     </style>
 </head>
 <body>
@@ -549,8 +569,10 @@
                             html += `
 
                             <div class="data-row"
-                            data-contentid="${item.contentId}"
-                            data-group="${item.stationName}_${item.itemName}">
+                                data-contentid="${item.contentId}"
+                                data-group="${item.stationName}_${item.itemName}"
+                                data-stationname="${item.stationName}"
+                                data-itemname="${item.itemName}">
 
 
                             <input type="hidden"
@@ -685,109 +707,336 @@
             });
         }
 
-        function saveRow(btn) {
+        $(document).on("change", ".status", function () {
 
-            let rowsToSave = [];
+            var row = $(this).closest(".data-row");
 
-            $(".data-row").each(function () {
+            var status = $(this).val();
 
-                let row = $(this);
+            if (status === "NG") {
+                row.addClass("ng-row");
+            }
+            else {
+                row.removeClass("ng-row");
+            }
 
-                let result = row.find(".result").val();
+        });
 
-                let ngDesc = row.find(".ngdesc").val();
+        function ValidateNGRecords() {
 
-                let status = row.find(".status").val();
+            var ngRecords = [];
 
-                if(result != "" || ngDesc != "")
-                {
-                    rowsToSave.push({
+            $(".data-row").each(function (index) {
 
-                        ContentId:row.find(".contentId").val(),
+                var row = $(this);
 
-                        SRId:
+                var status = row.find(".status").val();
 
-                        status=="OK" ? 5 :
+                if (status === "NG") {
 
-                        status=="NG" ? 6 : 7,
+                    var stationName =
+                        row.find(".station").text().trim();
 
-                        Result: result,
+                    var inspectionItem =
+                        row.find(".item").text().trim();
 
-                        RejectDescribe: ngDesc
+                    var criteria =
+                        row.find(".criteria-area").text().trim();
 
+                    var ngDescription =
+                        row.find(".ngdesc").val();
+
+                    row.addClass("ng-row");
+
+                    ngRecords.push({
+                        index: index,
+                        stationName: stationName,
+                        inspectionItem: inspectionItem,
+                        criteria: criteria,
+                        ngDescription: ngDescription,
+                        row: row
                     });
                 }
+                else {
+                    row.removeClass("ng-row");
+                }
+
             });
 
-            if(rowsToSave.length == 0)
-            {
+            if (ngRecords.length === 0) {
+                return true;
+            }
+
+            var message =
+                ngRecords.length +
+                " NG record(s) found.\n\n";
+
+
+            $.each(ngRecords, function (i, item) {
+
+                message +=
+                    "Record " +
+                    (item.index + 1) +
+                    "\n";
+
+                message +=
+                    "Station: " +
+                    (item.stationName || "-") +
+                    "\n";
+
+                message +=
+                    "Inspection Item: " +
+                    (item.inspectionItem || "-") +
+                    "\n";
+
+                message +=
+                    "Criteria: " +
+                    (item.criteria || "-") +
+                    "\n";
+
+                if (item.ngDescription &&
+                    item.ngDescription.trim() !== "") {
+
+                    message +=
+                        "NG Description: " +
+                        item.ngDescription +
+                        "\n";
+                }
+
+                message += "\n";
+            });
+
+
+            message +=
+                "Do you want to save these NG records?";
+
+            var result = confirm(message);
+
+            if (!result) {
+
+                $.each(ngRecords, function (i, item) {
+                    item.row.addClass("ng-row");
+                });
+
+                return false;
+            }
+
+            return true;
+        }
+
+        function saveRow(btn) {
+
+            let row = $(btn).closest(".data-row");
+
+
+            let result =
+                row.find(".result").val();
+
+            let ngDesc =
+                row.find(".ngdesc").val();
+
+            let status =
+                row.find(".status").val();
+
+            if (result == "" &&
+                ngDesc == "") {
+
                 alert("Please enter data before saving");
+
                 return;
             }
 
+            if (status == "NG") {
+
+                row.addClass("ng-row");
+
+
+                let stationName =
+                    row.attr("data-stationname") || "";
+
+                let itemName =
+                    row.attr("data-itemname") || "";
+
+                let criteria =
+                    row.find(".criteria-area")
+                        .text()
+                        .trim();
+
+
+                let message =
+                    "This record is marked as NG.\n\n" +
+
+                    "Station: " +
+                    stationName +
+                    "\n\n" +
+
+                    "Inspection Item: " +
+                    itemName +
+                    "\n\n" +
+
+                    "Inspection Criteria: " +
+                    criteria;
+
+
+                if (ngDesc != null &&
+                    ngDesc.trim() != "") {
+
+                    message +=
+                        "\n\nNG Description: " +
+                        ngDesc;
+
+                }
+
+
+                message +=
+                    "\n\nDo you want to save this NG record?";
+
+
+                let confirmNG =
+                    confirm(message);
+
+                if (!confirmNG) {
+
+                    row.addClass("ng-row");
+
+                    return;
+
+                }
+
+            }
+            else {
+
+                row.removeClass("ng-row");
+
+            }
+
+            let rowsToSave = [];
+
+            rowsToSave.push({
+
+                ContentId:
+                    row.find(".contentId").val(),
+
+                SRId:
+
+                    status == "OK" ? 5 :
+
+                    status == "NG" ? 6 : 7,
+
+                Result:
+                    result,
+
+                RejectDescribe:
+                    ngDesc
+
+            });
+
             let model = {
-                LineId: $("#ddlLine").val(),
-                ProjectId: $("#ddlProject").val(),
-                ModelId: $("#ddlModel").val(),
-                PartId: $("#ddlPart").val(),
+
+                LineId:
+                    $("#ddlLine").val(),
+
+                ProjectId:
+                    $("#ddlProject").val(),
+
+                ModelId:
+                    $("#ddlModel").val(),
+
+                PartId:
+                    $("#ddlPart").val(),
+
                 ProductName:
-                $("#txtProductName").val(),
+                    $("#txtProductName").val(),
+
                 WorkOrder:
-                $("#txtWorkOrder").val(),
+                    $("#txtWorkOrder").val(),
+
                 DrawingVersion:
-                $("#txtDrawingVersion").val(),
+                    $("#txtDrawingVersion").val(),
+
                 PackVersion:
-                $("#txtPackVersion").val(),
+                    $("#txtPackVersion").val(),
+
                 SamplingQty:
-                $("#txtSamplingQty").val(),
+                    $("#txtSamplingQty").val(),
+
                 ProdLineLeader:
-                $("#txtLineLeader").val(),
+                    $("#txtLineLeader").val(),
+
                 CheckedBy:
-                $("#txtCheckedBy").val(),
+                    $("#txtCheckedBy").val(),
+
                 ApprovedBy:
-                $("#txtApprovedBy").val(),
+                    $("#txtApprovedBy").val(),
+
                 CreatedBy:
-                $("#hdnCreatedBy").val(),
+                    $("#hdnCreatedBy").val(),
+
                 CheckListFirstArticleInspections:
-                rowsToSave
+                    rowsToSave
+
             };
 
             $.ajax({
 
-                url:"/FirstArticleInspection/SubmitInspection",
-                type:"POST",
-                contentType:"application/json",
-                data:JSON.stringify(model),
-                success:function(res){
+                url:
+                    "/FirstArticleInspection/SubmitInspection",
 
-                if(res.success)
-                {
-                    rowsToSave.forEach(function(x){
+                type:
+                    "POST",
 
-                        let row =
-                            $(".data-row[data-contentid='"+x.ContentId+"']");
+                contentType:
+                    "application/json",
 
-                            row.fadeOut(300, function () {
+                data:
+                    JSON.stringify(model),
 
-                            $(this).remove();
 
-                            refreshStationAndItemDisplay();
+                success:
+                    function (res) {
 
-                        });
+                        if (res.success) {
 
-                    });
-                }
+                            row.fadeOut(
+                                300,
+                                function () {
 
-                },
+                                    $(this).remove();
 
-                error:function(xhr){
-                    alert("Error while saving");
-                }
+                                    refreshStationAndItemDisplay();
+
+                                }
+                            );
+
+                            alert("Saved Successfully");
+
+                        }
+                        else {
+
+                            alert("Save Failed");
+
+                        }
+
+                    },
+
+                error:
+                    function () {
+
+                        alert("Error while saving");
+
+                    }
             });
         }
 
 
         function submitData() {
+
+            var validationResult =
+                ValidateNGRecords();
+
+            if (!validationResult) {
+                return;
+            }
 
             let list = [];
 
