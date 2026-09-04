@@ -247,15 +247,32 @@
         @@media(max - width:900px) {
             .form-row
 
-        {
-            grid-template-columns: 1fr;
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .custom-table {
+                min-width: 1600px;
+            }
+
+        }
+        
+        .ng-row {
+            background: rgba(220, 53, 69, 0.20) !important;
+            border-left: 4px solid #dc3545 !important;
         }
 
-        .custom-table {
-            min-width: 1600px;
-        }
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.08) !important;
+                color: #ff8080 !important;
+            }
 
-        }</style>
+        .ng-input {
+            border: 2px solid #dc3545 !important;
+            background: rgba(220, 53, 69, 0.18) !important;
+            color: #ff8080 !important;
+        }
+ </style>
 
 </head>
 
@@ -424,13 +441,24 @@
                                 <td>@row["InspectionProject"]</td>
                                 <td>@row["InspectionSpecifications"]</td>
                                 <td>@row["Frequency"]</td>
-                                <td>@row["Section"]</td>
-
                                 <td>
+                                    @row["Section"]
+
                                     <input type="hidden"
                                            class="SectionId"
                                            value="@row["SectionId"]" />
 
+                                    <input type="hidden"
+                                           class="StartSpec"
+                                           value="@row["StartSpec"]" />
+
+                                    <input type="hidden"
+                                           class="EndSpec"
+                                           value="@row["EndSpec"]" />
+                                </td>
+
+                                <td>
+                                    
                                     <input type="text" class="Value1" />
                                 </td>
 
@@ -536,110 +564,455 @@
             });
         });
     </script>
+
+    <script>
+
+                function validateAOIValue(value, startSpec, endSpec) {
+
+            value = $.trim(value);
+
+            // Empty value is allowed
+            if (value === "") {
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+
+            }
+
+            // NG is not allowed
+            if (value.toUpperCase() === "NG") {
+
+                return {
+                    valid: false,
+                    message: "NG value is not allowed"
+                };
+
+            }
+
+            // Convert entered value to number
+            var numericValue = Number(value);
+
+            if (isNaN(numericValue)) {
+
+                return {
+                    valid: false,
+                    message: "Please enter a valid numeric value"
+                };
+
+            }
+
+            // Convert StartSpec to number
+            var minValue = Number(startSpec);
+
+            if (isNaN(minValue)) {
+
+                return {
+                    valid: false,
+                    message: "Invalid Start Specification"
+                };
+
+            }
+
+            // Convert EndSpec to number
+            var maxValue = Number(endSpec);
+
+            if (isNaN(maxValue)) {
+
+                return {
+                    valid: false,
+                    message: "Invalid End Specification"
+                };
+
+            }
+
+            // Check specification range
+            if (
+                numericValue < minValue ||
+                numericValue > maxValue
+            ) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Value must be between " +
+                        minValue +
+                        " and " +
+                        maxValue
+                };
+
+            }
+
+            return {
+                valid: true,
+                message: ""
+            };
+
+        }
+
+
+                function validateAOIRow(row) {
+
+            var startSpec = $.trim(
+                row.find(".StartSpec").val()
+            );
+
+            var endSpec = $.trim(
+                row.find(".EndSpec").val()
+            );
+
+            var values = [
+
+                {
+                    name: "Value1",
+                    input: row.find(".Value1")
+                },
+
+                {
+                    name: "Value2",
+                    input: row.find(".Value2")
+                },
+
+                {
+                    name: "Value3",
+                    input: row.find(".Value3")
+                },
+
+                {
+                    name: "Value4",
+                    input: row.find(".Value4")
+                },
+
+                {
+                    name: "Value5",
+                    input: row.find(".Value5")
+                }
+
+            ];
+
+            var invalidValues = [];
+
+            // Remove previous NG styles
+            row.removeClass("ng-row");
+
+            row.find(
+                ".Value1, .Value2, .Value3, .Value4, .Value5"
+            ).removeClass("ng-input");
+
+
+            values.forEach(function (item) {
+
+                var inputValue = $.trim(
+                    item.input.val()
+                );
+
+                if (inputValue !== "") {
+
+                    var result = validateAOIValue(
+
+                        inputValue,
+
+                        startSpec,
+
+                        endSpec
+
+                    );
+
+
+                    if (!result.valid) {
+
+                        invalidValues.push(
+
+                            item.name +
+                            " = " +
+                            inputValue +
+                            " (" +
+                            result.message +
+                            ")"
+
+                        );
+
+                        item.input.addClass("ng-input");
+
+                    }
+
+                }
+
+            });
+
+
+            // Invalid values found
+            if (invalidValues.length > 0) {
+
+                row.addClass("ng-row");
+
+                return {
+
+                    valid: false,
+
+                    message:
+                        invalidValues.join("\n")
+
+                };
+
+            }
+
+
+            return {
+
+                valid: true,
+
+                message: ""
+
+            };
+
+        }
+
+
+        // Validate immediately when user enters a value
+        $(document).on(
+
+            "input change",
+
+            ".Value1, .Value2, .Value3, .Value4, .Value5",
+
+            function () {
+
+                var row = $(this).closest("tr.row");
+
+                validateAOIRow(row);
+
+            }
+
+        );
+
+    </script>
     
     <script>
-                $(document).on("click", ".btnRowSave", function () {
 
-            // Current clicked Save button row
-            let clickedRow = $(this).closest("tr");
+        $(document).on("click", ".btnRowSave", function () {
+
+            let clickedRow = $(this).closest("tr.row");
 
             let rowsToSave = [];
 
-            // Read rows from first row up to clicked row
+            let validationErrors = [];
+
+
+            // Read from first row up to clicked row
             $("#body tr.row").each(function () {
 
                 let row = $(this);
 
-                let sectionId = row.find(".SectionId").val();
+                let sectionId =
+                    row.find(".SectionId").val();
 
-                let value1 = $.trim(row.find(".Value1").val());
-                let value2 = $.trim(row.find(".Value2").val());
-                let value3 = $.trim(row.find(".Value3").val());
-                let value4 = $.trim(row.find(".Value4").val());
-                let value5 = $.trim(row.find(".Value5").val());
 
-                // Check whether this row contains at least one entered value
+                let value1 =
+                    $.trim(row.find(".Value1").val());
+
+                let value2 =
+                    $.trim(row.find(".Value2").val());
+
+                let value3 =
+                    $.trim(row.find(".Value3").val());
+
+                let value4 =
+                    $.trim(row.find(".Value4").val());
+
+                let value5 =
+                    $.trim(row.find(".Value5").val());
+
+
                 let hasValue =
+
                     value1 !== "" ||
                     value2 !== "" ||
                     value3 !== "" ||
                     value4 !== "" ||
                     value5 !== "";
 
-                // Save only rows having values
+
+                // Validate only rows having values
+                if (hasValue) {
+
+                    let validationResult =
+                        validateAOIRow(row);
+
+
+                    if (!validationResult.valid) {
+
+                        let sectionName =
+
+                            row.find("td:eq(4)")
+                                .text()
+                                .trim();
+
+
+                        validationErrors.push(
+
+                            "Section: " +
+                            sectionName +
+                            "\n" +
+                            validationResult.message
+
+                        );
+
+                    }
+
+                }
+
+
+                // Add only rows having values
                 if (sectionId && hasValue) {
 
                     rowsToSave.push({
 
-                        SectionId: parseInt(sectionId) || 0,
+                        SectionId:
+                            parseInt(sectionId) || 0,
 
-                        Value1: value1 === "" ? null : value1,
-                        Value2: value2 === "" ? null : value2,
-                        Value3: value3 === "" ? null : value3,
-                        Value4: value4 === "" ? null : value4,
-                        Value5: value5 === "" ? null : value5,
+
+                        Value1:
+                            value1 === ""
+                                ? null
+                                : value1,
+
+
+                        Value2:
+                            value2 === ""
+                                ? null
+                                : value2,
+
+
+                        Value3:
+                            value3 === ""
+                                ? null
+                                : value3,
+
+
+                        Value4:
+                            value4 === ""
+                                ? null
+                                : value4,
+
+
+                        Value5:
+                            value5 === ""
+                                ? null
+                                : value5,
+
 
                         InspectionResults: "",
 
-                        // Store HTML row
+
+                        // Used only in JavaScript
                         _htmlRow: row
+
                     });
+
                 }
 
-                // Stop after clicked Save row
+
+                // Stop at clicked Save row
                 if (row[0] === clickedRow[0]) {
+
                     return false;
+
                 }
 
             });
 
-            if (rowsToSave.length === 0) {
 
-                alert("Please enter at least one value before saving.");
+            // Stop save if NG / invalid values exist
+            if (validationErrors.length > 0) {
+
+                alert(
+
+                    "❌ Cannot save because invalid / NG values were found.\n\n" +
+
+                    validationErrors.join("\n\n")
+
+                );
 
                 return;
+
             }
 
-            // Remove _htmlRow before sending
+
+            if (rowsToSave.length === 0) {
+
+                alert(
+                    "Please enter at least one value before saving."
+                );
+
+                return;
+
+            }
+
+
+            // Remove _htmlRow before sending to Controller
             let resultList = rowsToSave.map(function (x) {
 
                 return {
 
-                    SectionId: x.SectionId,
+                    SectionId:
+                        x.SectionId,
 
-                    Value1: x.Value1,
-                    Value2: x.Value2,
-                    Value3: x.Value3,
-                    Value4: x.Value4,
-                    Value5: x.Value5,
+                    Value1:
+                        x.Value1,
 
-                    InspectionResults: x.InspectionResults
+                    Value2:
+                        x.Value2,
+
+                    Value3:
+                        x.Value3,
+
+                    Value4:
+                        x.Value4,
+
+                    Value5:
+                        x.Value5,
+
+                    InspectionResults:
+                        x.InspectionResults
 
                 };
 
             });
 
+
             let model = {
 
-                LineId: parseInt($("#LineId").val()) || 0,
+                LineId:
+                    parseInt($("#LineId").val()) || 0,
 
-                ProjectId: parseInt($("#ProjectId").val()) || 0,
+                ProjectId:
+                    parseInt($("#ProjectId").val()) || 0,
 
-                ModelId: parseInt($("#ModelId").val()) || 0,
+                ModelId:
+                    parseInt($("#ModelId").val()) || 0,
 
-                PartId: parseInt($("#PartId").val()) || 0,
+                PartId:
+                    parseInt($("#PartId").val()) || 0,
 
-                MachineId: parseInt($("#MachineId").val()) || 0,
+                MachineId:
+                    parseInt($("#MachineId").val()) || 0,
 
-                ProdLineLeader: $("#ProdLineLeader").val(),
+                ProdLineLeader:
+                    $("#ProdLineLeader").val(),
 
-                CheckedBy: $("#CheckedBy").val(),
+                CheckedBy:
+                    $("#CheckedBy").val(),
 
-                ApprovedBy: $("#ApprovedBy").val(),
+                ApprovedBy:
+                    $("#ApprovedBy").val(),
 
-                AOIResults: resultList
+                AOIResults:
+                    resultList
 
             };
+
 
             $.ajax({
 
@@ -647,22 +1020,35 @@
 
                 type: 'POST',
 
-                contentType: 'application/json; charset=utf-8',
+                contentType:
+                    'application/json; charset=utf-8',
 
-                data: JSON.stringify(model),
+                data:
+                    JSON.stringify(model),
+
 
                 success: function (response) {
 
-                    if (response &&
-                        response.success !== undefined &&
-                        response.success === false) {
+                    if (
+                        response &&
+                        response.success === false
+                    ) {
 
-                        alert(response.message || "Save Failed");
+                        alert(
+                            response.message ||
+                            "Save Failed"
+                        );
 
                         return;
+
                     }
 
-                    alert(response.message || "Data Saved Successfully");
+
+                    alert(
+                        response.message ||
+                        "Data Saved Successfully"
+                    );
+
 
                     // Remove only saved rows
                     rowsToSave.forEach(function (x) {
@@ -671,24 +1057,37 @@
 
                     });
 
-                    // If all rows removed
-                    if ($("#body tr.row").length === 0) {
+
+                    // If all rows are saved
+                    if (
+                        $("#body tr.row").length === 0
+                    ) {
 
                         $("#body").html(`
+
                             <tr>
-                                <td colspan="11" class="empty-row">
+
+                                <td colspan="11"
+                                    class="empty-row">
+
                                     No Records Found
+
                                 </td>
+
                             </tr>
+
                         `);
 
                     }
 
                 },
 
-                error: function (xhr) {
 
-                    alert("Server Error while saving.");
+                error: function () {
+
+                    alert(
+                        "Server Error while saving."
+                    );
 
                 }
 
@@ -696,95 +1095,279 @@
 
         });
 
+    </script>
 
-        $(document).on("click", ".btn-submit", function (e) {
+    <script>
 
-            e.preventDefault();
+        $(document).on(
 
-            var results = [];
+            "click",
 
-            $("#body tr.row").each(function () {
+            ".btn-submit",
 
-                results.push({
+            function (e) {
 
-                    SectionId: parseInt($(this).find(".SectionId").val()) || 0,
+                e.preventDefault();
 
-                    Value1: parseFloat($(this).find(".Value1").val()) || 0,
 
-                    Value2: parseFloat($(this).find(".Value2").val()) || 0,
+                var results = [];
 
-                    Value3: parseFloat($(this).find(".Value3").val()) || 0,
+                var validationErrors = [];
 
-                    Value4: parseFloat($(this).find(".Value4").val()) || 0,
 
-                    Value5: parseFloat($(this).find(".Value5").val()) || 0,
+                $("#body tr.row").each(function () {
 
-                    InspectionResults: ""
+                    var row = $(this);
+
+
+                    var value1 =
+                        $.trim(row.find(".Value1").val());
+
+                    var value2 =
+                        $.trim(row.find(".Value2").val());
+
+                    var value3 =
+                        $.trim(row.find(".Value3").val());
+
+                    var value4 =
+                        $.trim(row.find(".Value4").val());
+
+                    var value5 =
+                        $.trim(row.find(".Value5").val());
+
+
+                    var hasValue =
+
+                        value1 !== "" ||
+                        value2 !== "" ||
+                        value3 !== "" ||
+                        value4 !== "" ||
+                        value5 !== "";
+
+
+                    // Skip completely empty rows
+                    if (!hasValue) {
+
+                        return;
+
+                    }
+
+
+                    // Validate row
+                    var validationResult =
+                        validateAOIRow(row);
+
+
+                    if (!validationResult.valid) {
+
+                        var sectionName =
+
+                            row.find("td:eq(4)")
+                                .text()
+                                .trim();
+
+
+                        validationErrors.push(
+
+                            "Section: " +
+                            sectionName +
+                            "\n" +
+                            validationResult.message
+
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    results.push({
+
+                        SectionId:
+
+                            parseInt(
+                                row.find(".SectionId").val()
+                            ) || 0,
+
+
+                        Value1:
+
+                            value1 === ""
+                                ? null
+                                : value1,
+
+
+                        Value2:
+
+                            value2 === ""
+                                ? null
+                                : value2,
+
+
+                        Value3:
+
+                            value3 === ""
+                                ? null
+                                : value3,
+
+
+                        Value4:
+
+                            value4 === ""
+                                ? null
+                                : value4,
+
+
+                        Value5:
+
+                            value5 === ""
+                                ? null
+                                : value5,
+
+
+                        InspectionResults:
+                            ""
+
+                    });
 
                 });
 
-            });
 
-            var model = {
+                // Stop Submit when invalid / NG values exist
+                if (validationErrors.length > 0) {
 
-                LineId: parseInt($("#LineId").val()) || 0,
+                    alert(
 
-                ProjectId: parseInt($("#ProjectId").val()) || 0,
+                        "❌ Cannot submit because invalid / NG values were found.\n\n" +
 
-                ModelId: parseInt($("#ModelId").val()) || 0,
+                        validationErrors.join("\n\n")
 
-                PartId: parseInt($("#PartId").val()) || 0,
+                    );
 
-                MachineId: parseInt($("#MachineId").val()) || 0,
-
-                ProdLineLeader: $("#ProdLineLeader").val(),
-
-                CheckedBy: $("#CheckedBy").val(),
-
-                ApprovedBy: $("#ApprovedBy").val(),
-
-                AOIResults: results
-
-            };
-
-            $.ajax({
-
-                url: '@Url.Action("Save", "AOI")',
-
-                type: 'POST',
-
-                contentType: 'application/json',
-
-                data: JSON.stringify(model),
-
-                success: function (response) {
-
-                    if (response.success === true) {
-
-                        $(".Value1").val("");
-                        $(".Value2").val("");
-                        $(".Value3").val("");
-                        $(".Value4").val("");
-                        $(".Value5").val("");
-
-                    }
-                    else {
-
-                        alert(response.message);
-
-                    }
-
-                },
-
-                error: function (xhr) {
-
-                    alert("Save Failed");
+                    return;
 
                 }
 
-            });
 
-        });
+                if (results.length === 0) {
+
+                    alert(
+                        "Please enter at least one value before submitting."
+                    );
+
+                    return;
+
+                }
+
+
+                var model = {
+
+                    LineId:
+                        parseInt($("#LineId").val()) || 0,
+
+                    ProjectId:
+                        parseInt($("#ProjectId").val()) || 0,
+
+                    ModelId:
+                        parseInt($("#ModelId").val()) || 0,
+
+                    PartId:
+                        parseInt($("#PartId").val()) || 0,
+
+                    MachineId:
+                        parseInt($("#MachineId").val()) || 0,
+
+
+                    ProdLineLeader:
+                        $("#ProdLineLeader").val(),
+
+                    CheckedBy:
+                        $("#CheckedBy").val(),
+
+                    ApprovedBy:
+                        $("#ApprovedBy").val(),
+
+
+                    AOIResults:
+                        results
+
+                };
+
+
+                $.ajax({
+
+                    url:
+                        '@Url.Action("Save", "AOI")',
+
+                    type:
+                        'POST',
+
+                    contentType:
+                        'application/json; charset=utf-8',
+
+                    data:
+                        JSON.stringify(model),
+
+
+                    success: function (response) {
+
+                        if (
+                            response &&
+                            response.success === false
+                        ) {
+
+                            alert(
+                                response.message ||
+                                "Save Failed"
+                            );
+
+                            return;
+
+                        }
+
+
+                        alert(
+                            "All Records Saved Successfully"
+                        );
+
+
+                        // Clear inputs
+                        $(".Value1").val("");
+
+                        $(".Value2").val("");
+
+                        $(".Value3").val("");
+
+                        $(".Value4").val("");
+
+                        $(".Value5").val("");
+
+
+                        // Remove NG styles
+                        $(".row")
+                            .removeClass("ng-row");
+
+
+                        $(".Value1, .Value2, .Value3, .Value4, .Value5")
+                            .removeClass("ng-input");
+
+                    },
+
+
+                    error: function () {
+
+                        alert(
+                            "Save Failed"
+                        );
+
+                    }
+
+                });
+
+            }
+
+        );
 
     </script>
 </body>

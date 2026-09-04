@@ -266,6 +266,23 @@
         }
 
         }
+
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.20) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.08) !important;
+                color: #ff8080 !important;
+            }
+
+        .ng-input {
+            border: 2px solid #dc3545 !important;
+            background: rgba(220, 53, 69, 0.18) !important;
+            color: #ff8080 !important;
+        }
     </style>
 </head>
 
@@ -437,7 +454,13 @@
 
                                 <td>@row["InspectionProject"]</td>
 
-                                <td>@row["InspectionSpecifications"]</td>
+                                <td>
+                                    @row["InspectionSpecifications"]
+
+                                    <input type="hidden"
+                                           class="InspectionSpecifications"
+                                           value="@row["InspectionSpecifications"]" />
+                                </td>
 
                                 <td>@row["Frequency"]</td>
 
@@ -558,15 +581,448 @@
     </script>
     
     <script>
-                $(document).on("click", ".btnRowSave", function () {
 
-            // Get the row whose Save button was clicked
-            let clickedRow = $(this).closest("tr");
+                function getSpecificationRange(specification) {
+
+            if (!specification) {
+                return null;
+            }
+
+            specification = $.trim(specification)
+                .replace(/,/g, "")
+                .replace(/\s+/g, " ");
+
+            // ==========================
+            // 1. PLUS / MINUS
+            // Example:
+            // 10 ± 2
+            // 10+/-2
+            // ==========================
+
+            var plusMinusMatch = specification.match(
+                /(-?\d+(?:\.\d+)?)\s*(?:±|\+\/-)\s*(\d+(?:\.\d+)?)/
+            );
+
+            if (plusMinusMatch) {
+
+                var target = parseFloat(plusMinusMatch[1]);
+                var tolerance = parseFloat(plusMinusMatch[2]);
+
+                return {
+                    min: target - tolerance,
+                    max: target + tolerance
+                };
+            }
+
+
+            // ==========================
+            // 2. BETWEEN RANGE
+            // Examples:
+            // 10 - 20
+            // 10~20
+            // 10 to 20
+            // ==========================
+
+            var rangeMatch = specification.match(
+                /(-?\d+(?:\.\d+)?)\s*(?:-|~|to)\s*(-?\d+(?:\.\d+)?)/
+            );
+
+            if (rangeMatch) {
+
+                var minValue = parseFloat(rangeMatch[1]);
+                var maxValue = parseFloat(rangeMatch[2]);
+
+                return {
+                    min: Math.min(minValue, maxValue),
+                    max: Math.max(minValue, maxValue)
+                };
+            }
+
+
+            // ==========================
+            // 3. GREATER THAN OR EQUAL
+            // Examples:
+            // ≥ 10
+            // >= 10
+            // ==========================
+
+            var greaterEqualMatch = specification.match(
+                /(?:≥|>=)\s*(-?\d+(?:\.\d+)?)/
+            );
+
+            if (greaterEqualMatch) {
+
+                return {
+                    min: parseFloat(greaterEqualMatch[1]),
+                    max: Infinity
+                };
+            }
+
+
+            // ==========================
+            // 4. GREATER THAN
+            // Example:
+            // > 10
+            // ==========================
+
+            var greaterMatch = specification.match(
+                />\s*(-?\d+(?:\.\d+)?)/
+            );
+
+            if (greaterMatch) {
+
+                return {
+                    min: parseFloat(greaterMatch[1]),
+                    max: Infinity,
+                    exclusiveMin: true
+                };
+            }
+
+
+            // ==========================
+            // 5. LESS THAN OR EQUAL
+            // Examples:
+            // ≤ 10
+            // <= 10
+            // ==========================
+
+            var lessEqualMatch = specification.match(
+                /(?:≤|<=)\s*(-?\d+(?:\.\d+)?)/
+            );
+
+            if (lessEqualMatch) {
+
+                return {
+                    min: -Infinity,
+                    max: parseFloat(lessEqualMatch[1])
+                };
+            }
+
+
+            // ==========================
+            // 6. LESS THAN
+            // Example:
+            // < 10
+            // ==========================
+
+            var lessMatch = specification.match(
+                /<\s*(-?\d+(?:\.\d+)?)/
+            );
+
+            if (lessMatch) {
+
+                return {
+                    min: -Infinity,
+                    max: parseFloat(lessMatch[1]),
+                    exclusiveMax: true
+                };
+            }
+
+
+            // ==========================
+            // 7. EXACT NUMERIC VALUE
+            // Example:
+            // 10
+            // ==========================
+
+            var exactMatch = specification.match(
+                /^(-?\d+(?:\.\d+)?)$/
+            );
+
+            if (exactMatch) {
+
+                var exactValue = parseFloat(exactMatch[1]);
+
+                return {
+                    min: exactValue,
+                    max: exactValue,
+                    exact: true
+                };
+            }
+
+
+            return null;
+        }
+
+        function validateSingleValue(value, specification) {
+
+            value = $.trim(value);
+
+            // Empty values are allowed
+            if (value === "") {
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+            }
+
+
+            // NG is always invalid
+            if (value.toUpperCase() === "NG") {
+
+                return {
+                    valid: false,
+                    message: "NG value is not allowed"
+                };
+            }
+
+
+            // Convert input to number
+            var numericValue = Number(value);
+
+
+            if (isNaN(numericValue)) {
+
+                return {
+                    valid: false,
+                    message: "Please enter a valid numeric value"
+                };
+            }
+
+
+            // Get range from Inspection Specifications
+            var range = getSpecificationRange(specification);
+
+
+            // IMPORTANT:
+            // If specification cannot be understood,
+            // do not automatically allow the value.
+            if (!range) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Unable to validate this Inspection Specification: " +
+                        specification
+                };
+            }
+
+
+            // ==========================
+            // EXACT VALUE
+            // ==========================
+
+            if (range.exact === true) {
+
+                if (numericValue !== range.min) {
+
+                    return {
+                        valid: false,
+                        message:
+                            "Value must be exactly " +
+                            range.min
+                    };
+                }
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+            }
+
+
+            // ==========================
+            // GREATER THAN (>)
+            // ==========================
+
+            if (range.exclusiveMin === true) {
+
+                if (numericValue <= range.min) {
+
+                    return {
+                        valid: false,
+                        message:
+                            "Value must be greater than " +
+                            range.min
+                    };
+                }
+            }
+
+
+            // ==========================
+            // LESS THAN (<)
+            // ==========================
+
+            if (range.exclusiveMax === true) {
+
+                if (numericValue >= range.max) {
+
+                    return {
+                        valid: false,
+                        message:
+                            "Value must be less than " +
+                            range.max
+                    };
+                }
+            }
+
+
+            // ==========================
+            // NORMAL RANGE VALIDATION
+            // ==========================
+
+            if (
+                numericValue < range.min ||
+                numericValue > range.max
+            ) {
+
+                var message = "";
+
+
+                if (
+                    range.min !== -Infinity &&
+                    range.max !== Infinity
+                ) {
+
+                    message =
+                        "Value must be between " +
+                        range.min +
+                        " and " +
+                        range.max;
+                }
+                else if (range.min !== -Infinity) {
+
+                    message =
+                        "Value must be greater than or equal to " +
+                        range.min;
+                }
+                else if (range.max !== Infinity) {
+
+                    message =
+                        "Value must be less than or equal to " +
+                        range.max;
+                }
+
+
+                return {
+                    valid: false,
+                    message: message
+                };
+            }
+
+
+            return {
+                valid: true,
+                message: ""
+            };
+        }
+
+        function validateRow(row) {
+
+            var specification = $.trim(
+                row.find(".InspectionSpecifications").val()
+            );
+
+
+            var values = [
+
+                {
+                    name: "Value1",
+                    input: row.find(".Value1")
+                },
+
+                {
+                    name: "Value2",
+                    input: row.find(".Value2")
+                },
+
+                {
+                    name: "Value3",
+                    input: row.find(".Value3")
+                },
+
+                {
+                    name: "Value4",
+                    input: row.find(".Value4")
+                },
+
+                {
+                    name: "Value5",
+                    input: row.find(".Value5")
+                }
+
+            ];
+
+
+            var invalidValues = [];
+
+            row.removeClass("ng-row");
+
+            row.find(
+                ".Value1, .Value2, .Value3, .Value4, .Value5"
+            ).removeClass("ng-input");
+
+
+            values.forEach(function (item) {
+
+                var inputValue = $.trim(item.input.val());
+
+                if (inputValue !== "") {
+
+                    var result = validateSingleValue(
+                        inputValue,
+                        specification
+                    );
+
+
+                    if (!result.valid) {
+
+                        invalidValues.push(
+                            item.name +
+                            " = " +
+                            inputValue +
+                            " (" +
+                            result.message +
+                            ")"
+                        );
+
+                        item.input.addClass("ng-input");
+                    }
+                }
+
+            });
+
+
+            if (invalidValues.length > 0) {
+
+                row.addClass("ng-row");
+
+                return {
+                    valid: false,
+                    message: invalidValues.join("\n")
+                };
+            }
+
+
+            return {
+                valid: true,
+                message: ""
+            };
+        }
+
+
+        $(document).on(
+            "input change",
+            ".Value1, .Value2, .Value3, .Value4, .Value5",
+            function () {
+
+                var row = $(this).closest("tr.row");
+
+                validateRow(row);
+            }
+        );
+
+
+        $(document).on("click", ".btnRowSave", function () {
+
+            let clickedRow = $(this).closest("tr.row");
 
             let rowsToSave = [];
 
-            // Start from first remaining row
-            // and continue only until clicked row
+            let validationErrors = [];
+
+
             $("#body tr.row").each(function () {
 
                 let row = $(this);
@@ -583,7 +1039,6 @@
                     $.trim(row.find(".CableSerialNo").val());
 
 
-                // Check whether current row contains any entered data
                 let hasValue =
                     value1 !== "" ||
                     value2 !== "" ||
@@ -592,37 +1047,71 @@
                     value5 !== "" ||
                     cableSerialNo !== "";
 
+                if (hasValue) {
 
-                // Add ONLY rows having entered data
+                    let validationResult = validateRow(row);
+
+                    if (!validationResult.valid) {
+
+                        let sectionName = row.find("td:eq(4)")
+                            .clone()
+                            .children()
+                            .remove()
+                            .end()
+                            .text()
+                            .trim();
+
+
+                        validationErrors.push(
+                            "Section: " +
+                            sectionName +
+                            "\n" +
+                            validationResult.message
+                        );
+                    }
+                }
+
+
                 if (sectionId && hasValue) {
 
                     rowsToSave.push({
 
                         SectionId: parseInt(sectionId) || 0,
 
-                        Value1: value1 === "" ? null : value1,
+                        Value1:
+                            value1 === ""
+                                ? null
+                                : value1,
 
-                        Value2: value2 === "" ? null : value2,
+                        Value2:
+                            value2 === ""
+                                ? null
+                                : value2,
 
-                        Value3: value3 === "" ? null : value3,
+                        Value3:
+                            value3 === ""
+                                ? null
+                                : value3,
 
-                        Value4: value4 === "" ? null : value4,
+                        Value4:
+                            value4 === ""
+                                ? null
+                                : value4,
 
-                        Value5: value5 === "" ? null : value5,
+                        Value5:
+                            value5 === ""
+                                ? null
+                                : value5,
 
                         CablesSerialNumber:
                             cableSerialNo === ""
                                 ? null
                                 : cableSerialNo,
 
-                        // Keep HTML row reference
-                        // so only successfully saved rows are removed
                         _htmlRow: row
                     });
                 }
 
-
-                // Stop once we reach the clicked Save row
                 if (row[0] === clickedRow[0]) {
 
                     return false;
@@ -631,17 +1120,29 @@
             });
 
 
-            // Nothing entered
-            if (rowsToSave.length === 0) {
+            if (validationErrors.length > 0) {
 
-                alert("Please enter at least one value before saving.");
+                alert(
+                    "❌ NG / Invalid values found.\n\n" +
+                    validationErrors.join("\n\n")
+                );
 
                 return;
             }
 
 
-            // Prepare clean result list
-            // Do not send _htmlRow to controller
+
+            if (rowsToSave.length === 0) {
+
+                alert(
+                    "Please enter at least one value before saving."
+                );
+
+                return;
+            }
+
+
+
             let resultList = rowsToSave.map(function (x) {
 
                 return {
@@ -658,14 +1159,14 @@
 
                     Value5: x.Value5,
 
-                    CablesSerialNumber: x.CablesSerialNumber
-
+                    CablesSerialNumber:
+                        x.CablesSerialNumber
                 };
 
             });
 
 
-            // Prepare complete ViewModel
+
             let data = {
 
                 LineId:
@@ -683,7 +1184,6 @@
                 MachineId:
                     parseInt($("#MachineId").val()) || 0,
 
-
                 ProdLineLeader:
                     $("#ProdLineLeader").val(),
 
@@ -693,9 +1193,10 @@
                 ApprovedBy:
                     $("#ApprovedBy").val(),
 
-
-                WireCombMoldingResults: resultList
+                WireCombMoldingResults:
+                    resultList
             };
+
 
 
             $.ajax({
@@ -704,17 +1205,19 @@
 
                 type: 'POST',
 
-                contentType: 'application/json; charset=utf-8',
+                contentType:
+                    'application/json; charset=utf-8',
 
-                data: JSON.stringify(data),
+                data:
+                    JSON.stringify(data),
 
 
                 success: function (response) {
 
-                    // In case controller returns success = false
-                    if (response &&
-                        response.success !== undefined &&
-                        response.success === false) {
+                    if (
+                        response &&
+                        response.success === false
+                    ) {
 
                         alert(
                             response.message ||
@@ -728,7 +1231,6 @@
                     alert("Data Saved Successfully");
 
 
-                    // Remove ONLY successfully saved rows
                     rowsToSave.forEach(function (x) {
 
                         x._htmlRow.remove();
@@ -736,8 +1238,9 @@
                     });
 
 
-                    // If all rows have now been saved/removed
-                    if ($("#body tr.row").length === 0) {
+                    if (
+                        $("#body tr.row").length === 0
+                    ) {
 
                         $("#body").html(`
                             <tr>
@@ -747,15 +1250,16 @@
                                 </td>
                             </tr>
                         `);
-
                     }
 
                 },
 
 
-                error: function (xhr) {
+                error: function () {
 
-                    alert("Server Error while saving.");
+                    alert(
+                        "Server Error while saving."
+                    );
 
                 }
 
@@ -763,60 +1267,240 @@
 
         });
 
-        $(document).on("click", ".btn-submit", function (e) {
 
-            e.preventDefault();
+        $(document).on(
+            "click",
+            ".btn-submit",
+            function (e) {
 
-            var results = [];
+                e.preventDefault();
 
-            $("#body tr.row").each(function () {
 
-                results.push({
-                    SectionId: parseInt($(this).find(".SectionId").val()) || 0,
-                    Value1: parseFloat($(this).find(".Value1").val()) || 0,
-                    Value2: parseFloat($(this).find(".Value2").val()) || 0,
-                    Value3: parseFloat($(this).find(".Value3").val()) || 0,
-                    Value4: parseFloat($(this).find(".Value4").val()) || 0,
-                    Value5: parseFloat($(this).find(".Value5").val()) || 0,
-                    CablesSerialNumber: $(this).find(".CableSerialNo").val()
+                var results = [];
+
+                var validationErrors = [];
+
+
+                $("#body tr.row").each(function () {
+
+                    var row = $(this);
+
+
+                    var value1 =
+                        $.trim(row.find(".Value1").val());
+
+                    var value2 =
+                        $.trim(row.find(".Value2").val());
+
+                    var value3 =
+                        $.trim(row.find(".Value3").val());
+
+                    var value4 =
+                        $.trim(row.find(".Value4").val());
+
+                    var value5 =
+                        $.trim(row.find(".Value5").val());
+
+
+                    var cableSerialNo =
+                        $.trim(
+                            row.find(".CableSerialNo").val()
+                        );
+
+
+                    var hasValue =
+                        value1 !== "" ||
+                        value2 !== "" ||
+                        value3 !== "" ||
+                        value4 !== "" ||
+                        value5 !== "" ||
+                        cableSerialNo !== "";
+
+
+                    if (!hasValue) {
+
+                        return;
+                    }
+
+                    var validationResult =
+                        validateRow(row);
+
+
+                    if (!validationResult.valid) {
+
+                        var sectionName =
+                            row.find("td:eq(4)")
+                                .clone()
+                                .children()
+                                .remove()
+                                .end()
+                                .text()
+                                .trim();
+
+
+                        validationErrors.push(
+                            "Section: " +
+                            sectionName +
+                            "\n" +
+                            validationResult.message
+                        );
+
+                        return;
+                    }
+
+
+                    results.push({
+
+                        SectionId:
+                            parseInt(
+                                row.find(".SectionId").val()
+                            ) || 0,
+
+                        Value1:
+                            value1 === ""
+                                ? null
+                                : value1,
+
+                        Value2:
+                            value2 === ""
+                                ? null
+                                : value2,
+
+                        Value3:
+                            value3 === ""
+                                ? null
+                                : value3,
+
+                        Value4:
+                            value4 === ""
+                                ? null
+                                : value4,
+
+                        Value5:
+                            value5 === ""
+                                ? null
+                                : value5,
+
+                        CablesSerialNumber:
+                            cableSerialNo === ""
+                                ? null
+                                : cableSerialNo
+                    });
+
                 });
-            });
 
-            var model = {
-                LineId: parseInt($("#LineId").val()) || 0,
-                ProjectId: parseInt($("#ProjectId").val()) || 0,
-                ModelId: parseInt($("#ModelId").val()) || 0,
-                PartId: parseInt($("#PartId").val()) || 0,
-                MachineId: parseInt($("#MachineId").val()) || 0,
 
-                ProdLineLeader: $("#ProdLineLeader").val(),
-                CheckedBy: $("#CheckedBy").val(),
-                ApprovedBy: $("#ApprovedBy").val(),
+                if (validationErrors.length > 0) {
 
-                WireCombMoldingResults: results
-            };
+                    alert(
+                        "❌ Cannot submit because NG / Invalid values were found.\n\n" +
+                        validationErrors.join("\n\n")
+                    );
 
-            $.ajax({
-                url: '/WireCombMolding/SaveA246FWCMMCCheckList',
-                type: 'POST',
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(model),
+                    return;
+                }
 
-                success: function (response) {
-                    alert("All Records Saved Successfully");
+
+
+                if (results.length === 0) {
+
+                    alert(
+                        "Please enter at least one value before submitting."
+                    );
+
+                    return;
+                }
+
+
+
+                var model = {
+
+                    LineId:
+                        parseInt($("#LineId").val()) || 0,
+
+                    ProjectId:
+                        parseInt($("#ProjectId").val()) || 0,
+
+                    ModelId:
+                        parseInt($("#ModelId").val()) || 0,
+
+                    PartId:
+                        parseInt($("#PartId").val()) || 0,
+
+                    MachineId:
+                        parseInt($("#MachineId").val()) || 0,
+
+                    ProdLineLeader:
+                        $("#ProdLineLeader").val(),
+
+                    CheckedBy:
+                        $("#CheckedBy").val(),
+
+                    ApprovedBy:
+                        $("#ApprovedBy").val(),
+
+                    WireCombMoldingResults:
+                        results
+                };
+
+
+
+                $.ajax({
+
+                    url:
+                        '/WireCombMolding/SaveA246FWCMMCCheckList',
+
+                    type:
+                        'POST',
+
+                    contentType:
+                        'application/json; charset=utf-8',
+
+                    data:
+                        JSON.stringify(model),
+
+
+                    success: function (response) {
+
+                        if (
+                            response &&
+                            response.success === false
+                        ) {
+
+                            alert(
+                                response.message ||
+                                "Save Failed"
+                            );
+
+                            return;
+                        }
+
+
+                        alert(
+                            "All Records Saved Successfully"
+                        );
+
+
                         $(".Value1").val("");
                         $(".Value2").val("");
                         $(".Value3").val("");
                         $(".Value4").val("");
                         $(".Value5").val("");
                         $(".CableSerialNo").val("");
-                },
 
-                error: function (xhr) {
-                    alert("Save Failed");
-                }
-            });
-        });
+                    },
+
+
+                    error: function () {
+
+                        alert("Save Failed");
+
+                    }
+
+                });
+
+            }
+        );
     </script>
 </body>
 </html>

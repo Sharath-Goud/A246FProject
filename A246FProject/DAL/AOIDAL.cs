@@ -165,30 +165,30 @@ namespace A246FProject.DAL
             {
                 SqlParameter[] parameters =
                 {
-            new SqlParameter("@Checklist", SqlDbType.Structured)
-            {
-                TypeName = "ipqc.A246FAOICheckList",
-                Value = dtChecklist
-            },
+                    new SqlParameter("@Checklist", SqlDbType.Structured)
+                    {
+                        TypeName = "ipqc.A246FAOICheckList",
+                        Value = dtChecklist
+                    },
 
-            new SqlParameter("@CreatedBy", createdBy),
+                    new SqlParameter("@CreatedBy", createdBy),
 
-            new SqlParameter("@LineId", lineId),
+                    new SqlParameter("@LineId", lineId),
 
-            new SqlParameter("@ProjectId", projectId),
+                    new SqlParameter("@ProjectId", projectId),
 
-            new SqlParameter("@Model", DBNull.Value),
+                    new SqlParameter("@Model", DBNull.Value),
 
-            new SqlParameter("@ProdLineLeader", prodLineLeader),
+                    new SqlParameter("@ProdLineLeader", prodLineLeader),
 
-            new SqlParameter("@CheckedBy", checkedBy),
+                    new SqlParameter("@CheckedBy", checkedBy),
 
-            new SqlParameter("@ApprovedBy", approvedBy),
+                    new SqlParameter("@ApprovedBy", approvedBy),
 
-            new SqlParameter("@ModelId", modelId),
+                    new SqlParameter("@ModelId", modelId),
 
-            new SqlParameter("@PartId", partId)
-        };
+                    new SqlParameter("@PartId", partId)
+                };
 
                 result = _db.ExecuteNonQueryWithParameter(
                     "ipqc.InsertBulkA246FAOICheckList",

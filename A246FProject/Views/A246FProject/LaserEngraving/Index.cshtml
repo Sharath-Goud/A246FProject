@@ -178,6 +178,22 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.20) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.08) !important;
+                color: #ff8080 !important;
+            }
+
+        .ng-input {
+            border: 2px solid #dc3545 !important;
+            background: rgba(220, 53, 69, 0.18) !important;
+            color: #ff8080 !important;
+        }
     </style>
 
 </head>
@@ -358,7 +374,9 @@
                         {
                             for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
                             {
-                                <tr>
+                                <tr class="laser-row"
+                                    data-min="@Model.dtChecklist.Rows[i]["Min"]"
+                                    data-max="@Model.dtChecklist.Rows[i]["Max"]">
 
                                     <td>
                                         @Model.dtChecklist.Rows[i]["Locations"]
@@ -372,20 +390,54 @@
                                     <td>@Model.dtChecklist.Rows[i]["Min"]</td>
                                     <td>@Model.dtChecklist.Rows[i]["Max"]</td>
 
-                                    <td><input name="LaserResults[@i].Value1" /></td>
-                                    <td><input name="LaserResults[@i].SerialNumber1" /></td>
+                                    <td>
+                                        <input class="laser-value"
+                                               name="LaserResults[@i].Value1" />
+                                    </td>
 
-                                    <td><input name="LaserResults[@i].Value2" /></td>
-                                    <td><input name="LaserResults[@i].SerialNumber2" /></td>
+                                    <td>
+                                        <input name="LaserResults[@i].SerialNumber1" />
+                                    </td>
 
-                                    <td><input name="LaserResults[@i].Value3" /></td>
-                                    <td><input name="LaserResults[@i].SerialNumber3" /></td>
 
-                                    <td><input name="LaserResults[@i].Value4" /></td>
-                                    <td><input name="LaserResults[@i].SerialNumber4" /></td>
+                                    <td>
+                                        <input class="laser-value"
+                                               name="LaserResults[@i].Value2" />
+                                    </td>
 
-                                    <td><input name="LaserResults[@i].Value5" /></td>
-                                    <td><input name="LaserResults[@i].SerialNumber5" /></td>
+                                    <td>
+                                        <input name="LaserResults[@i].SerialNumber2" />
+                                    </td>
+
+
+                                    <td>
+                                        <input class="laser-value"
+                                               name="LaserResults[@i].Value3" />
+                                    </td>
+
+                                    <td>
+                                        <input name="LaserResults[@i].SerialNumber3" />
+                                    </td>
+
+
+                                    <td>
+                                        <input class="laser-value"
+                                               name="LaserResults[@i].Value4" />
+                                    </td>
+
+                                    <td>
+                                        <input name="LaserResults[@i].SerialNumber4" />
+                                    </td>
+
+
+                                    <td>
+                                        <input class="laser-value"
+                                               name="LaserResults[@i].Value5" />
+                                    </td>
+
+                                    <td>
+                                        <input name="LaserResults[@i].SerialNumber5" />
+                                    </td>
 
                                     <td>
                                         <button type="button" class="btn-search" onclick="saveSingleRow(@i)">
@@ -489,151 +541,575 @@
             });
         });
 
-        function saveSingleRow(index) {
+                function validateLaserValue(value, min, max) {
 
-            let clickedRow = $(".custom-table tbody tr").eq(index);
+            value = $.trim(value);
+
+            // Empty values are allowed
+            if (value === "") {
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+
+            }
+
+
+            // NG text is not allowed
+            if (value.toUpperCase() === "NG") {
+
+                return {
+                    valid: false,
+                    message: "NG value is not allowed"
+                };
+
+            }
+
+
+            // Must be numeric
+            var numericValue = Number(value);
+
+            if (isNaN(numericValue)) {
+
+                return {
+                    valid: false,
+                    message: "Please enter a valid numeric value"
+                };
+
+            }
+
+
+            // Validate minimum
+            if (numericValue < min) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Value " + numericValue +
+                        " is below Minimum " + min
+                };
+
+            }
+
+
+            // Validate maximum
+            if (numericValue > max) {
+
+                return {
+                    valid: false,
+                    message:
+                        "Value " + numericValue +
+                        " is above Maximum " + max
+                };
+
+            }
+
+
+            return {
+
+                valid: true,
+
+                message: ""
+
+            };
+
+        }
+
+                function validateLaserRow(row) {
+
+            var min = parseFloat(row.attr("data-min"));
+
+            var max = parseFloat(row.attr("data-max"));
+
+
+            var invalidValues = [];
+
+
+            // Remove old NG styles
+            row.removeClass("ng-row");
+
+            row.find(".laser-value")
+                .removeClass("ng-input");
+
+
+            // Validate all Value fields
+            row.find(".laser-value").each(function () {
+
+                var input = $(this);
+
+                var value = $.trim(input.val());
+
+
+                // Validate only if value exists
+                if (value !== "") {
+
+                    var result =
+                        validateLaserValue(
+                            value,
+                            min,
+                            max
+                        );
+
+
+                    if (!result.valid) {
+
+                        invalidValues.push(
+
+                            input.attr("name") +
+                            " = " +
+                            value +
+                            " (" +
+                            result.message +
+                            ")"
+
+                        );
+
+
+                        input.addClass("ng-input");
+
+                    }
+
+                }
+
+            });
+
+
+            // Mark entire row NG
+            if (invalidValues.length > 0) {
+
+                row.addClass("ng-row");
+
+
+                return {
+
+                    valid: false,
+
+                    message:
+                        invalidValues.join("\n")
+
+                };
+
+            }
+
+
+            return {
+
+                valid: true,
+
+                message: ""
+
+            };
+
+        }
+
+                $(document).on(
+
+            "input change",
+
+            ".laser-value",
+
+            function () {
+
+                var row =
+                    $(this).closest("tr.laser-row");
+
+
+                validateLaserRow(row);
+
+            }
+
+        );
+
+                function saveSingleRow(index) {
+
+            let clickedRow =
+                $(".custom-table tbody tr.laser-row").eq(index);
 
             let rowsToSave = [];
 
-            $(".custom-table tbody tr").each(function () {
+            let validationErrors = [];
+
+
+            $(".custom-table tbody tr.laser-row").each(function () {
 
                 let row = $(this);
 
-                let rowIndex = row.index();
+                let rowIndex =
+                    row.index();
 
-                let locationId = row.find("input[name='LaserResults[" + rowIndex + "].LocationId']").val();
 
-                let value1 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].Value1']").val());
-                let serial1 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].SerialNumber1']").val());
+                let locationId =
+                    row.find(
+                        "input[name='LaserResults[" +
+                        rowIndex +
+                        "].LocationId']"
+                    ).val();
 
-                let value2 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].Value2']").val());
-                let serial2 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].SerialNumber2']").val());
 
-                let value3 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].Value3']").val());
-                let serial3 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].SerialNumber3']").val());
+                let value1 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].Value1']"
+                        ).val()
+                    );
 
-                let value4 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].Value4']").val());
-                let serial4 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].SerialNumber4']").val());
 
-                let value5 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].Value5']").val());
-                let serial5 = $.trim(row.find("input[name='LaserResults[" + rowIndex + "].SerialNumber5']").val());
+                let serial1 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].SerialNumber1']"
+                        ).val()
+                    );
 
-                // Check whether any value is entered
+
+                let value2 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].Value2']"
+                        ).val()
+                    );
+
+
+                let serial2 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].SerialNumber2']"
+                        ).val()
+                    );
+
+
+                let value3 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].Value3']"
+                        ).val()
+                    );
+
+
+                let serial3 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].SerialNumber3']"
+                        ).val()
+                    );
+
+
+                let value4 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].Value4']"
+                        ).val()
+                    );
+
+
+                let serial4 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].SerialNumber4']"
+                        ).val()
+                    );
+
+
+                let value5 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].Value5']"
+                        ).val()
+                    );
+
+
+                let serial5 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            rowIndex +
+                            "].SerialNumber5']"
+                        ).val()
+                    );
+
+
+                // Check whether any value exists
                 let hasValue =
+
                     value1 !== "" ||
                     serial1 !== "" ||
+
                     value2 !== "" ||
                     serial2 !== "" ||
+
                     value3 !== "" ||
                     serial3 !== "" ||
+
                     value4 !== "" ||
                     serial4 !== "" ||
+
                     value5 !== "" ||
                     serial5 !== "";
 
+
+                // Validate only rows having values
+                if (hasValue) {
+
+                    let validationResult =
+                        validateLaserRow(row);
+
+
+                    if (!validationResult.valid) {
+
+                        validationErrors.push(
+                            validationResult.message
+                        );
+
+                    }
+
+                }
+
+
+                // Add only rows having values
                 if (locationId && hasValue) {
 
                     rowsToSave.push({
 
-                        locationId: parseInt(locationId),
+                        locationId:
+                            parseInt(locationId),
 
-                        value1: value1 === "" ? null : value1,
-                        serialNumber1: serial1 === "" ? null : serial1,
+                        value1:
+                            value1 === ""
+                                ? null
+                                : value1,
 
-                        value2: value2 === "" ? null : value2,
-                        serialNumber2: serial2 === "" ? null : serial2,
+                        serialNumber1:
+                            serial1 === ""
+                                ? null
+                                : serial1,
 
-                        value3: value3 === "" ? null : value3,
-                        serialNumber3: serial3 === "" ? null : serial3,
 
-                        value4: value4 === "" ? null : value4,
-                        serialNumber4: serial4 === "" ? null : serial4,
+                        value2:
+                            value2 === ""
+                                ? null
+                                : value2,
 
-                        value5: value5 === "" ? null : value5,
-                        serialNumber5: serial5 === "" ? null : serial5,
+                        serialNumber2:
+                            serial2 === ""
+                                ? null
+                                : serial2,
 
-                        _htmlRow: row
+
+                        value3:
+                            value3 === ""
+                                ? null
+                                : value3,
+
+                        serialNumber3:
+                            serial3 === ""
+                                ? null
+                                : serial3,
+
+
+                        value4:
+                            value4 === ""
+                                ? null
+                                : value4,
+
+                        serialNumber4:
+                            serial4 === ""
+                                ? null
+                                : serial4,
+
+
+                        value5:
+                            value5 === ""
+                                ? null
+                                : value5,
+
+                        serialNumber5:
+                            serial5 === ""
+                                ? null
+                                : serial5,
+
+
+                        _htmlRow:
+                            row
 
                     });
 
                 }
 
+
                 // Stop at clicked Save row
                 if (row[0] === clickedRow[0]) {
+
                     return false;
+
                 }
 
             });
 
-            if (rowsToSave.length == 0) {
 
-                alert("Please enter at least one value before saving.");
+            // Stop saving when NG values exist
+            if (validationErrors.length > 0) {
+
+                alert(
+
+                    "❌ Cannot save because NG / invalid values were found.\n\n" +
+
+                    validationErrors.join("\n\n")
+
+                );
 
                 return;
 
             }
 
+
+            if (rowsToSave.length === 0) {
+
+                alert(
+                    "Please enter at least one value before saving."
+                );
+
+                return;
+
+            }
+
+
             // Remove _htmlRow before sending
-            let resultList = rowsToSave.map(function (x) {
+            let resultList =
+                rowsToSave.map(function (x) {
 
-                return {
+                    return {
 
-                    locationId: x.locationId,
+                        locationId:
+                            x.locationId,
 
-                    value1: x.value1,
-                    serialNumber1: x.serialNumber1,
 
-                    value2: x.value2,
-                    serialNumber2: x.serialNumber2,
+                        value1:
+                            x.value1,
 
-                    value3: x.value3,
-                    serialNumber3: x.serialNumber3,
+                        serialNumber1:
+                            x.serialNumber1,
 
-                    value4: x.value4,
-                    serialNumber4: x.serialNumber4,
 
-                    value5: x.value5,
-                    serialNumber5: x.serialNumber5
+                        value2:
+                            x.value2,
 
-                };
+                        serialNumber2:
+                            x.serialNumber2,
 
-            });
+
+                        value3:
+                            x.value3,
+
+                        serialNumber3:
+                            x.serialNumber3,
+
+
+                        value4:
+                            x.value4,
+
+                        serialNumber4:
+                            x.serialNumber4,
+
+
+                        value5:
+                            x.value5,
+
+                        serialNumber5:
+                            x.serialNumber5
+
+                    };
+
+                });
+
 
             let obj = {
 
-                lineId: $("#LineId").val(),
+                lineId:
+                    $("#LineId").val(),
 
-                projectId: $("#ProjectId").val(),
+                projectId:
+                    $("#ProjectId").val(),
 
-                modelId: $("#ModelId").val(),
+                modelId:
+                    $("#ModelId").val(),
 
-                partId: $("#PartId").val(),
+                partId:
+                    $("#PartId").val(),
 
-                machineId: $("#MachineId").val(),
+                machineId:
+                    $("#MachineId").val(),
 
-                prodLineLeader: $("input[name='ProdLineLeader']").val(),
+                prodLineLeader:
+                    $("input[name='ProdLineLeader']").val(),
 
-                checkedBy: $("input[name='CheckedBy']").val(),
+                checkedBy:
+                    $("input[name='CheckedBy']").val(),
 
-                approvedBy: $("input[name='ApprovedBy']").val(),
+                approvedBy:
+                    $("input[name='ApprovedBy']").val(),
 
-                laserResults: resultList
+                laserResults:
+                    resultList
 
             };
 
+
             $.ajax({
 
-                url: '/LaserEngraving/SaveLaserEngraving',
+                url:
+                    '/LaserEngraving/SaveLaserEngraving',
 
-                type: 'POST',
+                type:
+                    'POST',
 
-                contentType: 'application/json',
+                contentType:
+                    'application/json',
 
-                data: JSON.stringify(obj),
+                data:
+                    JSON.stringify(obj),
+
 
                 success: function (res) {
 
-                    alert(res.message || "Saved Successfully");
+                    if (
+                        res &&
+                        res.success === false
+                    ) {
+
+                        alert(
+                            res.message ||
+                            "Save Failed"
+                        );
+
+                        return;
+
+                    }
+
+
+                    alert(
+                        res.message ||
+                        "Saved Successfully"
+                    );
+
 
                     // Remove only saved rows
                     rowsToSave.forEach(function (x) {
@@ -642,24 +1118,33 @@
 
                     });
 
-                    // Show No Records when all rows removed
-                    if ($(".custom-table tbody tr").length === 0) {
 
-                        $(".custom-table tbody").html(`
-                            <tr>
-                                <td colspan="15" class="empty-row">
+                    // Show message when all rows are removed
+                    if (
+                        $(".custom-table tbody tr.laser-row").length === 0
+                    ) {
+
+                        $(".custom-table tbody").html(
+
+                            `<tr>
+                                <td colspan="15"
+                                    class="empty-row">
                                     No records found.
                                 </td>
-                            </tr>
-                        `);
+                            </tr>`
+
+                        );
 
                     }
 
                 },
 
+
                 error: function () {
 
-                    alert("Save Failed");
+                    alert(
+                        "Save Failed"
+                    );
 
                 }
 
@@ -668,55 +1153,283 @@
         }
 
         function SubmitAll() {
+
             var results = [];
 
-            $(".custom-table tbody tr").each(function (index) {
+            var validationErrors = [];
 
-                var locationId = $(this).find("input[name='LaserResults[" + index + "].LocationId']").val();
 
-                if (!locationId) return;
+            $(".custom-table tbody tr.laser-row").each(function (index) {
 
-                results.push({
-                    locationId: parseInt(locationId),
-                    value1: $(this).find("input[name='LaserResults[" + index + "].Value1']").val(),
-                    serialNumber1: $(this).find("input[name='LaserResults[" + index + "].SerialNumber1']").val(),
-                    value2: $(this).find("input[name='LaserResults[" + index + "].Value2']").val(),
-                    serialNumber2: $(this).find("input[name='LaserResults[" + index + "].SerialNumber2']").val(),
-                    value3: $(this).find("input[name='LaserResults[" + index + "].Value3']").val(),
-                    serialNumber3: $(this).find("input[name='LaserResults[" + index + "].SerialNumber3']").val(),
-                    value4: $(this).find("input[name='LaserResults[" + index + "].Value4']").val(),
-                    serialNumber4: $(this).find("input[name='LaserResults[" + index + "].SerialNumber4']").val(),
-                    value5: $(this).find("input[name='LaserResults[" + index + "].Value5']").val(),
-                    serialNumber5: $(this).find("input[name='LaserResults[" + index + "].SerialNumber5']").val()
-                });
+                var row = $(this);
+
+
+                var locationId =
+                    row.find(
+                        "input[name='LaserResults[" +
+                        index +
+                        "].LocationId']"
+                    ).val();
+
+
+                if (!locationId) {
+
+                    return;
+
+                }
+
+
+                var value1 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            index +
+                            "].Value1']"
+                        ).val()
+                    );
+
+                var value2 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            index +
+                            "].Value2']"
+                        ).val()
+                    );
+
+                var value3 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            index +
+                            "].Value3']"
+                        ).val()
+                    );
+
+                var value4 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            index +
+                            "].Value4']"
+                        ).val()
+                    );
+
+                var value5 =
+                    $.trim(
+                        row.find(
+                            "input[name='LaserResults[" +
+                            index +
+                            "].Value5']"
+                        ).val()
+                    );
+
+
+                var hasValue =
+
+                    value1 !== "" ||
+                    value2 !== "" ||
+                    value3 !== "" ||
+                    value4 !== "" ||
+                    value5 !== "";
+
+
+                // Validate only when values are entered
+                if (hasValue) {
+
+                    var validationResult =
+                        validateLaserRow(row);
+
+
+                    if (!validationResult.valid) {
+
+                        var locationName =
+                            row.find("td:eq(0)")
+                               .clone()
+                               .children()
+                               .remove()
+                               .end()
+                               .text()
+                               .trim();
+
+
+                        validationErrors.push(
+
+                            "Location: " +
+                            locationName +
+                            "\n" +
+                            validationResult.message
+
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+
+                if (hasValue) {
+
+                    results.push({
+
+                        locationId:
+                            parseInt(locationId),
+
+                        value1:
+                            value1 === "" ? null : value1,
+
+                        serialNumber1:
+                            row.find(
+                                "input[name='LaserResults[" +
+                                index +
+                                "].SerialNumber1']"
+                            ).val() || null,
+
+
+                        value2:
+                            value2 === "" ? null : value2,
+
+                        serialNumber2:
+                            row.find(
+                                "input[name='LaserResults[" +
+                                index +
+                                "].SerialNumber2']"
+                            ).val() || null,
+
+
+                        value3:
+                            value3 === "" ? null : value3,
+
+                        serialNumber3:
+                            row.find(
+                                "input[name='LaserResults[" +
+                                index +
+                                "].SerialNumber3']"
+                            ).val() || null,
+
+
+                        value4:
+                            value4 === "" ? null : value4,
+
+                        serialNumber4:
+                            row.find(
+                                "input[name='LaserResults[" +
+                                index +
+                                "].SerialNumber4']"
+                            ).val() || null,
+
+
+                        value5:
+                            value5 === "" ? null : value5,
+
+                        serialNumber5:
+                            row.find(
+                                "input[name='LaserResults[" +
+                                index +
+                                "].SerialNumber5']"
+                            ).val() || null
+
+                    });
+
+                }
+
             });
+
+
+            if (validationErrors.length > 0) {
+
+                alert(
+
+                    "❌ Cannot submit because NG / invalid values were found.\n\n" +
+
+                    validationErrors.join("\n\n")
+
+                );
+
+                return;
+
+            }
+
+
+            if (results.length === 0) {
+
+                alert(
+                    "Please enter at least one value before submitting."
+                );
+
+                return;
+
+            }
+
 
             var obj = {
-                lineId: $("#LineId").val(),
-                projectId: $("#ProjectId").val(),
-                modelId: $("#ModelId").val(),
-                partId: $("#PartId").val(),
-                machineId: $("#MachineId").val(),
-                prodLineLeader: $("input[name='ProdLineLeader']").val(),
-                checkedBy: $("input[name='CheckedBy']").val(),
-                approvedBy: $("input[name='ApprovedBy']").val(),
-                laserResults: results
+
+                lineId:
+                    $("#LineId").val(),
+
+                projectId:
+                    $("#ProjectId").val(),
+
+                modelId:
+                    $("#ModelId").val(),
+
+                partId:
+                    $("#PartId").val(),
+
+                machineId:
+                    $("#MachineId").val(),
+
+                prodLineLeader:
+                    $("input[name='ProdLineLeader']").val(),
+
+                checkedBy:
+                    $("input[name='CheckedBy']").val(),
+
+                approvedBy:
+                    $("input[name='ApprovedBy']").val(),
+
+                laserResults:
+                    results
+
             };
 
-            $.ajax({
-                url: '/LaserEngraving/SaveLaserEngraving',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(obj),
 
-                success: function (res) {
-                    alert(res.message);
-                    location.reload();
-                },
-                error: function () {
-                    alert("Save failed");
-                }
+            $.ajax({
+
+                url:
+                    '/LaserEngraving/SaveLaserEngraving',
+
+                type:
+                    'POST',
+
+                contentType:
+                    'application/json',
+
+                data:
+                    JSON.stringify(obj),
+
+                success:
+                    function (res) {
+
+                        alert(
+                            res.message ||
+                            "Saved Successfully"
+                        );
+
+                        location.reload();
+
+                    },
+
+                error:
+                    function () {
+
+                        alert("Save failed");
+
+                    }
+
             });
+
         }
 
     </script>

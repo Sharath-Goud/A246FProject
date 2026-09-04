@@ -291,6 +291,23 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.18) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.18) !important;
+                color: #ff6b6b !important;
+            }
+
+            .ng-row select,
+            .ng-row input {
+                border: 1px solid #dc3545 !important;
+                background: rgba(220, 53, 69, 0.12) !important;
+                color: #ff6b6b !important;
+            }
     </style>
 </head>
 <body>
@@ -610,6 +627,93 @@
 
         });
 
+        function validateNGRows(rows) {
+
+            var ngRecords = [];
+
+            rows.each(function () {
+
+                var row = $(this);
+
+                var result = row.find(".result").val();
+
+                var defective =
+                    row.find(".defective").val();
+
+                if (result === "NG") {
+
+                    row.addClass("ng-row");
+
+                    ngRecords.push({
+                        sno: row.attr("data-sno"),
+                        defective: defective,
+                        row: row
+                    });
+                }
+                else {
+
+                    row.removeClass("ng-row");
+                }
+
+            });
+
+
+            if (ngRecords.length === 0) {
+                return true;
+            }
+
+
+            var message =
+                ngRecords.length +
+                " record(s) are marked as NG.\n\n";
+
+
+            $.each(ngRecords, function (i, item) {
+
+                message +=
+                    "SNO " +
+                    item.sno +
+                    " → NG";
+
+                if (item.defective &&
+                    item.defective.trim() !== "") {
+
+                    message +=
+                        " → Defective Number: " +
+                        item.defective;
+                }
+
+                message += "\n";
+            });
+
+
+            message +=
+                "\nDo you want to save these NG records?";
+
+
+            var result = confirm(message);
+
+            if (!result) {
+
+                $.each(ngRecords, function (i, item) {
+
+                    item.row.addClass("ng-row");
+
+                });
+
+                return false;
+            }
+
+            $.each(ngRecords, function (i, item) {
+
+                item.row.removeClass("ng-row");
+
+            });
+
+
+            return true;
+        }
+
         function refreshStationDisplay() {
 
             let previousStation = "";
@@ -620,11 +724,8 @@
 
                 let stationName = row.attr("data-station");
 
-                // Clear existing displayed station
                 row.find(".station-cell").text("");
 
-                // Display station only on first
-                // remaining row of that station
                 if (stationName != previousStation) {
 
                     row.find(".station-cell").text(stationName);
@@ -634,97 +735,162 @@
             });
         }
 
-                $(document).on("click", ".btn-save-row", function () {
+                        $(document).on("click", ".btn-save-row", function () {
 
-            let clickedRow = $(this).closest("tr");
+            let clickedRow =
+                $(this).closest("tr");
 
             let rowsToSave = [];
+
+            let rowsForValidation =
+                $();
 
             $(".inspection-row").each(function () {
 
                 let row = $(this);
 
-                let dataId = row.find(".dataid").val();
-                let result = row.find(".result").val();
-                let defective = row.find(".defective").val();
+                let dataId =
+                    row.find(".dataid").val();
 
-                // Only rows having a Result will be saved
+                let result =
+                    row.find(".result").val();
+
+                let defective =
+                    row.find(".defective").val();
+
                 if (dataId && result !== "") {
 
                     rowsToSave.push({
-                        DataId: parseInt(dataId) || 0,
-                        Section1: result,
-                        DefectiveNumber: defective || "0",
-                        _htmlRow: row
+
+                        DataId:
+                            parseInt(dataId) || 0,
+
+                        Section1:
+                            result,
+
+                        DefectiveNumber:
+                            defective || "0",
+
+                        _htmlRow:
+                            row
+
                     });
+
+                    rowsForValidation =
+                        rowsForValidation.add(row);
                 }
 
-                // Stop after clicked row
+
                 if (row[0] === clickedRow[0]) {
+
                     return false;
                 }
 
             });
 
+
             if (rowsToSave.length === 0) {
 
-                alert("Please enter inspection result before saving.");
+                alert(
+                    "Please enter inspection result before saving."
+                );
+
                 return;
             }
 
-            let inspectionList = rowsToSave.map(function (x) {
+            if (!validateNGRows(rowsForValidation)) {
 
-                return {
-                    DataId: x.DataId,
-                    Section1: x.Section1,
-                    DefectiveNumber: x.DefectiveNumber
-                };
+                return;
+            }
 
-            });
+
+            let inspectionList =
+                rowsToSave.map(function (x) {
+
+                    return {
+
+                        DataId:
+                            x.DataId,
+
+                        Section1:
+                            x.Section1,
+
+                        DefectiveNumber:
+                            x.DefectiveNumber
+                    };
+
+                });
+
 
             let model = {
 
-                VisualInspectionResults: inspectionList,
+                VisualInspectionResults:
+                    inspectionList,
 
-                LineId: parseInt($("#LineId").val()) || 0,
+                LineId:
+                    parseInt($("#LineId").val()) || 0,
 
-                ProjectId: parseInt($("#ProjectId").val()) || 0,
+                ProjectId:
+                    parseInt($("#ProjectId").val()) || 0,
 
-                ModelId: parseInt($("#ModelId").val()) || 0,
+                ModelId:
+                    parseInt($("#ModelId").val()) || 0,
 
-                PartId: parseInt($("#PartId").val()) || 0,
+                PartId:
+                    parseInt($("#PartId").val()) || 0,
 
-                VisualsId: parseInt($("#VisualsId").val()) || 0,
+                VisualsId:
+                    parseInt($("#VisualsId").val()) || 0,
 
-                Model: $("#ModelId option:selected").text(),
+                Model:
+                    $("#ModelId option:selected").text(),
 
-                ProdLineLeader: $("#txtLineLeader").val() || "",
+                ProdLineLeader:
+                    $("#txtLineLeader").val() || "",
 
-                CheckedBy: $("#txtCheckedBy").val() || "",
+                CheckedBy:
+                    $("#txtCheckedBy").val() || "",
 
-                ApprovedBy: $("#txtApprovedBy").val() || ""
+                ApprovedBy:
+                    $("#txtApprovedBy").val() || ""
+
             };
 
 
             $.ajax({
 
-                url: '/VisualInspection/Submit',
+                url:
+                    '/VisualInspection/Submit',
 
-                type: 'POST',
+                type:
+                    'POST',
 
-                contentType: 'application/json; charset=utf-8',
+                contentType:
+                    'application/json; charset=utf-8',
 
-                dataType: 'json',
+                dataType:
+                    'json',
 
-                data: JSON.stringify(model),
+                data:
+                    JSON.stringify(model),
+
 
                 success: function (res) {
 
-                    console.log("Save response:", res);
+                    console.log(
+                        "Save response:",
+                        res
+                    );
 
-                    if (res && res.success === true) {
 
-                        alert(res.message || "Data Saved Successfully");
+                    if (res &&
+                        res.success === true) {
+
+                        alert(
+                            res.message ||
+                            "Data Saved Successfully"
+                        );
+
 
                         rowsToSave.forEach(function (x) {
 
@@ -732,13 +898,16 @@
 
                         });
 
+
                         refreshStationDisplay();
+
 
                         if ($(".inspection-row").length === 0) {
 
                             $(".table-custom tbody").html(`
                                 <tr>
-                                    <td colspan="8" class="empty">
+                                    <td colspan="8"
+                                        class="empty">
                                         No records found.
                                     </td>
                                 </tr>
@@ -751,37 +920,24 @@
                         alert(
                             (res && res.message)
                                 ? res.message
-                                : "Save failed. No error message was returned by the server."
+                                : "Save failed."
                         );
 
                     }
 
                 },
 
-                error: function (xhr, status, error) {
 
-                    console.log("AJAX Error:", xhr.responseText);
+                error: function (xhr) {
 
-                    let message = "Server Error while saving.";
+                    console.log(
+                        "AJAX Error:",
+                        xhr.responseText
+                    );
 
-                    try {
-
-                        let response = JSON.parse(xhr.responseText);
-
-                        if (response.message) {
-                            message = response.message;
-                        }
-
-                    }
-                    catch (e) {
-
-                        if (xhr.responseText) {
-                            message = xhr.responseText;
-                        }
-
-                    }
-
-                    alert(message);
+                    alert(
+                        "Server Error while saving."
+                    );
 
                 }
 
@@ -789,75 +945,167 @@
 
         });
 
-         function submitData() {
+                function submitData() {
 
             var list = [];
 
-            $("tbody tr").each(function () {
+            var rowsForValidation =
+                $();
+
+            $(".inspection-row").each(function () {
 
                 var row = $(this);
 
-                var dataId = row.find(".dataid").val();
-                var result = row.find(".result").val();
-                var defective = row.find(".defective").val();
+                var dataId =
+                    row.find(".dataid").val();
 
-                if (dataId && result !== "") {
+                var result =
+                    row.find(".result").val();
+
+                var defective =
+                    row.find(".defective").val();
+
+
+                if (dataId &&
+                    result !== "") {
 
                     list.push({
-                        DataId: parseInt(dataId) || 0,
-                        Section1: result,
-                        DefectiveNumber: defective || "0"
+
+                        DataId:
+                            parseInt(dataId) || 0,
+
+                        Section1:
+                            result,
+
+                        DefectiveNumber:
+                            defective || "0"
+
                     });
+
+
+                    rowsForValidation =
+                        rowsForValidation.add(row);
+
                 }
+
             });
 
+
             if (list.length === 0) {
-                alert("Please enter at least one inspection result.");
+
+                alert(
+                    "Please enter at least one inspection result."
+                );
+
                 return;
             }
 
+            if (!validateNGRows(rowsForValidation)) {
+
+                return;
+            }
+
+
             var model = {
 
-                VisualInspectionResults: list,
+                VisualInspectionResults:
+                    list,
 
-                LineId: parseInt($("#LineId").val()) || 0,
-                ProjectId: parseInt($("#ProjectId").val()) || 0,
-                ModelId: parseInt($("#ModelId").val()) || 0,
-                PartId: parseInt($("#PartId").val()) || 0,
-                VisualsId: parseInt($("#VisualsId").val()) || 0,
+                LineId:
+                    parseInt($("#LineId").val()) || 0,
 
-                Model: $("#ModelId option:selected").text(),
+                ProjectId:
+                    parseInt($("#ProjectId").val()) || 0,
 
-                ProdLineLeader: $("#txtLineLeader").val(),
-                CheckedBy: $("#txtCheckedBy").val(),
-                ApprovedBy: $("#txtApprovedBy").val()
+                ModelId:
+                    parseInt($("#ModelId").val()) || 0,
+
+                PartId:
+                    parseInt($("#PartId").val()) || 0,
+
+                VisualsId:
+                    parseInt($("#VisualsId").val()) || 0,
+
+
+                Model:
+                    $("#ModelId option:selected").text(),
+
+
+                ProdLineLeader:
+                    $("#txtLineLeader").val(),
+
+                CheckedBy:
+                    $("#txtCheckedBy").val(),
+
+                ApprovedBy:
+                    $("#txtApprovedBy").val()
+
             };
 
+
             $.ajax({
-                url: '/VisualInspection/Submit',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(model),
+
+                url:
+                    '/VisualInspection/Submit',
+
+                type:
+                    'POST',
+
+                contentType:
+                    'application/json',
+
+                data:
+                    JSON.stringify(model),
+
+
                 success: function (res) {
 
                     if (res.success) {
-                        alert("Data Submitted Successfully");
+
+                        alert(
+                            "Data Submitted Successfully"
+                        );
 
                         $(".result").val("");
+
                         $(".defective").val("");
 
+                        $(".inspection-row")
+                            .removeClass("ng-row");
+
                         $("#txtLineLeader").val("");
+
                         $("#txtCheckedBy").val("");
+
                         $("#txtApprovedBy").val("");
+
                     }
                     else {
-                        alert(res.message);
+
+                        alert(
+                            res.message ||
+                            "Save failed."
+                        );
+
                     }
+
                 },
+
+
                 error: function (xhr) {
-                    alert("Server Error");
+
+                    console.log(
+                        xhr.responseText
+                    );
+
+                    alert(
+                        "Server Error"
+                    );
+
                 }
+
             });
+
         }
         
     </script>

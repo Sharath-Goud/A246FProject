@@ -183,6 +183,28 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .ng-row {
+            background: rgba(220, 53, 69, 0.20) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row td {
+                background: rgba(220, 53, 69, 0.08) !important;
+                color: #ff8080 !important;
+            }
+
+        .ng-value {
+            border: 2px solid #dc3545 !important;
+            background: rgba(220, 53, 69, 0.18) !important;
+            color: #ff8080 !important;
+        }
+
+        .ok-value {
+            border: 2px solid #28a745 !important;
+            background: rgba(40, 167, 69, 0.12) !important;
+            color: #90ee90 !important;
+        }
     </style>
 
 </head>
@@ -359,7 +381,9 @@
                     {
                         foreach (System.Data.DataRow row in Model.dtChecklist.Rows)
                         {
-                            <tr data-section-id="@row["SectionId"]">
+                            <tr data-section-id="@row["SectionId"]"
+                                data-specification="@row["InspectionSpecifications"]">
+
                                 <td>@row["WorkStation"]</td>
                                 <td>@row["InspectionProject"]</td>
                                 <td>@row["InspectionSpecifications"]</td>
@@ -468,33 +492,378 @@
         });
     </script>
     <script>
-    function buildItemFromRow($row) {
-        var sectionId = parseInt($row.data("section-id"), 10);
-        var vals = {};
-        $row.find(".val-input").each(function () {
-            var slot = $(this).data("slot");
-            var raw = $(this).val();
-            if (raw === "" || raw === null) {
-                vals["value" + slot] = null;
-            }
-            else if (isNaN(raw)) {
-                alert("Please enter only numeric values.");
-                throw "Invalid value";
-            }
-            else {
-                vals["value" + slot] = parseFloat(raw);
-            }
-        });
 
-        return {
-            sectionId: sectionId,
-            value1: vals.value1,
-            value2: vals.value2,
-            value3: vals.value3,
-            value4: vals.value4,
-            value5: vals.value5
-        };
-    }
+                function getSpecificationRange(specification) {
+
+            if (!specification) {
+                return null;
+            }
+
+            let spec = specification.toString()
+                .trim()
+                .replace(/\s+/g, "")
+                .replace(/mm/gi, "");
+
+            /*
+               Pattern 1:
+
+               126.63±1.0
+
+               Result:
+               Min = 125.63
+               Max = 127.63
+            */
+
+            let plusMinusMatch = spec.match(
+                /^([+-]?\d+(?:\.\d+)?)±([+-]?\d+(?:\.\d+)?)$/
+            );
+
+            if (plusMinusMatch) {
+
+                let target = parseFloat(plusMinusMatch[1]);
+                let tolerance = parseFloat(plusMinusMatch[2]);
+
+                return {
+                    min: target - tolerance,
+                    max: target + tolerance
+                };
+            }
+
+
+            /*
+               Pattern 2:
+
+               6.22+0.83/0.00
+
+               Result:
+               Min = 6.22 - 0.00 = 6.22
+               Max = 6.22 + 0.83 = 7.05
+            */
+
+            let asymmetricMatch = spec.match(
+                /^([+-]?\d+(?:\.\d+)?)\+(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/
+            );
+
+            if (asymmetricMatch) {
+
+                let target = parseFloat(asymmetricMatch[1]);
+                let plusTolerance = parseFloat(asymmetricMatch[2]);
+                let minusTolerance = parseFloat(asymmetricMatch[3]);
+
+                return {
+                    min: target - minusTolerance,
+                    max: target + plusTolerance
+                };
+            }
+
+
+            /*
+               Pattern 3:
+
+               1000
+
+               Exact value expected.
+            */
+
+            let exactMatch = spec.match(
+                /^([+-]?\d+(?:\.\d+)?)$/
+            );
+
+            if (exactMatch) {
+
+                let exactValue = parseFloat(exactMatch[1]);
+
+                return {
+                    min: exactValue,
+                    max: exactValue
+                };
+            }
+
+            return null;
+        }
+
+        function validateInputValue($input) {
+
+            let $row = $input.closest("tr");
+
+            let specification = $row.data("specification");
+
+            let range = getSpecificationRange(specification);
+
+            let rawValue = $.trim($input.val());
+
+
+            // Empty values are allowed
+            if (rawValue === "") {
+
+                $input.removeClass("ng-value ok-value");
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+
+            }
+
+
+            // NG text is not allowed
+            if (rawValue.toUpperCase() === "NG") {
+
+                $input
+                    .removeClass("ok-value")
+                    .addClass("ng-value");
+
+                return {
+                    valid: false,
+                    message: "NG value is not allowed"
+                };
+
+            }
+
+
+            // Numeric validation
+            let numericValue = Number(rawValue);
+
+            if (isNaN(numericValue)) {
+
+                $input
+                    .removeClass("ok-value")
+                    .addClass("ng-value");
+
+                return {
+                    valid: false,
+                    message: "Please enter a valid numeric value"
+                };
+
+            }
+
+
+            // If specification does not have a numeric range
+            if (!range) {
+
+                $input
+                    .removeClass("ng-value")
+                    .removeClass("ok-value");
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+
+            }
+
+
+            // Minimum validation
+            if (numericValue < range.min) {
+
+                $input
+                    .removeClass("ok-value")
+                    .addClass("ng-value");
+
+                return {
+                    valid: false,
+                    message:
+                        "Value " + numericValue +
+                        " is below Minimum " + range.min
+                };
+
+            }
+
+
+            // Maximum validation
+            if (numericValue > range.max) {
+
+                $input
+                    .removeClass("ok-value")
+                    .addClass("ng-value");
+
+                return {
+                    valid: false,
+                    message:
+                        "Value " + numericValue +
+                        " is above Maximum " + range.max
+                };
+
+            }
+
+
+            // Valid value
+            $input
+                .removeClass("ng-value")
+                .addClass("ok-value");
+
+
+            return {
+
+                valid: true,
+                message: ""
+
+            };
+
+        }
+
+        function validateHankingRow(row) {
+
+            let invalidValues = [];
+
+
+            // Remove previous NG row style
+            row.removeClass("ng-row");
+
+
+            // Validate all value fields
+            row.find(".val-input").each(function () {
+
+                let input = $(this);
+
+                let value = $.trim(input.val());
+
+
+                // Validate only entered values
+                if (value !== "") {
+
+                    let result =
+                        validateInputValue(input);
+
+
+                    if (!result.valid) {
+
+                        invalidValues.push(
+
+                            "Value " +
+                            input.data("slot") +
+                            " = " +
+                            value +
+                            " (" +
+                            result.message +
+                            ")"
+
+                        );
+
+                    }
+
+                }
+
+            });
+
+
+            // Mark entire row as NG
+            if (invalidValues.length > 0) {
+
+                row.addClass("ng-row");
+
+                return {
+
+                    valid: false,
+
+                    message:
+                        invalidValues.join("\n")
+
+                };
+
+            }
+
+
+            return {
+
+                valid: true,
+
+                message: ""
+
+            };
+
+        }
+
+                $(document).on(
+            "input change",
+            ".val-input",
+            function () {
+
+                let row =
+                    $(this).closest("tr[data-section-id]");
+
+
+                validateHankingRow(row);
+
+            }
+        );
+
+                function buildItemFromRow(row) {
+
+            let sectionId =
+                parseInt(
+                    row.data("section-id")
+                );
+
+
+            let value1 =
+                $.trim(
+                    row.find(
+                        ".val-input[data-slot='1']"
+                    ).val()
+                );
+
+            let value2 =
+                $.trim(
+                    row.find(
+                        ".val-input[data-slot='2']"
+                    ).val()
+                );
+
+            let value3 =
+                $.trim(
+                    row.find(
+                        ".val-input[data-slot='3']"
+                    ).val()
+                );
+
+            let value4 =
+                $.trim(
+                    row.find(
+                        ".val-input[data-slot='4']"
+                    ).val()
+                );
+
+            let value5 =
+                $.trim(
+                    row.find(
+                        ".val-input[data-slot='5']"
+                    ).val()
+                );
+
+
+            return {
+
+                sectionId: sectionId,
+
+                value1:
+                    value1 === ""
+                        ? null
+                        : parseFloat(value1),
+
+                value2:
+                    value2 === ""
+                        ? null
+                        : parseFloat(value2),
+
+                value3:
+                    value3 === ""
+                        ? null
+                        : parseFloat(value3),
+
+                value4:
+                    value4 === ""
+                        ? null
+                        : parseFloat(value4),
+
+                value5:
+                    value5 === ""
+                        ? null
+                        : parseFloat(value5)
+
+            };
+
+        }
 
     function getHeaderContext() {
         return {
@@ -532,155 +901,413 @@
         });
     }
 
-            $(document).on("click", ".row-save-btn", function () {
+        $(document).on(
+            "click",
+            ".row-save-btn",
+            function () {
 
-            let clickedRow = $(this).closest("tr");
+                let clickedRow =
+                    $(this).closest(
+                        "tr[data-section-id]"
+                    );
 
-            let rowsToSave = [];
 
-            $(".custom-table tbody tr[data-section-id]").each(function () {
+                let rowsToSave = [];
 
-                let row = $(this);
+                let validationErrors = [];
 
-                let value1 = $.trim(row.find(".val-input[data-slot='1']").val());
-                let value2 = $.trim(row.find(".val-input[data-slot='2']").val());
-                let value3 = $.trim(row.find(".val-input[data-slot='3']").val());
-                let value4 = $.trim(row.find(".val-input[data-slot='4']").val());
-                let value5 = $.trim(row.find(".val-input[data-slot='5']").val());
 
-                let hasValue =
-                    value1 !== "" ||
-                    value2 !== "" ||
-                    value3 !== "" ||
-                    value4 !== "" ||
-                    value5 !== "";
+                $(".custom-table tbody tr[data-section-id]")
+                    .each(function () {
 
-                if (hasValue) {
+                        let row = $(this);
 
-                    let item = buildItemFromRow(row);
 
-                    item._htmlRow = row;
+                        let value1 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='1']"
+                                ).val()
+                            );
 
-                    rowsToSave.push(item);
+                        let value2 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='2']"
+                                ).val()
+                            );
 
-                }
+                        let value3 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='3']"
+                                ).val()
+                            );
 
-                // Stop after clicked row
-                if (row[0] === clickedRow[0]) {
-                    return false;
-                }
+                        let value4 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='4']"
+                                ).val()
+                            );
 
-            });
+                        let value5 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='5']"
+                                ).val()
+                            );
 
-            if (rowsToSave.length === 0) {
 
-                alert("Please enter at least one value before saving.");
+                        let hasValue =
 
-                return;
+                            value1 !== "" ||
+                            value2 !== "" ||
+                            value3 !== "" ||
+                            value4 !== "" ||
+                            value5 !== "";
 
-            }
 
-            let items = rowsToSave.map(function (x) {
+                        // Validate only rows having values
+                        if (hasValue) {
 
-                return {
+                            let validationResult =
+                                validateHankingRow(row);
 
-                    sectionId: x.sectionId,
 
-                    value1: x.value1,
-                    value2: x.value2,
-                    value3: x.value3,
-                    value4: x.value4,
-                    value5: x.value5
+                            if (!validationResult.valid) {
 
-                };
+                                validationErrors.push(
+                                    validationResult.message
+                                );
 
-            });
-
-            submitItems(items)
-
-                .done(function (res) {
-
-                    if (res.success) {
-
-                        alert("Rows Saved Successfully");
-
-                        rowsToSave.forEach(function (x) {
-
-                            x._htmlRow.remove();
-
-                        });
-
-                        if ($(".custom-table tbody tr[data-section-id]").length === 0) {
-
-                            $(".custom-table tbody").html(`
-                                <tr>
-                                    <td colspan="11" class="empty-row">
-                                        No records found.
-                                    </td>
-                                </tr>
-                            `);
+                            }
 
                         }
 
-                    }
-                    else {
 
-                        alert(res.message);
+                        // Add only rows having values
+                        if (hasValue) {
 
-                    }
+                            let item =
+                                buildItemFromRow(row);
 
-                })
 
-                .fail(function () {
+                            item._htmlRow = row;
 
-                    alert("Save Error");
 
-                });
+                            rowsToSave.push(item);
 
-        });
+                        }
 
-    $(".btn-submit").on("click", function (e) {
-        e.preventDefault();
 
-        var items = [];
-        $(".custom-table tbody tr[data-section-id]").each(function () {
-            items.push(buildItemFromRow($(this)));
-        });
+                        // Stop at clicked Save row
+                        if (row[0] === clickedRow[0]) {
 
-        if (items.length === 0) {
-            alert("No data to submit.");
-            return;
-        }
+                            return false;
 
-        submitItems(items)
-        .done(function (res) {
+                        }
 
-            if (res.success) {
+                    });
 
-                alert("All rows saved successfully.");
 
-                $(".val-input").val("");
+                // Stop saving when invalid values exist
+                if (validationErrors.length > 0) {
 
-                $("#LineId").val("");
-                $("#ProjectId").val("");
-                $("#ModelId").empty().append('<option value="">-- Select Model --</option>');
-                $("#PartId").empty().append('<option value="">-- Select Part --</option>');
-                $("#MachineId").val("");
+                    alert(
 
-                $("input[name='ProdLineLeader']").val("");
-                $("input[name='CheckedBy']").val("");
-                $("input[name='ApprovedBy']").val("");
+                        "❌ Cannot save because NG / invalid values were found.\n\n" +
+
+                        validationErrors.join("\n\n")
+
+                    );
+
+                    return;
+
+                }
+
+
+                if (rowsToSave.length === 0) {
+
+                    alert(
+                        "Please enter at least one value before saving."
+                    );
+
+                    return;
+
+                }
+
+
+                // Remove _htmlRow before sending
+                let items =
+                    rowsToSave.map(function (x) {
+
+                        return {
+
+                            sectionId:
+                                x.sectionId,
+
+                            value1:
+                                x.value1,
+
+                            value2:
+                                x.value2,
+
+                            value3:
+                                x.value3,
+
+                            value4:
+                                x.value4,
+
+                            value5:
+                                x.value5
+
+                        };
+
+                    });
+
+
+                submitItems(items)
+
+                    .done(function (res) {
+
+                        if (
+                            res &&
+                            res.success === false
+                        ) {
+
+                            alert(
+                                res.message ||
+                                "Save Failed"
+                            );
+
+                            return;
+
+                        }
+
+
+                        alert(
+                            res.message ||
+                            "Saved Successfully"
+                        );
+
+
+                        // Remove only saved rows
+                        rowsToSave.forEach(
+                            function (x) {
+
+                                x._htmlRow.remove();
+
+                            }
+                        );
+
+
+                        // Show empty row
+                        if (
+
+                            $(".custom-table tbody tr[data-section-id]")
+                                .length === 0
+
+                        ) {
+
+                            $(".custom-table tbody")
+                                .html(
+
+                                    `<tr>
+
+                                        <td colspan="11"
+                                            class="empty-row">
+
+                                            No records found.
+
+                                        </td>
+
+                                    </tr>`
+
+                                );
+
+                        }
+
+                    })
+
+                    .fail(function () {
+
+                        alert(
+                            "Save Failed"
+                        );
+
+                    });
 
             }
-            else {
-                alert("Submit failed: " + res.message);
-            }
+        );
 
-        })
-        .fail(function (xhr) {
-            alert("Submit error.");
-        });
-    });
+                $(".btn-submit").on(
+            "click",
+            function (e) {
+
+                e.preventDefault();
+
+
+                let items = [];
+
+                let validationErrors = [];
+
+
+                $(".custom-table tbody tr[data-section-id]")
+                    .each(function () {
+
+                        let row = $(this);
+
+
+                        let value1 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='1']"
+                                ).val()
+                            );
+
+                        let value2 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='2']"
+                                ).val()
+                            );
+
+                        let value3 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='3']"
+                                ).val()
+                            );
+
+                        let value4 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='4']"
+                                ).val()
+                            );
+
+                        let value5 =
+                            $.trim(
+                                row.find(
+                                    ".val-input[data-slot='5']"
+                                ).val()
+                            );
+
+
+                        let hasValue =
+
+                            value1 !== "" ||
+                            value2 !== "" ||
+                            value3 !== "" ||
+                            value4 !== "" ||
+                            value5 !== "";
+
+
+                        // Validate only entered rows
+                        if (hasValue) {
+
+                            let validationResult =
+                                validateHankingRow(row);
+
+
+                            if (!validationResult.valid) {
+
+                                let sectionName =
+                                    row.find("td:eq(4)")
+                                        .text()
+                                        .trim();
+
+
+                                validationErrors.push(
+
+                                    "Section: " +
+                                    sectionName +
+                                    "\n" +
+                                    validationResult.message
+
+                                );
+
+                                return;
+
+                            }
+
+
+                            items.push(
+                                buildItemFromRow(row)
+                            );
+
+                        }
+
+                    });
+
+
+                // Stop submit when NG exists
+                if (validationErrors.length > 0) {
+
+                    alert(
+
+                        "❌ Cannot submit because NG / invalid values were found.\n\n" +
+
+                        validationErrors.join("\n\n")
+
+                    );
+
+                    return;
+
+                }
+
+
+                if (items.length === 0) {
+
+                    alert(
+                        "Please enter at least one value before submitting."
+                    );
+
+                    return;
+
+                }
+
+
+                submitItems(items)
+
+                    .done(function (res) {
+
+                        if (
+                            res &&
+                            res.success === false
+                        ) {
+
+                            alert(
+                                res.message ||
+                                "Submit Failed"
+                            );
+
+                            return;
+
+                        }
+
+
+                        alert(
+                            res.message ||
+                            "Saved Successfully"
+                        );
+
+
+                        location.reload();
+
+                    })
+
+                    .fail(function () {
+
+                        alert(
+                            "Submit Failed"
+                        );
+
+                    });
+
+            }
+        );
 </script>
 </body>
 </html>

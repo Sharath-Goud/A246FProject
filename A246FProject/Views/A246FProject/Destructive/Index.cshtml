@@ -304,8 +304,8 @@
                         <select asp-for="LineId"
                                 id="LineId"
                                 asp-items="@(new SelectList(Model.Lines,
-                                "LineId",
-                                "LineName"))">
+                                                                "LineId",
+                                                                "LineName"))">
                             <option value="">-- Select Line --</option>
                         </select>
                     </div>
@@ -315,8 +315,8 @@
                         <select asp-for="ProjectId"
                                 id="ProjectId"
                                 asp-items="@(new SelectList(Model.Projects,
-                                "ProjectId",
-                                "ProjectName"))">
+                                                                "ProjectId",
+                                                                "ProjectName"))">
                             <option value="">-- Select Project --</option>
                         </select>
                     </div>
@@ -326,8 +326,8 @@
                         <select asp-for="ModelId"
                                 id="ModelId"
                                 asp-items="@(new SelectList(Model.ModelNos,
-                                "ModelId",
-                                "Model"))">
+                                                                "ModelId",
+                                                                "Model"))">
                             <option value="">-- Select Model --</option>
                         </select>
                     </div>
@@ -343,8 +343,8 @@
                         <select asp-for="PartId"
                                 id="PartId"
                                 asp-items="@(new SelectList(Model.PartNos,
-                                "PartId",
-                                "Part"))">
+                                                                "PartId",
+                                                                "Part"))">
                             <option value="">-- Select Part --</option>
                         </select>
                     </div>
@@ -354,8 +354,8 @@
                         <select asp-for="MachineId"
                                 id="MachineId"
                                 asp-items="@(new SelectList(Model.Machines,
-                                "MachineId",
-                                "Machine"))">
+                                                                "MachineId",
+                                                                "Machine"))">
                             <option value="">-- Select Machine --</option>
                         </select>
                     </div>
@@ -404,13 +404,13 @@
         {
             <div id="validationMessage"
                  style="
-         background:#dc3545;
-         color:white;
-         padding:10px 15px;
-         border-radius:8px;
-         margin:10px 0;
-         font-size:13px;
-         font-weight:500;">
+             background:#dc3545;
+             color:white;
+             padding:10px 15px;
+             border-radius:8px;
+             margin:10px 0;
+             font-size:13px;
+             font-weight:500;">
 
                 @ViewBag.Message
 
@@ -438,21 +438,31 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody id="body">
 
                     @if (Model.dtChecklist != null &&
-                    Model.dtChecklist.Rows.Count > 0)
+                                        Model.dtChecklist.Rows.Count > 0)
                     {
                         @for (int i = 0; i < Model.dtChecklist.Rows.Count; i++)
                         {
-                            <tr>
+                            <tr class="checklist-row">
 
                                 <td>
+
                                     <input type="hidden"
                                            class="SectionId"
                                            value="@Model.dtChecklist.Rows[i]["SectionId"]" />
 
+                                    <input type="hidden"
+                                           class="StartSpec"
+                                           value="@Model.dtChecklist.Rows[i]["StartSpec"]" />
+
+                                    <input type="hidden"
+                                           class="EndSpec"
+                                           value="@Model.dtChecklist.Rows[i]["EndSpec"]" />
+
                                     @Model.dtChecklist.Rows[i]["WorkStation"]
+
                                 </td>
 
                                 <td>
@@ -591,120 +601,421 @@
 
     </script>
     <script>
-        $(document).on("click", ".btnRowSave", function () {
 
-            // Save button clicked row
-            let clickedRow = $(this).closest("tr");
+                function getStartSpec(row) {
 
-            let rowsToSave = [];
+            return $.trim(
+                row.find(".StartSpec").val()
+            );
+        }
 
-            // Read rows from top until clicked row
-            $("tbody tr").each(function () {
+
+        function getEndSpec(row) {
+
+            return $.trim(
+                row.find(".EndSpec").val()
+            );
+        }
+
+
+        function validateValue(value, startSpec, endSpec) {
+
+            value = $.trim(value);
+
+            // Empty value is allowed
+            if (value === "") {
+                return true;
+            }
+
+            // NG is invalid
+            if (value.toUpperCase() === "NG") {
+                return false;
+            }
+
+            // Convert entered value to number
+            let numericValue = Number(value);
+
+            // Reject non-numeric values
+            if (!Number.isFinite(numericValue)) {
+                return false;
+            }
+
+            // Convert specifications
+            let min = Number(startSpec);
+            let max = Number(endSpec);
+
+            let hasMin = Number.isFinite(min);
+            let hasMax = Number.isFinite(max);
+
+            // No specification
+            if (!hasMin && !hasMax) {
+                return true;
+            }
+
+            // Both minimum and maximum
+            if (hasMin && hasMax) {
+
+                return numericValue >= min &&
+                       numericValue <= max;
+            }
+
+            // Only minimum
+            if (hasMin) {
+
+                return numericValue >= min;
+            }
+
+            // Only maximum
+            if (hasMax) {
+
+                return numericValue <= max;
+            }
+
+            return true;
+        }
+
+
+        function validateRow(row) {
+
+            let startSpec = getStartSpec(row);
+
+            let endSpec = getEndSpec(row);
+
+            let value = $.trim(
+                row.find(".value1").val()
+            );
+
+            return validateValue(
+                value,
+                startSpec,
+                endSpec
+            );
+        }
+
+
+        function highlightInput(input) {
+
+            input.css({
+                "background": "rgba(220,53,69,0.65)",
+                "border": "2px solid #dc3545",
+                "color": "#ffffff"
+            });
+        }
+
+
+        function removeInputHighlight(input) {
+
+            input.css({
+                "background": "",
+                "border": "",
+                "color": ""
+            });
+        }
+
+                $(document).on(
+            "input change",
+            ".value1",
+            function () {
+
+                let input = $(this);
+
+                let row = input.closest("tr");
+
+                let startSpec = getStartSpec(row);
+
+                let endSpec = getEndSpec(row);
+
+                let value = $.trim(input.val());
+
+
+                // Empty value
+                if (value === "") {
+
+                    removeInputHighlight(input);
+
+                    row.css(
+                        "background",
+                        ""
+                    );
+
+                    return;
+                }
+
+
+                // Validate value
+                let isValid = validateValue(
+                    value,
+                    startSpec,
+                    endSpec
+                );
+
+
+                if (!isValid) {
+
+                    highlightInput(input);
+
+                    row.css(
+                        "background",
+                        "rgba(220,53,69,0.20)"
+                    );
+
+                }
+                else {
+
+                    removeInputHighlight(input);
+
+                    row.css(
+                        "background",
+                        ""
+                    );
+                }
+
+            }
+        );
+
+                function clearRowError(row) {
+
+            row.css("background", "");
+
+            row.find(".value1").each(function () {
+
+                removeInputHighlight($(this));
+
+            });
+        }
+
+
+        function validateAndCollectRows() {
+
+            let results = [];
+
+            let hasInvalidValue = false;
+
+            let invalidMessage = "";
+
+            $("#body tr.checklist-row").each(function () {
 
                 let row = $(this);
 
-                let sectionId = row.find(".SectionId").val();
+                let input = row.find(".value1");
 
-                let value1 = $.trim(row.find(".value1").val());
+                let value = $.trim(input.val());
 
-                // Save only rows having a value
-                if (sectionId && value1 !== "") {
+                let startSpec = getStartSpec(row);
 
-                    rowsToSave.push({
+                let endSpec = getEndSpec(row);
 
-                        sectionId: parseInt(sectionId) || 0,
 
-                        value1: parseFloat(value1) || 0,
+                // Clear previous highlighting
+                clearRowError(row);
 
-                        inspectionResults: "",
 
-                        // Keep HTML row reference
-                        _htmlRow: row
-
-                    });
-
+                // Skip completely empty rows
+                if (value === "") {
+                    return true;
                 }
 
-                // Stop at clicked row
-                if (row[0] === clickedRow[0]) {
+
+                // NG validation
+                if (value.toUpperCase() === "NG") {
+
+                    hasInvalidValue = true;
+
+                    invalidMessage =
+                        "NG value found. Please correct all invalid values before saving.";
+
+                    row.css(
+                        "background",
+                        "rgba(220,53,69,0.20)"
+                    );
+
+                    highlightInput(input);
+
                     return false;
                 }
 
+
+                // Validate based on StartSpec and EndSpec
+                let isValid = validateValue(
+                    value,
+                    startSpec,
+                    endSpec
+                );
+
+
+                if (!isValid) {
+
+                    hasInvalidValue = true;
+
+                    invalidMessage =
+                        "Invalid value found based on the Inspection Specifications.";
+
+                    row.css(
+                        "background",
+                        "rgba(220,53,69,0.20)"
+                    );
+
+                    highlightInput(input);
+
+                    return false;
+                }
+
+
+                let sectionId =
+                    row.find(".SectionId").val();
+
+
+                if (sectionId) {
+
+                    results.push({
+
+                        sectionId:
+                            parseInt(sectionId) || 0,
+
+                        value1:
+                            value,
+
+                        inspectionResults:
+                            ""
+                    });
+                }
+
             });
 
-            if (rowsToSave.length === 0) {
 
-                alert("Please enter at least one value before saving.");
+            return {
 
-                return;
-            }
+                isValid: !hasInvalidValue,
 
-            // Remove _htmlRow before sending
-            let resultList = rowsToSave.map(function (x) {
+                results: results,
 
-                return {
-
-                    sectionId: x.sectionId,
-
-                    value1: x.value1,
-
-                    inspectionResults: x.inspectionResults
-
-                };
-
-            });
-
-            let data = {
-
-                lineId: parseInt($("#LineId").val()) || 0,
-
-                projectId: parseInt($("#ProjectId").val()) || 0,
-
-                modelId: parseInt($("#ModelId").val()) || 0,
-
-                partId: parseInt($("#PartId").val()) || 0,
-
-                machineId: parseInt($("#MachineId").val()) || 0,
-
-                prodLineLeader: $("#ProdLineLeader").val(),
-
-                checkedBy: $("#CheckedBy").val(),
-
-                approvedBy: $("#ApprovedBy").val(),
-
-                a246FMHB2CheckListResults: resultList
+                message: invalidMessage
 
             };
+        }
 
-            $.ajax({
+                $(document).on(
+            "click",
+            ".btnRowSave",
+            function (e) {
 
-                url: '/Destructive/SaveA246FMHB2CheckList',
+                e.preventDefault();
+                e.stopPropagation();
 
-                type: 'POST',
+                let validationResult =
+                    validateAndCollectRows();
 
-                contentType: 'application/json',
+                if (!validationResult.isValid) {
 
-                data: JSON.stringify(data),
+                    alert(
+                        validationResult.message ||
+                        "Invalid or NG value found. Nothing was saved. Please correct the highlighted value."
+                    );
 
-                success: function (response) {
+                    return false;
+                }
 
-                    if (response > 0 || response.success === true) {
+                if (
+                    validationResult.results.length === 0
+                ) {
 
-                        alert("Data Saved Successfully");
+                    alert(
+                        "Please enter at least one value before saving."
+                    );
 
-                        // Remove only saved rows
-                        rowsToSave.forEach(function (x) {
+                    return false;
+                }
 
-                            x._htmlRow.remove();
+                let data = {
+
+                    lineId:
+                        parseInt($("#LineId").val()) || 0,
+
+                    projectId:
+                        parseInt($("#ProjectId").val()) || 0,
+
+                    modelId:
+                        parseInt($("#ModelId").val()) || 0,
+
+                    partId:
+                        parseInt($("#PartId").val()) || 0,
+
+                    machineId:
+                        parseInt($("#MachineId").val()) || 0,
+
+                    prodLineLeader:
+                        $("#ProdLineLeader").val(),
+
+                    checkedBy:
+                        $("#CheckedBy").val(),
+
+                    approvedBy:
+                        $("#ApprovedBy").val(),
+
+                    a246FMHB2CheckListResults:
+                        validationResult.results
+                };
+
+                $.ajax({
+
+                    url:
+                        '/Destructive/SaveA246FMHB2CheckList',
+
+                    type:
+                        'POST',
+
+                    contentType:
+                        'application/json; charset=utf-8',
+
+                    data:
+                        JSON.stringify(data),
+
+
+                    success: function (response) {
+
+                        if (
+                            response &&
+                            response.success === false
+                        ) {
+
+                            alert(
+                                response.message ||
+                                "Error while saving."
+                            );
+
+                            return;
+                        }
+
+
+                        alert(
+                            response.message ||
+                            "All entered data saved successfully."
+                        );
+
+                        $("#body tr.checklist-row").each(function () {
+
+                            let row = $(this);
+
+                            let value = $.trim(
+                                row.find(".value1").val()
+                            );
+
+                            if (value !== "") {
+
+                                row.remove();
+
+                            }
 
                         });
 
-                        // If all rows removed
-                        if ($("tbody tr").length === 0) {
+                        if (
+                            $("#body tr.checklist-row").length === 0
+                        ) {
 
-                            $("tbody").html(`
+                            $("#body").html(`
                                 <tr>
-                                    <td colspan="7" class="empty-row">
+                                    <td colspan="7"
+                                        class="empty-row">
                                         No records found.
                                     </td>
                                 </tr>
@@ -712,76 +1023,149 @@
 
                         }
 
+                    },
+
+
+                    error: function () {
+
+                        alert(
+                            "Server Error while saving."
+                        );
+
                     }
-                    else {
 
-                        alert("Save failed.");
-
-                    }
-
-                },
-
-                error: function () {
-
-                    alert("Error while saving.");
-
-                }
-
-            });
-
-        });
-
-
-        $("#btnSubmit").click(function () {
-
-            var results = [];
-
-            $("tbody tr").each(function () {
-
-                results.push({
-                    sectionId: $(this).find(".SectionId").val(),
-                    value1: $(this).find(".value1").val() || 0,
-                    inspectionResults: ""
                 });
 
-            });
 
-            var data = {
-                lineId: $("#LineId").val(),
-                projectId: $("#ProjectId").val(),
-                modelId: $("#ModelId").val(),
-                partId: $("#PartId").val(),
-                machineId: $("#MachineId").val(),
+                return false;
 
-                prodLineLeader: $("#ProdLineLeader").val(),
-                checkedBy: $("#CheckedBy").val(),
-                approvedBy: $("#ApprovedBy").val(),
+            }
+        );
 
-                a246FMHB2CheckListResults: results
-            };
 
-            $.ajax({
-                url: '/Destructive/SaveA246FMHB2CheckList',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
+                $(document).on(
+            "click",
+            "#btnSubmit",
+            function (e) {
 
-                success: function (response) {
+                e.preventDefault();
 
-                    if (response > 0) {
-                        alert("✔ Rows inserted successfully!");
-                        location.reload();
-                    } else {
-                        alert("❌ Submit failed!");
-                    }
-                },
+                let validationResult =
+                    validateAndCollectRows();
 
-                error: function () {
-                    alert("⚠ Error while submitting data!");
+
+                if (!validationResult.isValid) {
+
+                    alert(
+                        validationResult.message ||
+                        "Invalid or NG value found. Nothing was submitted. Please correct the highlighted value."
+                    );
+
+                    return;
                 }
-            });
 
-        });
+
+                if (
+                    validationResult.results.length === 0
+                ) {
+
+                    alert(
+                        "Please enter at least one value before submitting."
+                    );
+
+                    return;
+                }
+
+                let data = {
+
+                    lineId:
+                        parseInt($("#LineId").val()) || 0,
+
+                    projectId:
+                        parseInt($("#ProjectId").val()) || 0,
+
+                    modelId:
+                        parseInt($("#ModelId").val()) || 0,
+
+                    partId:
+                        parseInt($("#PartId").val()) || 0,
+
+                    machineId:
+                        parseInt($("#MachineId").val()) || 0,
+
+                    prodLineLeader:
+                        $("#ProdLineLeader").val(),
+
+                    checkedBy:
+                        $("#CheckedBy").val(),
+
+                    approvedBy:
+                        $("#ApprovedBy").val(),
+
+                    a246FMHB2CheckListResults:
+                        validationResult.results
+                };
+
+                $.ajax({
+
+                    url:
+                        '/Destructive/SaveA246FMHB2CheckList',
+
+                    type:
+                        'POST',
+
+                    contentType:
+                        'application/json; charset=utf-8',
+
+                    data:
+                        JSON.stringify(data),
+
+
+                    success: function (response) {
+
+                        if (
+                            response &&
+                            response.success === true
+                        ) {
+
+                            alert(
+                                response.message ||
+                                "All data submitted successfully."
+                            );
+
+                            $(".value1").val("");
+
+                            $("#body tr.checklist-row").each(function () {
+
+                                clearRowError($(this));
+
+                            });
+
+                        }
+                        else {
+
+                            alert(
+                                response.message ||
+                                "Save failed."
+                            );
+
+                        }
+
+                    },
+
+
+                    error: function () {
+
+                        alert(
+                            "Server Error while saving."
+                        );
+
+                    }
+
+                });
+
+            }
+        );
     </script>
 </body>
 </html>

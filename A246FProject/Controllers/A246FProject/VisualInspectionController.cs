@@ -245,7 +245,7 @@ public class VisualInspectionController : Controller
             return Json(new
             {
                 success = true,
-                message = "All inspection data saved successfully."
+                message = "Inspection data saved successfully."
             });
         }
         catch (Exception ex)

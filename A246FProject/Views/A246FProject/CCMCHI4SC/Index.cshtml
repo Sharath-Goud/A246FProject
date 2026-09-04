@@ -194,7 +194,31 @@
 
         }
 
-       
+        .ng-row {
+            background: rgba(220, 53, 69, 0.18) !important;
+            border-left: 4px solid #dc3545 !important;
+        }
+
+            .ng-row div {
+                color: #ff6b6b !important;
+            }
+
+            .ng-row input {
+                border: 1px solid #dc3545 !important;
+                background: rgba(220, 53, 69, 0.12) !important;
+                color: #ff6b6b !important;
+            }
+
+        .ng-input {
+            border: 2px solid #dc3545 !important;
+            background: rgba(220, 53, 69, 0.20) !important;
+            color: #ff6b6b !important;
+        }
+
+        .valid-input {
+            border: 2px solid #28a745 !important;
+            background: rgba(40, 167, 69, 0.12) !important;
+        }
     </style>
 </head>
 
@@ -359,7 +383,11 @@
                             @row["InspectionProject"]
                         </div>
 
-                        <div>@row["InspectionSpecifications"]</div>
+                        <div>@row["InspectionSpecifications"]
+                            <input type="hidden"
+                                   class="InspectionSpecifications"
+                                   value="@row["InspectionSpecifications"]" />
+                        </div>
 
                         <div>@row["Frequency"]</div>
 
@@ -489,9 +517,347 @@
         });
     });
 
+            function validateHeader() {
+
+            var LineId = $("#LineId").val();
+            var ProjectId = $("#ProjectId").val();
+            var ModelId = $("#ModelId").val();
+            var PartId = $("#PartId").val();
+            var MachineId = $("#MachineId").val();
+
+            var ProdLineLeader = $.trim($("#ProdLineLeader").val());
+            var CheckedBy = $.trim($("#CheckedBy").val());
+            var ApprovedBy = $.trim($("#ApprovedBy").val());
+
+            if (!LineId ||
+                !ProjectId ||
+                !ModelId ||
+                !PartId ||
+                !MachineId ||
+                !ProdLineLeader ||
+                !CheckedBy ||
+                !ApprovedBy) {
+
+                alert(
+                    "Please fill Line, Project, Model, Part, Machine, " +
+                    "Production Line Leader, Checked By and Approved By."
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+                function getSpecificationRange(specification) {
+
+            if (!specification) {
+                return null;
+            }
+
+            specification = specification
+                .replace(/,/g, "")
+                .trim();
+
+            var plusMinusMatch = specification.match(
+                /(-?\d+(\.\d+)?)\s*±\s*(\d+(\.\d+)?)/
+            );
+
+            if (plusMinusMatch) {
+
+                var target = parseFloat(plusMinusMatch[1]);
+
+                var tolerance = parseFloat(plusMinusMatch[3]);
+
+                return {
+                    min: target - tolerance,
+                    max: target + tolerance
+                };
+            }
+
+            var rangeMatch = specification.match(
+                /(-?\d+(\.\d+)?)\s*[-~]\s*(-?\d+(\.\d+)?)/
+            );
+
+            if (rangeMatch) {
+
+                return {
+                    min: parseFloat(rangeMatch[1]),
+                    max: parseFloat(rangeMatch[3])
+                };
+            }
+
+            var greaterEqualMatch = specification.match(
+                /≥\s*(-?\d+(\.\d+)?)/
+            );
+
+            if (greaterEqualMatch) {
+
+                return {
+                    min: parseFloat(greaterEqualMatch[1]),
+                    max: Infinity
+                };
+            }
+
+            var lessEqualMatch = specification.match(
+                /≤\s*(-?\d+(\.\d+)?)/
+            );
+
+            if (lessEqualMatch) {
+
+                return {
+                    min: -Infinity,
+                    max: parseFloat(lessEqualMatch[1])
+                };
+            }
+
+
+            return null;
+        }
+
+                function validateSingleValue(value, specification) {
+
+            value = $.trim(value);
+
+            if (value === "") {
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+            }
+
+            if (value.toUpperCase() === "NG") {
+
+                return {
+                    valid: false,
+                    message: "Value is NG"
+                };
+            }
+
+            var range = getSpecificationRange(specification);
+
+            if (!range) {
+
+                return {
+                    valid: true,
+                    message: ""
+                };
+            }
+
+            var numericValue = parseFloat(value);
+
+            if (isNaN(numericValue)) {
+
+                return {
+                    valid: false,
+                    message: "Invalid numeric value"
+                };
+            }
+
+            if (
+                numericValue < range.min ||
+                numericValue > range.max
+            ) {
+
+                return {
+                    valid: false,
+
+                    message:
+                        "Value must be between " +
+                        range.min +
+                        " and " +
+                        range.max
+                };
+            }
+
+
+            return {
+                valid: true,
+                message: ""
+            };
+        }
+
+                function validateRow(row) {
+
+            var specification = $.trim(
+                row.find(".InspectionSpecifications").val()
+            );
+
+            var values = [
+
+                {
+                    name: "Value1",
+                    input: row.find(".Value1")
+                },
+
+                {
+                    name: "Value2",
+                    input: row.find(".Value2")
+                },
+
+                {
+                    name: "Value3",
+                    input: row.find(".Value3")
+                },
+
+                {
+                    name: "Value4",
+                    input: row.find(".Value4")
+                },
+
+                {
+                    name: "Value5",
+                    input: row.find(".Value5")
+                }
+
+            ];
+
+            var invalidValues = [];
+
+            // Remove previous validation styles
+            row.removeClass("ng-row");
+
+            row.find(
+                ".Value1, .Value2, .Value3, .Value4, .Value5"
+            ).removeClass("ng-input valid-input");
+
+
+            values.forEach(function (item) {
+
+                var enteredValue = $.trim(item.input.val());
+
+                // Ignore empty values
+                if (enteredValue === "") {
+                    return;
+                }
+
+                var result = validateSingleValue(
+                    enteredValue,
+                    specification
+                );
+
+
+                if (!result.valid) {
+
+                    invalidValues.push(
+                        item.name +
+                        " = " +
+                        enteredValue +
+                        "\nReason: " +
+                        result.message
+                    );
+
+                    // Red input
+                    item.input.addClass("ng-input");
+
+                }
+                else {
+
+                    // Optional green indication for valid value
+                    item.input.addClass("valid-input");
+                }
+
+            });
+
+
+            // If any invalid value exists
+            if (invalidValues.length > 0) {
+
+                row.addClass("ng-row");
+
+                return {
+                    valid: false,
+                    message:
+                        "Inspection Specification: " +
+                        specification +
+                        "\n\nInvalid Values:\n\n" +
+                        invalidValues.join("\n\n")
+                };
+            }
+
+
+            return {
+                valid: true,
+                message: ""
+            };
+        }
+
+        function validateRowsBeforeSave(rows) {
+
+            var errors = [];
+
+            rows.each(function () {
+
+                var row = $(this);
+
+                var value1 = $.trim(row.find(".Value1").val());
+                var value2 = $.trim(row.find(".Value2").val());
+                var value3 = $.trim(row.find(".Value3").val());
+                var value4 = $.trim(row.find(".Value4").val());
+                var value5 = $.trim(row.find(".Value5").val());
+
+
+                // Check whether the row has at least one entered value
+                var hasValue =
+                    value1 !== "" ||
+                    value2 !== "" ||
+                    value3 !== "" ||
+                    value4 !== "" ||
+                    value5 !== "";
+
+
+                // Validate only rows containing values
+                if (hasValue) {
+
+                    var validation = validateRow(row);
+
+                    if (!validation.valid) {
+
+                        errors.push(
+                            "Row " +
+                            (row.index() + 1) +
+                            "\n" +
+                            validation.message
+                        );
+                    }
+                }
+
+            });
+
+
+            if (errors.length > 0) {
+
+                alert(
+                    "❌ VALIDATION FAILED\n\n" +
+                    errors.join("\n\n------------------------\n\n")
+                );
+
+                return false;
+            }
+
+
+            return true;
+        }
+
+                $(document).on(
+            "input change",
+            ".Value1, .Value2, .Value3, .Value4, .Value5",
+            function () {
+
+                var row = $(this).closest(".row");
+
+                validateRow(row);
+            }
+        );
+
+
          $(document).on("click", ".btnRowSave", function () {
 
-            // The row whose Save button was clicked
+            if (!validateHeader()) {
+                return;
+            }
+
             var clickedRow = $(this).closest(".row");
 
             var rowsToSave = [];
@@ -549,6 +915,17 @@
                 alert("Please enter at least one value before saving.");
                 return;
             }
+
+                    // Validate all rows before saving
+        var rowsForValidation = $();
+
+        rowsToSave.forEach(function (x) {
+            rowsForValidation = rowsForValidation.add(x._htmlRow);
+        });
+
+        if (!validateRowsBeforeSave(rowsForValidation)) {
+            return;
+        }
 
 
             // Remove _htmlRow before sending data to controller
@@ -647,58 +1024,126 @@
 
         });
 
-        $("#btnSubmit").click(function () {
+               $("#btnSubmit").click(function () {
+
+            if (!validateHeader()) {
+                return;
+            }
 
             var results = [];
 
-            $(".row").each(function () {
+            $("#body .row").each(function () {
 
-                results.push({
+                var row = $(this);
 
-                    SectionId: $(this).find(".SectionId").val(),
+                var sectionId = row.find(".SectionId").val();
 
-                    Value1: $(this).find(".Value1").val() || 0,
-                    Value2: $(this).find(".Value2").val() || 0,
-                    Value3: $(this).find(".Value3").val() || 0,
-                    Value4: $(this).find(".Value4").val() || 0,
-                    Value5: $(this).find(".Value5").val() || 0
+                var value1 = $.trim(row.find(".Value1").val());
+                var value2 = $.trim(row.find(".Value2").val());
+                var value3 = $.trim(row.find(".Value3").val());
+                var value4 = $.trim(row.find(".Value4").val());
+                var value5 = $.trim(row.find(".Value5").val());
 
-                });
+                var hasValue =
+                    value1 !== "" ||
+                    value2 !== "" ||
+                    value3 !== "" ||
+                    value4 !== "" ||
+                    value5 !== "";
+
+                // Save only rows containing at least one value
+                if (sectionId && hasValue) {
+
+                    results.push({
+
+                        SectionId: parseInt(sectionId) || 0,
+
+                        Value1: value1 === "" ? null : value1,
+                        Value2: value2 === "" ? null : value2,
+                        Value3: value3 === "" ? null : value3,
+                        Value4: value4 === "" ? null : value4,
+                        Value5: value5 === "" ? null : value5
+                    });
+                }
 
             });
 
+
+            if (results.length === 0) {
+
+                alert("Please enter at least one checklist value before submitting.");
+                return;
+            }
+
+            if (!validateRowsBeforeSave($("#body .row"))) {
+                return;
+            }
+
+
             var data = {
 
-                LineId: $("#LineId").val(),
-                ProjectId: $("#ProjectId").val(),
-                ModelId: $("#ModelId").val(),
-                PartId: $("#PartId").val(),
+                LineId: parseInt($("#LineId").val()) || 0,
+
+                ProjectId: parseInt($("#ProjectId").val()) || 0,
+
+                ModelId: parseInt($("#ModelId").val()) || 0,
+
+                PartId: parseInt($("#PartId").val()) || 0,
+
+                MachineId: parseInt($("#MachineId").val()) || 0,
 
                 ProdLineLeader: $("#ProdLineLeader").val(),
+
                 CheckedBy: $("#CheckedBy").val(),
+
                 ApprovedBy: $("#ApprovedBy").val(),
 
                 CCMCHI4SCResults: results
-
             };
+
 
             $.ajax({
 
                 url: '/CCMCHI4SC/SaveA246FCCMMC1CheckList',
+
                 type: 'POST',
+
                 contentType: 'application/json',
+
                 data: JSON.stringify(data),
 
                 success: function (result) {
 
+                    if (result &&
+                        result.success !== undefined &&
+                        result.success === false) {
+
+                        alert(result.message || "Error while saving.");
+                        return;
+                    }
+
+
                     alert("All Rows Saved Successfully");
+
                     $(".Value1").val("");
                     $(".Value2").val("");
                     $(".Value3").val("");
                     $(".Value4").val("");
                     $(".Value5").val("");
 
+                    $(".Value1, .Value2, .Value3, .Value4, .Value5")
+                    .val("")
+                    .removeClass("ng-input valid-input");
+
+                    $("#body .row").removeClass("ng-row");
+
+                },
+
+                error: function () {
+
+                    alert("Error while saving all rows.");
                 }
+
             });
 
         });
