@@ -1039,232 +1039,13 @@
 
     <script>
 
-    function saveTrapTestRow(button) {
+            function saveTrapTestRow(button) {
 
-            var row = $(button).closest("tr");
+            var clickedButton = $(button);
 
-            var inspectId = row.attr("data-inspect-id");
-
-            var inspecId = row.find(".inspector-category").val();
-            var inspectorName = row.find(".inspector-name").val();
-            var inspectorId = row.find(".inspector-id").val();
-
-            var noOfCables = row.find(".no-of-samples").val();
-            var checkedQty = row.find(".checked-qty").val();
-            var skippedQty = row.find(".skipped-qty").val();
-
-            var checkResult = row.find(".check-status").is(":checked");
-
-            if (!inspectId) {
-                alert("Inspector Id is missing.");
-                return;
-            }
-
-            if (!inspecId) {
-                alert("Please select Inspector Category.");
-                return;
-            }
-
-            if (!inspectorId) {
-                alert("Please enter Inspector Id.");
-                return;
-            }
-
-            if (!inspectorName) {
-                alert("Please enter Inspector Name.");
-                return;
-            }
-
-            if (!noOfCables) {
-                alert("Please enter No Of Samples.");
-                return;
-            }
-
-            if (!checkedQty) {
-                alert("Please enter No Of checked qty.");
-                return;
-            }
-
-            if (!skippedQty) {
-                alert("Please enter No Of skipped qty.");
-                return;
-            }
-
-            var lineId = $("#LineId").val();
-            var projectId = $("#ProjectId").val();
-            var modelId = $("#ModelId").val();
-            var partId = $("#PartId").val();
-
-            var prodLineLeader = $("#ProdLineLeader").val();
-            var checkedBy = $("#CheckedBy").val();
-            var approvedBy = $("#ApprovedBy").val();
-
-            if (!lineId || lineId == "0") {
-                alert("Please select Line.");
-                return;
-            }
-
-            if (!projectId || projectId == "0") {
-                alert("Please select Project.");
-                return;
-            }
-
-            if (!modelId || modelId == "0") {
-                alert("Please select Model.");
-                return;
-            }
-
-            if (!partId || partId == "0") {
-                alert("Please select Part.");
-                return;
-            }
-
-            if (!prodLineLeader) {
-                alert("Please enter Production Line Leader.");
-                return;
-            }
-
-            if (!checkedBy) {
-                alert("Please enter Checked By.");
-                return;
-            }
-
-            if (!approvedBy) {
-                alert("Please enter Approved By.");
-                return;
-            }
-
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            var formData = new FormData();
-
-            formData.append("__RequestVerificationToken", token);
-
-            formData.append("LineId", lineId);
-            formData.append("ProjectId", projectId);
-            formData.append("ModelId", modelId);
-            formData.append("PartId", partId);
-
-            formData.append(
-                "ProdLineLeader",
-                prodLineLeader
-            );
-
-            formData.append(
-                "CheckedBy",
-                checkedBy
-            );
-
-            formData.append(
-                "ApprovedBy",
-                approvedBy
-            );
-
-            formData.append(
-                "TrapTestResults[0].Id",
-                "1"
-            );
-
-            formData.append(
-                "TrapTestResults[0].InspectId",
-                inspectId
-            );
-
-            formData.append(
-                "TrapTestResults[0].InspecId",
-                inspecId
-            );
-
-            formData.append(
-                "TrapTestResults[0].InspectorName",
-                inspectorName
-            );
-
-            formData.append(
-                "TrapTestResults[0].InspectorId",
-                inspectorId
-            );
-
-            formData.append(
-                "TrapTestResults[0].NoOfCables",
-                noOfCables
-            );
-
-            formData.append(
-                "TrapTestResults[0].CheckResult",
-                checkResult ? "true" : "false"
-            );
-
-            formData.append(
-                "TrapTestResults[0].SkippedQty",
-                skippedQty
-            );
-
-            formData.append(
-                "TrapTestResults[0].CheckedQty",
-                checkedQty
-            );
-
-            var saveButton = $(button);
-
-            saveButton.prop("disabled", true);
-            saveButton.text("Saving...");
-
-
-            $.ajax({
-
-                url: '@Url.Action("SaveBulkTrapTest", "TrapTest")',
-
-                type: 'POST',
-
-                data: formData,
-
-                processData: false,
-
-                contentType: false,
-
-
-                success: function (response) {
-
-                    if (response.success) {
-
-                        alert(response.message);
-
-                        saveButton.text("Saved");
-
-                        saveButton.prop("disabled", true);
-
-                    }
-                    else {
-
-                        alert(response.message);
-
-                        saveButton.prop("disabled", false);
-
-                        saveButton.text("Save");
-                    }
-
-                },
-
-
-                error: function (xhr) {
-
-                    alert(
-                        "Error while saving Trap Test.\n\n" +
-                        xhr.responseText
-                    );
-
-                    saveButton.prop("disabled", false);
-
-                    saveButton.text("Save");
-                }
-
-            });
-        }
-
-
-        $("#btnSaveTrapTest").click(function () {
-
+            // ---------------------------------------------------------
+            // HEADER VALIDATION
+            // ---------------------------------------------------------
             if (!validateHeader()) {
                 return;
             }
@@ -1280,6 +1061,206 @@
 
             var token =
                 $('input[name="__RequestVerificationToken"]').val();
+
+
+            // ---------------------------------------------------------
+            // COLLECT ALL FILLED ROWS
+            // ---------------------------------------------------------
+
+            var rowsToSave = [];
+            var validationFailed = false;
+
+            $(".trap-test-table tbody tr:visible").each(function () {
+
+                if (validationFailed) {
+                    return false;
+                }
+
+                var row = $(this);
+
+                var inspectId =
+                    row.attr("data-inspect-id");
+
+                if (!inspectId) {
+
+                    alert("Inspect Id is missing.");
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                var inspecId =
+                    row.find(".inspector-category").val();
+
+                var inspectorId =
+                    row.find(".inspector-id").val();
+
+                var inspectorName =
+                    row.find(".inspector-name").val();
+
+                var noOfCables =
+                    row.find(".no-of-samples").val();
+
+                var checkedQty =
+                    row.find(".checked-qty").val();
+
+                var skippedQty =
+                    row.find(".skipped-qty").val();
+
+                var checkResult =
+                    row.find(".check-status").is(":checked");
+
+
+                // -----------------------------------------------------
+                // IMPORTANT:
+                // Only collect rows where the user has entered data.
+                // Empty untouched checklist rows are ignored.
+                // -----------------------------------------------------
+
+                var hasAnyData =
+                    inspecId ||
+                    inspectorId ||
+                    inspectorName ||
+                    noOfCables ||
+                    checkedQty ||
+                    skippedQty ||
+                    checkResult;
+
+
+                if (!hasAnyData) {
+                    return;
+                }
+
+
+                // -----------------------------------------------------
+                // VALIDATE THIS ENTERED ROW
+                // -----------------------------------------------------
+
+                if (!inspecId) {
+
+                    alert(
+                        "Please select Inspector Category for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                if (!inspectorId) {
+
+                    alert(
+                        "Please enter Inspector Id for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                if (!inspectorName) {
+
+                    alert(
+                        "Please enter Inspector Name for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                if (!noOfCables) {
+
+                    alert(
+                        "Please enter No Of Samples for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                if (!checkedQty) {
+
+                    alert(
+                        "Please enter No Of checked qty for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                if (!skippedQty) {
+
+                    alert(
+                        "Please enter No Of skipped qty for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+
+                // -----------------------------------------------------
+                // ADD ROW TO ARRAY
+                // -----------------------------------------------------
+
+                rowsToSave.push({
+                    row: row,
+                    inspectId: inspectId,
+                    inspecId: inspecId,
+                    inspectorId: inspectorId,
+                    inspectorName: inspectorName,
+                    noOfCables: noOfCables,
+                    checkedQty: checkedQty,
+                    skippedQty: skippedQty,
+                    checkResult: checkResult
+                });
+
+            });
+
+
+            // ---------------------------------------------------------
+            // STOP IF VALIDATION FAILED
+            // ---------------------------------------------------------
+
+            if (validationFailed) {
+                return;
+            }
+
+
+            // ---------------------------------------------------------
+            // CHECK WHETHER ANY DATA WAS ENTERED
+            // ---------------------------------------------------------
+
+            if (rowsToSave.length === 0) {
+
+                alert(
+                    "Please enter the Trap Test data in at least one row before clicking Save."
+                );
+
+                return;
+            }
+
+
+            // ---------------------------------------------------------
+            // CREATE FORM DATA
+            // ---------------------------------------------------------
 
             var formData = new FormData();
 
@@ -1323,10 +1304,282 @@
                 approvedBy
             );
 
-            var rowIndex = 0;
-            var hasRows = false;
-            var validationFailed = false;
 
+            // ---------------------------------------------------------
+            // ADD ALL ENTERED ROWS
+            // ---------------------------------------------------------
+
+            $.each(rowsToSave, function (index, item) {
+
+                formData.append(
+                    "TrapTestResults[" + index + "].Id",
+                    (index + 1).toString()
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].InspectId",
+                    item.inspectId
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].InspecId",
+                    item.inspecId
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].InspectorName",
+                    item.inspectorName
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].InspectorId",
+                    item.inspectorId
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].NoOfCables",
+                    item.noOfCables
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].CheckResult",
+                    item.checkResult ? "true" : "false"
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].SkippedQty",
+                    item.skippedQty
+                );
+
+                formData.append(
+                    "TrapTestResults[" + index + "].CheckedQty",
+                    item.checkedQty
+                );
+
+            });
+
+
+            // ---------------------------------------------------------
+            // DISABLE CLICKED SAVE BUTTON
+            // ---------------------------------------------------------
+
+            clickedButton.prop(
+                "disabled",
+                true
+            );
+
+            clickedButton.text(
+                "Saving..."
+            );
+
+
+            // ---------------------------------------------------------
+            // SAVE ALL ENTERED ROWS
+            // ---------------------------------------------------------
+
+            $.ajax({
+
+                url:
+                    '@Url.Action("SaveBulkTrapTest", "TrapTest")',
+
+                type: "POST",
+
+                data: formData,
+
+                processData: false,
+
+                contentType: false,
+
+
+                success: function (response) {
+
+                    console.log(
+                        "Save Response:",
+                        response
+                    );
+
+
+            if (response.success) {
+
+            $.each(rowsToSave, function (index, item) {
+
+                item.row.attr(
+                    "data-saved",
+                    "true"
+                );
+
+                item.row.attr(
+                    "data-saved-inspect-id",
+                    item.inspectId
+                );
+
+                item.row.hide();
+
+            });
+
+
+            alert(
+                response.message ||
+                (
+                    rowsToSave.length +
+                    " Trap Test row(s) saved successfully."
+                )
+            );
+
+
+            clickedButton.text(
+                "Saved"
+            );
+
+            clickedButton.prop(
+                "disabled",
+                true
+            );
+
+            if (
+                $(".trap-test-table tbody tr:visible").length === 0
+            ) {
+
+                $("#btnSaveTrapTest").prop(
+                    "disabled",
+                    false
+                );
+
+                $("#btnSaveTrapTest").text(
+                    "Submit"
+                );
+
+            }
+
+            location.reload();
+
+        }
+        else {
+
+            alert(
+                response.message ||
+                "Trap Test save failed."
+            );
+
+
+            clickedButton.prop(
+                "disabled",
+                false
+            );
+
+            clickedButton.text(
+                "Save"
+            );
+
+        }
+
+                },
+
+
+                error: function (xhr) {
+
+                    console.error(
+                        "Save Trap Test Error:",
+                        xhr.responseText
+                    );
+
+
+                    alert(
+                        "Error while saving Trap Test.\n\n" +
+                        xhr.responseText
+                    );
+
+
+                    clickedButton.prop(
+                        "disabled",
+                        false
+                    );
+
+                    clickedButton.text(
+                        "Save"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+                $("#btnSaveTrapTest").click(function () {
+
+            // ---------------------------------------------------------
+            // HEADER VALIDATION
+            // ---------------------------------------------------------
+            if (!validateHeader()) {
+                return;
+            }
+
+            // ---------------------------------------------------------
+            // HEADER VALUES
+            // ---------------------------------------------------------
+            var lineId = $("#LineId").val();
+            var projectId = $("#ProjectId").val();
+            var modelId = $("#ModelId").val();
+            var partId = $("#PartId").val();
+
+            var prodLineLeader = $("#ProdLineLeader").val();
+            var checkedBy = $("#CheckedBy").val();
+            var approvedBy = $("#ApprovedBy").val();
+
+            var token =
+                $('input[name="__RequestVerificationToken"]').val();
+
+            // ---------------------------------------------------------
+            // CREATE FORM DATA
+            // ---------------------------------------------------------
+            var formData = new FormData();
+
+            formData.append(
+                "__RequestVerificationToken",
+                token
+            );
+
+            formData.append(
+                "LineId",
+                lineId
+            );
+
+            formData.append(
+                "ProjectId",
+                projectId
+            );
+
+            formData.append(
+                "ModelId",
+                modelId
+            );
+
+            formData.append(
+                "PartId",
+                partId
+            );
+
+            formData.append(
+                "ProdLineLeader",
+                prodLineLeader
+            );
+
+            formData.append(
+                "CheckedBy",
+                checkedBy
+            );
+
+            formData.append(
+                "ApprovedBy",
+                approvedBy
+            );
+
+            // ---------------------------------------------------------
+            // COLLECT ONLY ENTERED ROWS
+            // ---------------------------------------------------------
+            var rowIndex = 0;
+            var validationFailed = false;
 
             $(".trap-test-table tbody tr").each(function () {
 
@@ -1334,24 +1587,13 @@
                     return false;
                 }
 
-
                 var row = $(this);
 
+                // -----------------------------------------------------
+                // GET ROW VALUES
+                // -----------------------------------------------------
                 var inspectId =
                     row.attr("data-inspect-id");
-
-
-                if (!inspectId) {
-
-                    alert(
-                        "Inspect Id is missing in row " +
-                        (rowIndex + 1)
-                    );
-
-                    validationFailed = true;
-
-                    return false;
-                }
 
                 var inspecId =
                     row.find(".inspector-category").val();
@@ -1374,11 +1616,50 @@
                 var checkResult =
                     row.find(".check-status").is(":checked");
 
+                // -----------------------------------------------------
+                // CHECK WHETHER THIS ROW IS COMPLETELY EMPTY
+                // -----------------------------------------------------
+                var hasAnyData =
+                    $.trim(inspecId || "") !== "" ||
+                    $.trim(inspectorId || "") !== "" ||
+                    $.trim(inspectorName || "") !== "" ||
+                    $.trim(noOfCables || "") !== "" ||
+                    $.trim(checkedQty || "") !== "" ||
+                    $.trim(skippedQty || "") !== "" ||
+                    checkResult;
+
+                // -----------------------------------------------------
+                // IMPORTANT:
+                // IF NOTHING WAS ENTERED IN THIS ROW,
+                // COMPLETELY IGNORE IT.
+                // -----------------------------------------------------
+                if (!hasAnyData) {
+                    return;
+                }
+
+                // -----------------------------------------------------
+                // INSPECT ID VALIDATION
+                // -----------------------------------------------------
+                if (!inspectId) {
+
+                    alert(
+                        "Inspect Id is missing for module: " +
+                        row.find(".module-name").text().trim()
+                    );
+
+                    validationFailed = true;
+
+                    return false;
+                }
+
+                // -----------------------------------------------------
+                // VALIDATE ONLY THIS ENTERED ROW
+                // -----------------------------------------------------
                 if (!inspecId) {
 
                     alert(
-                        "Please select Inspector Category in row " +
-                        (rowIndex + 1)
+                        "Please select Inspector Category for module: " +
+                        row.find(".module-name").text().trim()
                     );
 
                     validationFailed = true;
@@ -1389,8 +1670,8 @@
                 if (!inspectorId) {
 
                     alert(
-                        "Please enter Inspector Id in row " +
-                        (rowIndex + 1)
+                        "Please enter Inspector Id for module: " +
+                        row.find(".module-name").text().trim()
                     );
 
                     validationFailed = true;
@@ -1401,8 +1682,8 @@
                 if (!inspectorName) {
 
                     alert(
-                        "Please enter Inspector Name in row " +
-                        (rowIndex + 1)
+                        "Please enter Inspector Name for module: " +
+                        row.find(".module-name").text().trim()
                     );
 
                     validationFailed = true;
@@ -1413,8 +1694,8 @@
                 if (!noOfCables) {
 
                     alert(
-                        "Please enter No Of Samples in row " +
-                        (rowIndex + 1)
+                        "Please enter No Of Samples for module: " +
+                        row.find(".module-name").text().trim()
                     );
 
                     validationFailed = true;
@@ -1425,8 +1706,8 @@
                 if (!checkedQty) {
 
                     alert(
-                        "Please enter No Of checked qty in row " +
-                        (rowIndex + 1)
+                        "Please enter No Of checked qty for module: " +
+                        row.find(".module-name").text().trim()
                     );
 
                     validationFailed = true;
@@ -1437,8 +1718,8 @@
                 if (!skippedQty) {
 
                     alert(
-                        "Please enter No Of skipped qty in row " +
-                        (rowIndex + 1)
+                        "Please enter No Of skipped qty for module: " +
+                        row.find(".module-name").text().trim()
                     );
 
                     validationFailed = true;
@@ -1446,6 +1727,9 @@
                     return false;
                 }
 
+                // -----------------------------------------------------
+                // ADD ONLY THIS ENTERED ROW
+                // -----------------------------------------------------
                 formData.append(
                     "TrapTestResults[" + rowIndex + "].Id",
                     (rowIndex + 1).toString()
@@ -1491,26 +1775,32 @@
                     checkedQty
                 );
 
-
                 rowIndex++;
-
-                hasRows = true;
 
             });
 
+            // ---------------------------------------------------------
+            // STOP IF VALIDATION FAILED
+            // ---------------------------------------------------------
             if (validationFailed) {
                 return;
             }
 
-            if (!hasRows) {
+            // ---------------------------------------------------------
+            // NO DATA ENTERED IN ANY ROW
+            // ---------------------------------------------------------
+            if (rowIndex === 0) {
 
                 alert(
-                    "No Trap Test checklist rows found."
+                    "Please enter Trap Test data in at least one row before clicking Submit."
                 );
 
                 return;
             }
 
+            // ---------------------------------------------------------
+            // DISABLE SUBMIT BUTTON
+            // ---------------------------------------------------------
             var submitButton =
                 $("#btnSaveTrapTest");
 
@@ -1520,9 +1810,12 @@
             );
 
             submitButton.text(
-                "Submitting..."
+                "Saving..."
             );
 
+            // ---------------------------------------------------------
+            // SAVE ONLY ENTERED ROWS
+            // ---------------------------------------------------------
             $.ajax({
 
                 url:
@@ -1539,20 +1832,28 @@
                 success: function (response) {
 
                     console.log(
-                        "Bulk Save Response:",
+                        "Save Response:",
                         response
                     );
-
 
                     if (response.success) {
 
                         alert(
                             response.message ||
-                            "All Trap Test rows saved successfully."
+                            (
+                                rowIndex +
+                                " Trap Test row(s) saved successfully."
+                            )
                         );
 
+                        // -------------------------------------------------
+                        // ONLY ENTERED ROWS WERE SAVED.
+                        //
+                        // EMPTY ROWS WERE NEVER SENT TO SERVER.
+                        // -------------------------------------------------
+
                         submitButton.text(
-                            "Submitted"
+                            "Saved"
                         );
 
                         submitButton.prop(
@@ -1565,7 +1866,7 @@
 
                         alert(
                             response.message ||
-                            "Bulk Trap Test save failed."
+                            "Trap Test save failed."
                         );
 
                         submitButton.text(
@@ -1576,20 +1877,18 @@
                             "disabled",
                             false
                         );
-
                     }
-
                 },
 
                 error: function (xhr) {
 
                     console.error(
-                        "Bulk Save Error:",
+                        "Trap Test Save Error:",
                         xhr.responseText
                     );
 
                     alert(
-                        "Error while submitting Trap Test.\n\n" +
+                        "Error while saving Trap Test.\n\n" +
                         xhr.responseText
                     );
 
@@ -1601,9 +1900,7 @@
                         "disabled",
                         false
                     );
-
                 }
-
             });
 
         });

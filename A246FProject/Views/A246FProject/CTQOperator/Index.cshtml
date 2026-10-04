@@ -768,9 +768,8 @@
 
                                 <td>
 
-                                    <button type="button"
-                                            class="btn-search"
-                                            onclick="saveCTQOperatorRow(this)">
+
+                                    <button type="button" class="btn-search btn-save-row">
                                         Save
                                     </button>
 
@@ -976,237 +975,198 @@
 
     <script>
 
+
         function saveCTQOperatorRow(button) {
 
-            var row = $(button).closest("tr");
+            var clickedRow = $(button).closest("tr");
+            var rowsToSave = [];
+            var validationError = "";
+            var clickedRowFound = false;
 
-            var InspectionId = row.attr("data-inspect-id");
-
-            var inspecId = row.find(".inspector-category").val();
-            var inspectorName = row.find(".inspector-name").val();
-            var inspectorId = row.find(".inspector-id").val();
-
-            var checkResult = row.find(".check-status").is(":checked");
-
-            if (!InspectionId) {
-
-                alert("Inspection Id is missing.");
+            if (!validateHeader()) {
                 return;
-
             }
 
-            if (!inspecId) {
+            // Collect completed rows from the beginning through the selected row.
+            $(".trap-test-table tbody tr").each(function () {
 
-                alert("Please select Inspector Category.");
+                var row = $(this);
+                var inspectionId = row.attr("data-inspect-id");
+
+                var category = row.find(".inspector-category").val();
+                var inspectorName = $.trim(row.find(".inspector-name").val() || "");
+                var inspectorId = $.trim(row.find(".inspector-id").val() || "");
+                var checkResult = row.find(".check-status").is(":checked");
+
+                if (!inspectionId) {
+                    return;
+                }
+
+                var isEmpty = !category && !inspectorName && !inspectorId;
+
+                // Ignore blank rows above the selected row, but not the selected row.
+                if (isEmpty) {
+                    if (this === clickedRow[0]) {
+                        validationError =
+                            "Please complete the selected row before saving.";
+                        clickedRowFound = true;
+                        return false;
+                    }
+
+                    return;
+                }
+
+                // Do not silently skip partially completed records.
+                if (!category || !inspectorName || !inspectorId) {
+                    validationError =
+                        "Please complete Inspector Category, Inspector Name and Inspector Id in every partially filled row before the selected row.";
+
+                    clickedRowFound = (this === clickedRow[0]);
+                    return false;
+                }
+
+                rowsToSave.push({
+                    row: row,
+                    inspectionId: inspectionId,
+                    category: category,
+                    inspectorName: inspectorName,
+                    inspectorId: inspectorId,
+                    checkResult: checkResult
+                });
+
+                if (this === clickedRow[0]) {
+                    clickedRowFound = true;
+                    return false;
+                }
+            });
+
+            if (!clickedRowFound) {
+                alert("Could not identify the selected row.");
                 return;
-
             }
 
-            if (!inspectorName) {
-
-                alert("Please enter Inspector Name.");
+            if (validationError) {
+                alert(validationError);
                 return;
-
             }
 
-            if (!inspectorId) {
-
-                alert("Please enter Inspector Id.");
+            if (!rowsToSave.some(function (item) {
+                return item.row[0] === clickedRow[0];
+            })) {
+                alert("Please complete the selected row before saving.");
                 return;
-
             }
-
-            var lineId = $("#LineId").val();
-            var projectId = $("#ProjectId").val();
-            var modelId = $("#ModelId").val();
-            var partId = $("#PartId").val();
-
-            var prodLineLeader = $("#ProdLineLeader").val();
-            var checkedBy = $("#CheckedBy").val();
-            var approvedBy = $("#ApprovedBy").val();
-
-            if (!lineId || lineId == "0") {
-
-                alert("Please select Line.");
-                return;
-
-            }
-
-            if (!projectId || projectId == "0") {
-
-                alert("Please select Project.");
-                return;
-
-            }
-
-            if (!modelId || modelId == "0") {
-
-                alert("Please select Model.");
-                return;
-
-            }
-
-            if (!partId || partId == "0") {
-
-                alert("Please select Part.");
-                return;
-
-            }
-
-            if (!prodLineLeader) {
-
-                alert("Please enter Production Line Leader.");
-                return;
-
-            }
-
-            if (!checkedBy) {
-
-                alert("Please enter Checked By.");
-                return;
-
-            }
-
-            if (!approvedBy) {
-
-                alert("Please enter Approved By.");
-                return;
-
-            }
-
-            var token = $('input[name="__RequestVerificationToken"]').val();
 
             var formData = new FormData();
 
             formData.append(
                 "__RequestVerificationToken",
-                token
+                $('input[name="__RequestVerificationToken"]').val()
             );
 
-            formData.append(
-                "LineId",
-                lineId
-            );
+            formData.append("LineId", $("#LineId").val());
+            formData.append("ProjectId", $("#ProjectId").val());
+            formData.append("ModelId", $("#ModelId").val());
+            formData.append("PartId", $("#PartId").val());
+            formData.append("ProdLineLeader", $.trim($("#ProdLineLeader").val()));
+            formData.append("CheckedBy", $.trim($("#CheckedBy").val()));
+            formData.append("ApprovedBy", $.trim($("#ApprovedBy").val()));
 
-            formData.append(
-                "ProjectId",
-                projectId
-            );
+            rowsToSave.forEach(function (item, index) {
 
-            formData.append(
-                "ModelId",
-                modelId
-            );
+                formData.append(
+                    "CTQOperatorResults[" + index + "].Id",
+                    index + 1
+                );
 
-            formData.append(
-                "PartId",
-                partId
-            );
+                formData.append(
+                    "CTQOperatorResults[" + index + "].InspectId",
+                    item.inspectionId
+                );
 
-            formData.append(
-                "ProdLineLeader",
-                prodLineLeader
-            );
+                formData.append(
+                    "CTQOperatorResults[" + index + "].InspecId",
+                    item.category
+                );
 
-            formData.append(
-                "CheckedBy",
-                checkedBy
-            );
+                formData.append(
+                    "CTQOperatorResults[" + index + "].InspectorName",
+                    item.inspectorName
+                );
 
-            formData.append(
-                "ApprovedBy",
-                approvedBy
-            );
+                formData.append(
+                    "CTQOperatorResults[" + index + "].InspectorId",
+                    item.inspectorId
+                );
 
-            formData.append(
-                "CTQOperatorResults[0].Id",
-                "1"
-            );
-
-            formData.append(
-                "CTQOperatorResults[0].InspectionId",
-                InspectionId
-            );
-
-            formData.append(
-                "CTQOperatorResults[0].InspecId",
-                inspecId
-            );
-
-            formData.append(
-                "CTQOperatorResults[0].InspectorName",
-                inspectorName
-            );
-
-            formData.append(
-                "CTQOperatorResults[0].InspectorId",
-                inspectorId
-            );
-
-            formData.append(
-                "CTQOperatorResults[0].CheckResult",
-                checkResult ? "true" : "false"
-            );
+                formData.append(
+                    "CTQOperatorResults[" + index + "].CheckResult",
+                    item.checkResult ? "true" : "false"
+                );
+            });
 
             var saveButton = $(button);
+            var allSaveButtons = $(".btn-save-row");
 
-            saveButton.prop("disabled", true);
+            allSaveButtons.prop("disabled", true);
             saveButton.text("Saving...");
 
             $.ajax({
-
                 url: '@Url.Action("SaveBulkCTQOperator", "CTQOperator")',
-
-                type: 'POST',
-
+                type: "POST",
                 data: formData,
-
                 processData: false,
-
                 contentType: false,
-
 
                 success: function (response) {
 
-                    if (response === "Saved Successfully") {
+                    console.log("CTQ batch save response:", response);
 
-                        alert("CTQ Operator saved successfully.");
+                    if (response && response.success === true) {
 
-                        saveButton.text("Saved");
+                        alert(
+                            response.message ||
+                            rowsToSave.length + " record(s) saved successfully."
+                        );
 
-                        saveButton.prop("disabled", true);
+                        // Hide only the rows included in this successful request.
+                        rowsToSave.forEach(function (item) {
+                            item.row.fadeOut(400, function () {
+                                $(this).remove();
+                            });
+                        });
 
-                    }
-                    else {
+                    } else {
 
-                        alert(response);
+                        alert(
+                            (response && response.message) ||
+                            "The server did not confirm the save. Rows will remain visible."
+                        );
 
-                        saveButton.prop("disabled", false);
-
+                        allSaveButtons.prop("disabled", false);
                         saveButton.text("Save");
-
                     }
-
                 },
-
 
                 error: function (xhr) {
 
+                    console.error("CTQ save failed:", xhr.status, xhr.responseText);
+
                     alert(
-                        "Error while saving CTQ Operator.\n\n" +
-                        xhr.responseText
+                        "The save request failed (HTTP " + xhr.status + ").\n\n" +
+                        (xhr.responseText || "Check the browser console and server logs.")
                     );
 
-                    saveButton.prop("disabled", false);
-
+                    allSaveButtons.prop("disabled", false);
                     saveButton.text("Save");
-
                 }
-
             });
-
         }
 
+
+        $(document).on("click", ".btn-save-row", function () {
+            saveCTQOperatorRow(this);
+        });
 
                 $("#btnSaveCTQOperator").click(function () {
 
@@ -1261,16 +1221,37 @@
 
             var index = 0;
 
-            $(".trap-test-table tbody tr").each(function () {
+                $(".trap-test-table tbody tr").each(function () {
 
-                var row = $(this);
 
-                var inspectId =
-                    row.attr("data-inspect-id");
+        var row = $(this);
 
-                if (!inspectId) {
-                    return;
-                }
+
+        var inspectorName =
+            row.find(".inspector-name").val();
+
+
+        var inspectorId =
+            row.find(".inspector-id").val();
+
+
+        var inspectorCategory =
+            row.find(".inspector-category").val();
+
+
+        var inspectId =
+            row.attr("data-inspect-id");
+
+
+        if (!inspectId) {
+            return;
+        }
+
+
+                        formData.append(
+            "CTQOperatorResults[" + index + "].Id",
+            index + 1
+        );
 
                 formData.append(
                     "CTQOperatorResults[" + index + "].InspectId",
@@ -1314,7 +1295,9 @@
                         : "false"
                 );
 
-                index++;
+                        row.addClass("saved-row");
+
+        index++;
             });
 
             if (index === 0) {
@@ -1331,27 +1314,36 @@
 
                 success: function (response) {
 
-                    if (response.success) {
+                console.log("CTQ SAVE RESPONSE:", response);
+                console.log(
+                    "CTQ SAVE RESPONSE JSON:",
+                    JSON.stringify(response)
+                );
 
-                        alert(response.message);
+                if (response.success) {
 
-                        // Clear all table fields
-                        $(".inspector-category").val("");
-                        $(".inspector-id").val("");
-                        $(".inspector-name").val("");
-                        $(".no-of-samples").val("");
-                        $(".checked-qty").val("");
-                        $(".skipped-qty").val("");
-                        $(".check-status").prop("checked", false);
+                    alert(
+                        response.message ||
+                        "CTQ Operator results saved successfully."
+                    );
 
-                    }
-                    else {
+                    $(".trap-test-table tbody tr.saved-row")
+    .fadeOut(500, function () {
 
-                        alert(response.message);
+        $(this).remove();
 
-                    }
-                },
+    });
 
+                }
+                else {
+
+                    alert(
+                        response.message ||
+                        "CTQ Operator save failed."
+                    );
+
+                }
+            },
                 error: function (xhr) {
 
                     alert(

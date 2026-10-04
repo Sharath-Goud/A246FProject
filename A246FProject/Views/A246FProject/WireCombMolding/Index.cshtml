@@ -448,6 +448,7 @@
                     {
                         foreach (System.Data.DataRow row in Model.dtChecklist.Rows)
                         {
+                            
                             <tr class="row">
 
                                 <td>@row["WorkStation"]</td>
@@ -460,6 +461,15 @@
                                     <input type="hidden"
                                            class="InspectionSpecifications"
                                            value="@row["InspectionSpecifications"]" />
+
+                                    <!-- Actual validation range -->
+                                    <input type="hidden"
+                                           class="StartSpec"
+                                           value="@row["StartSpec"]" />
+
+                                    <input type="hidden"
+                                           class="EndSpec"
+                                           value="@row["EndSpec"]" />
                                 </td>
 
                                 <td>@row["Frequency"]</td>
@@ -472,15 +482,28 @@
                                            value="@row["SectionId"]" />
                                 </td>
 
-                                <td><input type="text" class="Value1" /></td>
-                                <td><input type="text" class="Value2" /></td>
-                                <td><input type="text" class="Value3" /></td>
-                                <td><input type="text" class="Value4" /></td>
-                                <td><input type="text" class="Value5" /></td>
+                                <td>
+                                    <input type="text" class="Value1" />
+                                </td>
 
                                 <td>
-                                    <input type="text"
-                                           class="CableSerialNo" />
+                                    <input type="text" class="Value2" />
+                                </td>
+
+                                <td>
+                                    <input type="text" class="Value3" />
+                                </td>
+
+                                <td>
+                                    <input type="text" class="Value4" />
+                                </td>
+
+                                <td>
+                                    <input type="text" class="Value5" />
+                                </td>
+
+                                <td>
+                                    <input type="text" class="CableSerialNo" />
                                 </td>
 
                                 <td>
@@ -491,6 +514,7 @@
                                 </td>
 
                             </tr>
+
                         }
                     }
                     else
@@ -582,325 +606,85 @@
     
     <script>
 
-                function getSpecificationRange(specification) {
-
-            if (!specification) {
-                return null;
-            }
-
-            specification = $.trim(specification)
-                .replace(/,/g, "")
-                .replace(/\s+/g, " ");
-
-            // ==========================
-            // 1. PLUS / MINUS
-            // Example:
-            // 10 ± 2
-            // 10+/-2
-            // ==========================
-
-            var plusMinusMatch = specification.match(
-                /(-?\d+(?:\.\d+)?)\s*(?:±|\+\/-)\s*(\d+(?:\.\d+)?)/
-            );
-
-            if (plusMinusMatch) {
-
-                var target = parseFloat(plusMinusMatch[1]);
-                var tolerance = parseFloat(plusMinusMatch[2]);
-
-                return {
-                    min: target - tolerance,
-                    max: target + tolerance
-                };
-            }
-
-
-            // ==========================
-            // 2. BETWEEN RANGE
-            // Examples:
-            // 10 - 20
-            // 10~20
-            // 10 to 20
-            // ==========================
-
-            var rangeMatch = specification.match(
-                /(-?\d+(?:\.\d+)?)\s*(?:-|~|to)\s*(-?\d+(?:\.\d+)?)/
-            );
-
-            if (rangeMatch) {
-
-                var minValue = parseFloat(rangeMatch[1]);
-                var maxValue = parseFloat(rangeMatch[2]);
-
-                return {
-                    min: Math.min(minValue, maxValue),
-                    max: Math.max(minValue, maxValue)
-                };
-            }
-
-
-            // ==========================
-            // 3. GREATER THAN OR EQUAL
-            // Examples:
-            // ≥ 10
-            // >= 10
-            // ==========================
-
-            var greaterEqualMatch = specification.match(
-                /(?:≥|>=)\s*(-?\d+(?:\.\d+)?)/
-            );
-
-            if (greaterEqualMatch) {
-
-                return {
-                    min: parseFloat(greaterEqualMatch[1]),
-                    max: Infinity
-                };
-            }
-
-
-            // ==========================
-            // 4. GREATER THAN
-            // Example:
-            // > 10
-            // ==========================
-
-            var greaterMatch = specification.match(
-                />\s*(-?\d+(?:\.\d+)?)/
-            );
-
-            if (greaterMatch) {
-
-                return {
-                    min: parseFloat(greaterMatch[1]),
-                    max: Infinity,
-                    exclusiveMin: true
-                };
-            }
-
-
-            // ==========================
-            // 5. LESS THAN OR EQUAL
-            // Examples:
-            // ≤ 10
-            // <= 10
-            // ==========================
-
-            var lessEqualMatch = specification.match(
-                /(?:≤|<=)\s*(-?\d+(?:\.\d+)?)/
-            );
-
-            if (lessEqualMatch) {
-
-                return {
-                    min: -Infinity,
-                    max: parseFloat(lessEqualMatch[1])
-                };
-            }
-
-
-            // ==========================
-            // 6. LESS THAN
-            // Example:
-            // < 10
-            // ==========================
-
-            var lessMatch = specification.match(
-                /<\s*(-?\d+(?:\.\d+)?)/
-            );
-
-            if (lessMatch) {
-
-                return {
-                    min: -Infinity,
-                    max: parseFloat(lessMatch[1]),
-                    exclusiveMax: true
-                };
-            }
-
-
-            // ==========================
-            // 7. EXACT NUMERIC VALUE
-            // Example:
-            // 10
-            // ==========================
-
-            var exactMatch = specification.match(
-                /^(-?\d+(?:\.\d+)?)$/
-            );
-
-            if (exactMatch) {
-
-                var exactValue = parseFloat(exactMatch[1]);
-
-                return {
-                    min: exactValue,
-                    max: exactValue,
-                    exact: true
-                };
-            }
-
-
-            return null;
-        }
-
-        function validateSingleValue(value, specification) {
+                function validateSingleValue(value, startSpec, endSpec) {
 
             value = $.trim(value);
+            startSpec = $.trim(startSpec);
+            endSpec = $.trim(endSpec);
 
-            // Empty values are allowed
+            // Empty value is allowed
             if (value === "") {
-
                 return {
                     valid: true,
                     message: ""
                 };
             }
 
-
-            // NG is always invalid
+            // NG is not allowed
             if (value.toUpperCase() === "NG") {
-
                 return {
                     valid: false,
-                    message: "NG value is not allowed"
+                    message: "NG value is not allowed."
                 };
             }
 
-
-            // Convert input to number
+            // Value must be numeric
             var numericValue = Number(value);
 
-
-            if (isNaN(numericValue)) {
-
+            if (!Number.isFinite(numericValue)) {
                 return {
                     valid: false,
-                    message: "Please enter a valid numeric value"
+                    message: "Please enter a valid numeric value."
                 };
             }
 
+            // StartSpec validation
+            var minValue = Number(startSpec);
 
-            // Get range from Inspection Specifications
-            var range = getSpecificationRange(specification);
+            if (!Number.isFinite(minValue)) {
+                return {
+                    valid: false,
+                    message: "Invalid StartSpec: " + startSpec
+                };
+            }
 
+            // EndSpec validation
+            var maxValue = Number(endSpec);
 
-            // IMPORTANT:
-            // If specification cannot be understood,
-            // do not automatically allow the value.
-            if (!range) {
+            if (!Number.isFinite(maxValue)) {
+                return {
+                    valid: false,
+                    message: "Invalid EndSpec: " + endSpec
+                };
+            }
+
+            // Invalid DB range
+            if (minValue > maxValue) {
+                return {
+                    valid: false,
+                    message:
+                        "Invalid specification range. StartSpec (" +
+                        minValue +
+                        ") cannot be greater than EndSpec (" +
+                        maxValue +
+                        ")."
+                };
+            }
+
+            // Actual range validation
+            if (numericValue < minValue || numericValue > maxValue) {
 
                 return {
                     valid: false,
                     message:
-                        "Unable to validate this Inspection Specification: " +
-                        specification
-                };
-            }
-
-
-            // ==========================
-            // EXACT VALUE
-            // ==========================
-
-            if (range.exact === true) {
-
-                if (numericValue !== range.min) {
-
-                    return {
-                        valid: false,
-                        message:
-                            "Value must be exactly " +
-                            range.min
-                    };
-                }
-
-                return {
-                    valid: true,
-                    message: ""
-                };
-            }
-
-
-            // ==========================
-            // GREATER THAN (>)
-            // ==========================
-
-            if (range.exclusiveMin === true) {
-
-                if (numericValue <= range.min) {
-
-                    return {
-                        valid: false,
-                        message:
-                            "Value must be greater than " +
-                            range.min
-                    };
-                }
-            }
-
-
-            // ==========================
-            // LESS THAN (<)
-            // ==========================
-
-            if (range.exclusiveMax === true) {
-
-                if (numericValue >= range.max) {
-
-                    return {
-                        valid: false,
-                        message:
-                            "Value must be less than " +
-                            range.max
-                    };
-                }
-            }
-
-
-            // ==========================
-            // NORMAL RANGE VALIDATION
-            // ==========================
-
-            if (
-                numericValue < range.min ||
-                numericValue > range.max
-            ) {
-
-                var message = "";
-
-
-                if (
-                    range.min !== -Infinity &&
-                    range.max !== Infinity
-                ) {
-
-                    message =
                         "Value must be between " +
-                        range.min +
+                        minValue +
                         " and " +
-                        range.max;
-                }
-                else if (range.min !== -Infinity) {
-
-                    message =
-                        "Value must be greater than or equal to " +
-                        range.min;
-                }
-                else if (range.max !== Infinity) {
-
-                    message =
-                        "Value must be less than or equal to " +
-                        range.max;
-                }
-
-
-                return {
-                    valid: false,
-                    message: message
+                        maxValue +
+                        ". Entered value: " +
+                        numericValue
                 };
             }
-
 
             return {
                 valid: true,
@@ -908,82 +692,83 @@
             };
         }
 
-        function validateRow(row) {
+                function validateRow(row) {
 
-            var specification = $.trim(
-                row.find(".InspectionSpecifications").val()
+            var startSpec = $.trim(
+                row.find(".StartSpec").val()
             );
 
+            var endSpec = $.trim(
+                row.find(".EndSpec").val()
+            );
 
             var values = [
-
                 {
                     name: "Value1",
                     input: row.find(".Value1")
                 },
-
                 {
                     name: "Value2",
                     input: row.find(".Value2")
                 },
-
                 {
                     name: "Value3",
                     input: row.find(".Value3")
                 },
-
                 {
                     name: "Value4",
                     input: row.find(".Value4")
                 },
-
                 {
                     name: "Value5",
                     input: row.find(".Value5")
                 }
-
             ];
-
 
             var invalidValues = [];
 
+            // Remove previous validation styling
             row.removeClass("ng-row");
 
             row.find(
                 ".Value1, .Value2, .Value3, .Value4, .Value5"
             ).removeClass("ng-input");
 
-
+            // Validate every entered value
             values.forEach(function (item) {
 
-                var inputValue = $.trim(item.input.val());
+                var inputValue = $.trim(
+                    item.input.val()
+                );
 
-                if (inputValue !== "") {
+                // Empty values are allowed
+                if (inputValue === "") {
+                    return;
+                }
 
-                    var result = validateSingleValue(
-                        inputValue,
-                        specification
+                var result = validateSingleValue(
+                    inputValue,
+                    startSpec,
+                    endSpec
+                );
+
+                if (!result.valid) {
+
+                    invalidValues.push(
+                        item.name +
+                        " = " +
+                        inputValue +
+                        " (" +
+                        result.message +
+                        ")"
                     );
 
-
-                    if (!result.valid) {
-
-                        invalidValues.push(
-                            item.name +
-                            " = " +
-                            inputValue +
-                            " (" +
-                            result.message +
-                            ")"
-                        );
-
-                        item.input.addClass("ng-input");
-                    }
+                    item.input.addClass("ng-input");
                 }
 
             });
 
-
+            // Any invalid value found
             if (invalidValues.length > 0) {
 
                 row.addClass("ng-row");
@@ -994,13 +779,11 @@
                 };
             }
 
-
             return {
                 valid: true,
                 message: ""
             };
         }
-
 
         $(document).on(
             "input change",
@@ -1014,69 +797,102 @@
         );
 
 
-        $(document).on("click", ".btnRowSave", function () {
+                $(document).on("click", ".btnRowSave", function () {
 
-            let clickedRow = $(this).closest("tr.row");
+            var row = $(this).closest("tr.row");
 
-            let rowsToSave = [];
+            var sectionId = row.find(".SectionId").val();
 
-            let validationErrors = [];
+            var value1 = $.trim(row.find(".Value1").val());
+            var value2 = $.trim(row.find(".Value2").val());
+            var value3 = $.trim(row.find(".Value3").val());
+            var value4 = $.trim(row.find(".Value4").val());
+            var value5 = $.trim(row.find(".Value5").val());
 
+            var cableSerialNo = $.trim(
+                row.find(".CableSerialNo").val()
+            );
 
-            $("#body tr.row").each(function () {
+            var hasValue =
+                value1 !== "" ||
+                value2 !== "" ||
+                value3 !== "" ||
+                value4 !== "" ||
+                value5 !== "" ||
+                cableSerialNo !== "";
 
-                let row = $(this);
+            // Check whether user entered anything
+            if (!hasValue) {
 
-                let sectionId = row.find(".SectionId").val();
+                alert(
+                    "Please enter at least one value before saving."
+                );
 
-                let value1 = $.trim(row.find(".Value1").val());
-                let value2 = $.trim(row.find(".Value2").val());
-                let value3 = $.trim(row.find(".Value3").val());
-                let value4 = $.trim(row.find(".Value4").val());
-                let value5 = $.trim(row.find(".Value5").val());
+                return;
+            }
 
-                let cableSerialNo =
-                    $.trim(row.find(".CableSerialNo").val());
+            // Validate row
+            var validationResult = validateRow(row);
 
+            if (!validationResult.valid) {
 
-                let hasValue =
-                    value1 !== "" ||
-                    value2 !== "" ||
-                    value3 !== "" ||
-                    value4 !== "" ||
-                    value5 !== "" ||
-                    cableSerialNo !== "";
+                var sectionName =
+                    row.find("td:eq(4)")
+                        .clone()
+                        .children()
+                        .remove()
+                        .end()
+                        .text()
+                        .trim();
 
-                if (hasValue) {
+                alert(
+                    "❌ NG / Invalid value found.\n\n" +
+                    "Section: " +
+                    sectionName +
+                    "\n" +
+                    validationResult.message
+                );
 
-                    let validationResult = validateRow(row);
+                return;
+            }
 
-                    if (!validationResult.valid) {
+            if (!sectionId) {
 
-                        let sectionName = row.find("td:eq(4)")
-                            .clone()
-                            .children()
-                            .remove()
-                            .end()
-                            .text()
-                            .trim();
+                alert("SectionId is missing.");
 
+                return;
+            }
 
-                        validationErrors.push(
-                            "Section: " +
-                            sectionName +
-                            "\n" +
-                            validationResult.message
-                        );
-                    }
-                }
+            var data = {
 
+                LineId:
+                    parseInt($("#LineId").val()) || 0,
 
-                if (sectionId && hasValue) {
+                ProjectId:
+                    parseInt($("#ProjectId").val()) || 0,
 
-                    rowsToSave.push({
+                ModelId:
+                    parseInt($("#ModelId").val()) || 0,
 
-                        SectionId: parseInt(sectionId) || 0,
+                PartId:
+                    parseInt($("#PartId").val()) || 0,
+
+                MachineId:
+                    parseInt($("#MachineId").val()) || 0,
+
+                ProdLineLeader:
+                    $("#ProdLineLeader").val(),
+
+                CheckedBy:
+                    $("#CheckedBy").val(),
+
+                ApprovedBy:
+                    $("#ApprovedBy").val(),
+
+                WireCombMoldingResults: [
+                    {
+                        SectionId:
+                            parseInt(sectionId) || 0,
 
                         Value1:
                             value1 === ""
@@ -1106,102 +922,15 @@
                         CablesSerialNumber:
                             cableSerialNo === ""
                                 ? null
-                                : cableSerialNo,
-
-                        _htmlRow: row
-                    });
-                }
-
-                if (row[0] === clickedRow[0]) {
-
-                    return false;
-                }
-
-            });
-
-
-            if (validationErrors.length > 0) {
-
-                alert(
-                    "❌ NG / Invalid values found.\n\n" +
-                    validationErrors.join("\n\n")
-                );
-
-                return;
-            }
-
-
-
-            if (rowsToSave.length === 0) {
-
-                alert(
-                    "Please enter at least one value before saving."
-                );
-
-                return;
-            }
-
-
-
-            let resultList = rowsToSave.map(function (x) {
-
-                return {
-
-                    SectionId: x.SectionId,
-
-                    Value1: x.Value1,
-
-                    Value2: x.Value2,
-
-                    Value3: x.Value3,
-
-                    Value4: x.Value4,
-
-                    Value5: x.Value5,
-
-                    CablesSerialNumber:
-                        x.CablesSerialNumber
-                };
-
-            });
-
-
-
-            let data = {
-
-                LineId:
-                    parseInt($("#LineId").val()) || 0,
-
-                ProjectId:
-                    parseInt($("#ProjectId").val()) || 0,
-
-                ModelId:
-                    parseInt($("#ModelId").val()) || 0,
-
-                PartId:
-                    parseInt($("#PartId").val()) || 0,
-
-                MachineId:
-                    parseInt($("#MachineId").val()) || 0,
-
-                ProdLineLeader:
-                    $("#ProdLineLeader").val(),
-
-                CheckedBy:
-                    $("#CheckedBy").val(),
-
-                ApprovedBy:
-                    $("#ApprovedBy").val(),
-
-                WireCombMoldingResults:
-                    resultList
+                                : cableSerialNo
+                    }
+                ]
             };
-
-
 
             $.ajax({
 
-                url: '/WireCombMolding/SaveA246FWCMMCCheckList',
+                url:
+                    '/WireCombMolding/SaveA246FWCMMCCheckList',
 
                 type: 'POST',
 
@@ -1210,7 +939,6 @@
 
                 data:
                     JSON.stringify(data),
-
 
                 success: function (response) {
 
@@ -1227,17 +955,14 @@
                         return;
                     }
 
+                    alert(
+                        "Data Saved Successfully"
+                    );
 
-                    alert("Data Saved Successfully");
+                    // Remove only the row that was saved
+                    row.remove();
 
-
-                    rowsToSave.forEach(function (x) {
-
-                        x._htmlRow.remove();
-
-                    });
-
-
+                    // Show empty message if no rows remain
                     if (
                         $("#body tr.row").length === 0
                     ) {
@@ -1254,13 +979,13 @@
 
                 },
 
+                error: function (xhr) {
 
-                error: function () {
+                    console.error(xhr);
 
                     alert(
                         "Server Error while saving."
                     );
-
                 }
 
             });

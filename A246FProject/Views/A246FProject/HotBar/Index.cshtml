@@ -650,6 +650,33 @@
             );
         }
 
+                // Rows where Value1 is mandatory and Value2-5 / Cable Serial No are optional
+        function isValue1Required(row) {
+            let project = $.trim(row.find("td:nth-child(2)").text()).toLowerCase();
+
+            return project.startsWith("uv light intensity") ||
+                   project.startsWith("tin inspection pen");
+        }
+
+        // force = true  -> Value1 must be filled (used for the row whose Save was clicked)
+        // force = false -> Value1 is required only if something else in the row is filled
+        function validateValue1Required(row, force) {
+
+            if (!isValue1Required(row)) return true;
+
+            let value1 = $.trim(row.find(".Value1").val());
+            if (value1 !== "") return true;
+
+            let otherFilled =
+                $.trim(row.find(".Value2").val()) !== "" ||
+                $.trim(row.find(".Value3").val()) !== "" ||
+                $.trim(row.find(".Value4").val()) !== "" ||
+                $.trim(row.find(".Value5").val()) !== "" ||
+                $.trim(row.find(".CableSerialNo").val()) !== "";
+
+            return !(force || otherFilled);
+        }
+
         function validateRow(row) {
 
             let startSpec = getStartSpec(row);
@@ -782,6 +809,7 @@
 
 
             let rowsToSave = [];
+                let hasError = false;
 
             $("#body tr.row").each(function () {
 
@@ -917,6 +945,10 @@
                 }
 
             });
+
+                    if (hasError) {
+            return;   // stop here, don't call AJAX with partial data
+        }
 
             if (rowsToSave.length === 0) {
 
@@ -1070,6 +1102,22 @@
 
                 let row = $(this);
 
+                        if (!validateValue1Required(row, false)) {
+            hasInvalidValue = true;
+            highlightInput(row.find(".Value1"));
+            row.css("background", "rgba(220,53,69,0.20)");
+            return false;
+        }
+
+                        let isClickedRow = (row[0] === clickedRow[0]);
+
+        if (!validateValue1Required(row, isClickedRow)) {
+            hasError = true;
+            highlightInput(row.find(".Value1"));
+            row.css("background", "rgba(220,53,69,0.20)");
+            alert("Value1 is required for this record.");
+            return false;
+        }
                 if (!validateRow(row)) {
 
                     hasInvalidValue = true;

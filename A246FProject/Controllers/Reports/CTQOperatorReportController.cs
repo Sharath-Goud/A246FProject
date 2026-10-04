@@ -58,7 +58,9 @@ namespace A246FProject.Controllers.Reports
 
             if (command == "Search")
             {
-                var date = model.FromDate?.ToString("MM/dd/yyyy");
+                var date = model.FromDate?.ToString(
+    "dd/MM/yyyy",
+    System.Globalization.CultureInfo.InvariantCulture);
 
                 model.dtReports = _bal.GetCTQOperatorReport(
                     date,

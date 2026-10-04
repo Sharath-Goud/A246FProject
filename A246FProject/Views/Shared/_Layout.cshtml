@@ -108,16 +108,21 @@
             color: rgba(255,255,255,.55);
             cursor: pointer;
             border-radius: 8px;
-            transition: .2s;
+            transition: all .2s ease;
+            margin: 2px 6px;
         }
 
             .dd-item:hover {
-                background: rgba(167,139,250,.1);
-                color: #d8b4fe;
+                background: rgba(167,139,250,.18);
+                color: #ffffff;
             }
 
             .dd-item.selected {
-                color: #d8b4fe;
+                background: linear-gradient( 90deg, rgba(124,58,237,.45), rgba(99,179,237,.18) );
+                color: #ffffff;
+                font-weight: 500;
+                box-shadow: 0 0 12px rgba(124,58,237,.25);
+                border-left: 3px solid #d8b4fe;
             }
 
         .header {
@@ -358,61 +363,110 @@
 
                 <div class="dropdown" id="menu">
 
-                    <div class="dd-item" onclick="go('/CTPParameter/Index')">
+                    <div class="dd-item"
+                         data-url="/CTPParameter/Index"
+                         onclick="go('/CTPParameter/Index')">
                         A246F CTP Parameters
                     </div>
-                    <div class="dd-item" onclick="go('/GlueWeighing/Index')">
+                    <div class="dd-item"
+                         data-url="/GlueWeighing/Index"
+                         onclick="go('/GlueWeighing/Index')">
                         Glue Weighing
                     </div>
-                    <div class="dd-item" onclick="go('/SOPPOR/Index')">
+
+                    <div class="dd-item"
+                         data-url="/SOPPOR/Index"
+                         onclick="go('/SOPPOR/Index')">
                         SOP/POR
                     </div>
-                    <div class="dd-item" onclick="go('/FirstArticleInspection/Index')">
+
+                    <div class="dd-item"
+                         data-url="/FirstArticleInspection/Index"
+                         onclick="go('/FirstArticleInspection/Index')">
                         First Article Inspection
                     </div>
-                    <div class="dd-item" onclick="go('/FirstArticleDimension/Index')">
+
+                    <div class="dd-item"
+                         data-url="/FirstArticleDimension/Index"
+                         onclick="go('/FirstArticleDimension/Index')">
                         First Article Dimension
-                        </div>
-                    <div class="dd-item" onclick="go('/VisualInspection/Index')">
+                    </div>
+
+                    <div class="dd-item"
+                         data-url="/VisualInspection/Index"
+                         onclick="go('/VisualInspection/Index')">
                         Visual Inspection
                     </div>
-                    <div class="dd-item" onclick="go('/CCMCHI4SC/Index')">
+
+                    <div class="dd-item"
+                         data-url="/CCMCHI4SC/Index"
+                         onclick="go('/CCMCHI4SC/Index')">
                         CCM &amp; CHI &amp; 4SC
                     </div>
-                    <div class="dd-item" onclick="go('/WireCombMolding/Index')">
+
+                    <div class="dd-item"
+                         data-url="/WireCombMolding/Index"
+                         onclick="go('/WireCombMolding/Index')">
                         Wire Comb Molding
                     </div>
-                    <div class="dd-item" onclick="go('/HotBar/Index')">
+
+                    <div class="dd-item"
+                         data-url="/HotBar/Index"
+                         onclick="go('/HotBar/Index')">
                         Hot Bar
                     </div>
-                    <div class="dd-item" onclick="go('/Destructive/Index')">
+
+                    <div class="dd-item"
+                         data-url="/Destructive/Index"
+                         onclick="go('/Destructive/Index')">
                         Destructive
                     </div>
-                    <div class="dd-item" onclick="go('/ShellCrimp/Index')">
+
+                    <div class="dd-item"
+                         data-url="/ShellCrimp/Index"
+                         onclick="go('/ShellCrimp/Index')">
                         Shell Crimp
                     </div>
-                    @* <div class="dd-item" onclick="go('/InnerMold/Index')">
-                        Inner Mold
-                    </div> *@
-                    <div class="dd-item" onclick="go('/AOI/Index')">
+
+                    <div class="dd-item"
+                         data-url="/AOI/Index"
+                         onclick="go('/AOI/Index')">
                         AOI
                     </div>
-                    <div class="dd-item" onclick="go('/LaserEngraving/Index')">
+
+                    <div class="dd-item"
+                         data-url="/LaserEngraving/Index"
+                         onclick="go('/LaserEngraving/Index')">
                         Laser Engraving
                     </div>
-                    <div class="dd-item" onclick="go('/NewHanking/Index')">
+
+                    <div class="dd-item"
+                         data-url="/NewHanking/Index"
+                         onclick="go('/NewHanking/Index')">
                         New Hanking
                     </div>
-                    <div class="dd-item" onclick="go('/OQCInspection/Index')">
+
+                    <div class="dd-item"
+                         data-url="/OQCInspection/Index"
+                         onclick="go('/OQCInspection/Index')">
                         OQC Inspection
                     </div>
-                    <div class="dd-item" onclick="go('/NegativeValidation/Index')">
+
+                    <div class="dd-item"
+                         data-url="/NegativeValidation/Index"
+                         onclick="go('/NegativeValidation/Index')">
                         Negative Validation
                     </div>
-                    <div class="dd-item" onclick="go('/TrapTest/Index')">
+
+                    <div class="dd-item"
+                         data-url="/TrapTest/Index"
+                         onclick="go('/TrapTest/Index')">
                         Trap Test
                     </div>
-                    <div class="dd-item" onclick="go('/CTQOperator/Index')">
+
+                    <div class="dd-item"
+                         data-url="/CTQOperator/Index"
+                         onclick="go('/CTQOperator/Index')">
                         CTQ Operator
                     </div>
 
@@ -618,12 +672,12 @@
             window.location.href = url;
         }
 
-        document.querySelectorAll('.dd-item').forEach(x => {
-            x.addEventListener('click', function () {
-                document.querySelectorAll('.dd-item').forEach(i => i.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
+        // document.querySelectorAll('.dd-item').forEach(x => {
+        //     x.addEventListener('click', function () {
+        //         document.querySelectorAll('.dd-item').forEach(i => i.classList.remove('selected'));
+        //         this.classList.add('selected');
+        //     });
+        // });
 
 
         function toggleReports() {
@@ -659,20 +713,42 @@
             }
         }
 
-        window.onload = function () {
+                window.onload = function () {
 
-            let savedMenu = localStorage.getItem("activeMenu");
+            let currentPath = window.location.pathname;
 
-            if (savedMenu) {
-                let btn = document.querySelector(`[data-menu="${savedMenu}"]`);
-                let menu = document.getElementById(savedMenu);
+            document.querySelectorAll('.dd-item').forEach(item => {
 
-                if (btn && menu) {
-                    btn.classList.add("active");
-                    menu.classList.add("open");
+                let itemUrl = item.getAttribute("data-url");
+
+                if (itemUrl === currentPath) {
+
+                    // Highlight the selected checklist
+                    item.classList.add("selected");
+
+                    // Find its parent dropdown
+                    let dropdown = item.closest(".dropdown");
+
+                    if (dropdown) {
+
+                        // Open the dropdown
+                        dropdown.classList.add("open");
+
+                        // Find the corresponding menu button
+                        let menuId = dropdown.id;
+
+                        let button = document.querySelector(
+                            `[data-menu="${menuId}"]`
+                        );
+
+                        if (button) {
+                            button.classList.add("active");
+                        }
+                    }
                 }
-            }
-        }
+            });
+
+        };
     </script>
 
     <script>
