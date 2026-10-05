@@ -180,7 +180,14 @@
             color: #fff;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 600;
+            transition: .30s;
         }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 18px rgba(37,99,235,.35);
+            }
 
         /* TABLE */
         .results-table {
@@ -206,8 +213,32 @@
             font-size: 13px;
         }
 
+        /* EXPORT SECTION (replaces the old Submit button) */
         .actions {
-            margin-top: 16px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            float: right;
+        }
+
+        .export-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .actions label {
+            font-size: 13px;
+            color: rgba(255,255,255,.7);
+            font-weight: 500;
+        }
+
+        .actions select {
+            min-width: 160px;
+            height: 40px;
         }
 
         @@media (max-width: 900px) {
@@ -218,6 +249,16 @@
             .header-row {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 10px;
+            }
+
+            .actions,
+            .export-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-submit {
+                width: 100%;
             }
         }
     </style>
@@ -355,7 +396,7 @@
 
                 <tbody>
 
-                    @if (Model.dtReports.Rows.Count > 0)
+                    @if (Model.dtReports != null && Model.dtReports.Rows.Count > 0)
                     {
                         string currentGroup = "";
 
@@ -420,9 +461,9 @@
                                 </td>
 
                                 <td style="font-weight:bold;
-                        color:@(row["Result"].ToString()=="PASS"
-                                                        ? "green"
-                                                        : "red")">
+                                color:@(row["Result"].ToString()=="PASS"
+                                                                                            ? "green"
+                                                                                            : "red")">
 
                             @row["Result"]
 
@@ -430,6 +471,14 @@
 
                             </tr>
                                         }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="empty">
+                                No records found. Use search to load data.
+                            </td>
+                        </tr>
                     }
 
                 </tbody>
@@ -440,11 +489,26 @@
 
         <div class="actions">
 
-            <button type="button"
-                    class="btn-submit"
-                    onclick="Save()">
-                Submit
-            </button>
+            <!-- Export File: only shown when the report has data -->
+            @if (Model.dtReports != null && Model.dtReports.Rows.Count > 0)
+            {
+                <div class="export-box">
+
+                    <label>Export Format File :</label>
+
+                    <select asp-for="ExportType"
+                            asp-items="@(new SelectList(Model.ExportTypes))">
+                    </select>
+
+                    <button type="submit"
+                            name="command"
+                            value="Export"
+                            class="btn-submit">
+                        Export File
+                    </button>
+
+                </div>
+            }
 
         </div>
 

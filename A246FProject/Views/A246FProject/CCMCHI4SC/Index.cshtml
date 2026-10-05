@@ -715,6 +715,24 @@
 
             var invalidValues = [];
 
+
+        if (isValue1RequiredRow(row)) {
+
+            var requiredValue1 =
+                $.trim(row.find(".Value1").val());
+
+            if (requiredValue1 === "") {
+
+                row.addClass("ng-row");
+
+                row.find(".Value1").addClass("ng-input");
+
+                invalidValues.push(
+                    "Value1 is required for this record."
+                );
+            }
+        }
+
             // Remove previous validation styles
             row.removeClass("ng-row");
 
@@ -781,6 +799,17 @@
                 valid: true,
                 message: ""
             };
+        }
+
+                function isValue1RequiredRow(row) {
+
+            var inspectionProject =
+                $.trim(row.find(".inspection-project").text());
+
+            return (
+                inspectionProject === "Tin dipping temperature M01" ||
+                inspectionProject === "Tin dipping time M01"
+            );
         }
 
         function validateRowsBeforeSave(rows) {
@@ -875,32 +904,60 @@
                 var value4 = $.trim(row.find(".Value4").val());
                 var value5 = $.trim(row.find(".Value5").val());
 
-                // Check whether this row contains at least one entered value
-                var hasValue =
-                    value1 !== "" ||
-                    value2 !== "" ||
-                    value3 !== "" ||
-                    value4 !== "" ||
-                    value5 !== "";
+                        // ============================================================
+        // DETERMINE WHETHER THIS ROW CAN BE SAVED
+        // ============================================================
 
-                // Add only rows having entered values
-                if (sectionId && hasValue) {
+        var value1Required =
+            isValue1RequiredRow(row);
 
-                    rowsToSave.push({
+        var hasValue;
 
-                        SectionId: parseInt(sectionId) || 0,
+        if (value1Required) {
 
-                        Value1: value1 === "" ? null : value1,
-                        Value2: value2 === "" ? null : value2,
-                        Value3: value3 === "" ? null : value3,
-                        Value4: value4 === "" ? null : value4,
-                        Value5: value5 === "" ? null : value5,
+            // For Tin dipping records:
+            // ONLY Value1 determines whether the row is submitted.
 
-                        // Keep HTML row reference so that
-                        // only successfully saved rows are removed
-                        _htmlRow: row
-                    });
-                }
+            hasValue = value1 !== "";
+
+        }
+        else {
+
+            // For all other records:
+            // Keep the existing behavior.
+
+            hasValue =
+                value1 !== "" ||
+                value2 !== "" ||
+                value3 !== "" ||
+                value4 !== "" ||
+                value5 !== "";
+        }
+
+
+        // ============================================================
+        // ADD ROW
+        // ============================================================
+
+        if (sectionId && hasValue) {
+
+            rowsToSave.push({
+
+                SectionId: parseInt(sectionId) || 0,
+
+                Value1: value1 === "" ? null : value1,
+
+                Value2: value2 === "" ? null : value2,
+
+                Value3: value3 === "" ? null : value3,
+
+                Value4: value4 === "" ? null : value4,
+
+                Value5: value5 === "" ? null : value5,
+
+                _htmlRow: row
+            });
+        }
 
                 // Stop after reaching the clicked Save row
                 if (row[0] === clickedRow[0]) {
@@ -1044,27 +1101,43 @@
                 var value4 = $.trim(row.find(".Value4").val());
                 var value5 = $.trim(row.find(".Value5").val());
 
-                var hasValue =
-                    value1 !== "" ||
-                    value2 !== "" ||
-                    value3 !== "" ||
-                    value4 !== "" ||
-                    value5 !== "";
+        var value1Required =
+            isValue1RequiredRow(row);
 
-                // Save only rows containing at least one value
-                if (sectionId && hasValue) {
+        var hasValue;
 
-                    results.push({
+        if (value1Required) {
 
-                        SectionId: parseInt(sectionId) || 0,
+            hasValue = value1 !== "";
 
-                        Value1: value1 === "" ? null : value1,
-                        Value2: value2 === "" ? null : value2,
-                        Value3: value3 === "" ? null : value3,
-                        Value4: value4 === "" ? null : value4,
-                        Value5: value5 === "" ? null : value5
-                    });
-                }
+        }
+        else {
+
+            hasValue =
+                value1 !== "" ||
+                value2 !== "" ||
+                value3 !== "" ||
+                value4 !== "" ||
+                value5 !== "";
+        }
+
+        if (sectionId && hasValue) {
+
+            results.push({
+
+                SectionId: parseInt(sectionId) || 0,
+
+                Value1: value1 === "" ? null : value1,
+
+                Value2: value2 === "" ? null : value2,
+
+                Value3: value3 === "" ? null : value3,
+
+                Value4: value4 === "" ? null : value4,
+
+                Value5: value5 === "" ? null : value5
+            });
+        }
 
             });
 

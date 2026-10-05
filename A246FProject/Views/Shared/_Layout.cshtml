@@ -343,6 +343,14 @@
                 background: rgba(255,255,255,0.15);
                 border-radius: 10px;
             }
+
+        .dd-item.selected {
+            background: linear-gradient( 90deg, rgba(124,58,237,.45), rgba(99,179,237,.18) );
+            color: #ffffff;
+            font-weight: 500;
+            box-shadow: 0 0 12px rgba(124,58,237,.25);
+            border-left: 3px solid #d8b4fe;
+        }
     </style>
 </head>
 
@@ -477,81 +485,111 @@
                     <i class="fa-solid fa-chevron-down chevron"></i>
                 </button>
 
-                <div class="dropdown" id="reportsMenu">
+            <div class="dropdown" id="reportsMenu">
 
-                    <div class="dd-item" onclick="go('/A246FCTPParameterReport/Index')">
-                        CTP Parameter Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/SOPPORReport/Index')">
-                        SOP/POR Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/FirstArticleInspectionReport/Index')">
-                        First Article Inspection Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/FirstArticleDimensionReport/Index')">
-                        First Article Dimension Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/VisualInspectionReport/Index')">
-                        Visual Inspection Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/CCMCHI4SCReport/Index')">
-                        CCM CHI 4SC Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/WireCombMoldingReport/Index')">
-                        Wire Comb Molding Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/HotBarReport/Index')">
-                        Hot Bar Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/DestructiveReport/Index')">
-                        Destructive Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/ShellCrimpReport/Index')">
-                        Shell Crimp Report
-                    </div>
-
-                    @* <div class="dd-item" onclick="go('/InnerMoldReport/Index')">
-                        Inner Mold Report
-                    </div> *@
-
-                    <div class="dd-item" onclick="go('/AOIReport/Index')">
-                        AOI Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/LaserEngravingReport/Index')">
-                        Laser Engraving Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/NewHankingReport/Index')">
-                        New Hanking Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/OQCInspectionReport/Index')">
-                        OQC Inspection Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/NegativeValidationReport/Index')">
-                        Negative Validation Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/TrapTestReport/Index')">
-                        Trap Test Report
-                    </div>
-
-                    <div class="dd-item" onclick="go('/CTQOperatorReport/Index')">
-                        CTQ Operator Report
-                    </div>
-
+                <div class="dd-item"
+                     data-url="/A246FCTPParameterReport/Index"
+                     onclick="go('/A246FCTPParameterReport/Index')">
+                    CTP Parameter Report
                 </div>
+
+                <div class="dd-item"
+                     data-url="/SOPPORReport/Index"
+                     onclick="go('/SOPPORReport/Index')">
+                    SOP/POR Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/FirstArticleInspectionReport/Index"
+                     onclick="go('/FirstArticleInspectionReport/Index')">
+                    First Article Inspection Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/FirstArticleDimensionReport/Index"
+                     onclick="go('/FirstArticleDimensionReport/Index')">
+                    First Article Dimension Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/VisualInspectionReport/Index"
+                     onclick="go('/VisualInspectionReport/Index')">
+                    Visual Inspection Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/CCMCHI4SCReport/Index"
+                     onclick="go('/CCMCHI4SCReport/Index')">
+                    CCM CHI 4SC Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/WireCombMoldingReport/Index"
+                     onclick="go('/WireCombMoldingReport/Index')">
+                    Wire Comb Molding Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/HotBarReport/Index"
+                     onclick="go('/HotBarReport/Index')">
+                    Hot Bar Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/DestructiveReport/Index"
+                     onclick="go('/DestructiveReport/Index')">
+                    Destructive Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/ShellCrimpReport/Index"
+                     onclick="go('/ShellCrimpReport/Index')">
+                    Shell Crimp Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/AOIReport/Index"
+                     onclick="go('/AOIReport/Index')">
+                    AOI Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/LaserEngravingReport/Index"
+                     onclick="go('/LaserEngravingReport/Index')">
+                    Laser Engraving Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/NewHankingReport/Index"
+                     onclick="go('/NewHankingReport/Index')">
+                    New Hanking Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/OQCInspectionReport/Index"
+                     onclick="go('/OQCInspectionReport/Index')">
+                    OQC Inspection Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/NegativeValidationReport/Index"
+                     onclick="go('/NegativeValidationReport/Index')">
+                    Negative Validation Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/TrapTestReport/Index"
+                     onclick="go('/TrapTestReport/Index')">
+                    Trap Test Report
+                </div>
+
+                <div class="dd-item"
+                     data-url="/CTQOperatorReport/Index"
+                     onclick="go('/CTQOperatorReport/Index')">
+                    CTQ Operator Report
+                </div>
+
+            </div>
 
             <button class="nav-btn" data-menu="serinReportsMenu" onclick="setActiveMenu(this, 'serinReportsMenu')">
                     <i class="ti ti-report-analytics"></i>
